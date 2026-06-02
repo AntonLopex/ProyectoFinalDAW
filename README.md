@@ -1,260 +1,33 @@
-# Forum
+# Proxecto de fin de ciclo DAW
 
-## DIAGRAMA BASE DE DATOS
+O proxecto consiste no desenvolvemento dunha aplicación web de receitas pensada para que calquera persoa poida descubrir, publicar e compartir pratos dunha forma sinxela e organizada. A plataforma permite crear receitas, engadir imaxes, clasificalas por categorías, buscalas por texto e marcalas como favoritas. Tamén inclúe opcións de interacción entre usuarios, como comentar, dar “likes” e reportar contido inapropiado. Ademais, cada usuario pode personalizar o seu perfil con foto, descrición e ligazóns externas.
 
-```mermaid
-erDiagram
+A aplicación está deseñada con distintos niveis de acceso: visitantes anónimos, usuarios rexistrados e administradores. Isto permite ofrecer unha experiencia cómoda para quen só quere consultar receitas, ao tempo que se manteñen ferramentas de control e moderación para garantir unha comunidade ordenada e segura. O sistema incorpora tamén medidas como a validación de formularios, a protección fronte a accesos non autorizados e o control de “strikes” para actuar ante comportamentos incorrectos. En conxunto, trátase dunha plataforma útil, visual e pensada para facilitar o intercambio de receitas entre persoas con intereses comúns.
 
-  %% ─────────────────────────────
-  %% USUARIOS Y RELACIONES BASE
-  %% ─────────────────────────────
+## Instalación/Posta en marcha
 
-  USUARIOS {
-    int id PK
-    string nombre
-    string email
-    string password_hash
-    string rol "ENUM: Admin, cliente, control, comercial, proveedor, invitado"
-    string nombreEmpresa
-    string cifEmpresa
-    string codigo
-    string direccionEmpresa
-    ENUM tipo_vc " V, C "
-    int comercial_id FK
-    Datetime fecha_llegada
-    string qr_token "UNIQUE"
-    bool estado
-    datetime fecha_alta
-  }
+> _Tarefa_: **Indica os pasos a seguir para que poidamos probar a vosa aplicación nun contorno de desenvolvemento**.
+> Debes incluír carga de datos inicial automática para poder probar a app.
+> É necesario indicar as credenciais dos usuarios necesarios para probar a app.
+> No caso de usar unha API Rest debes poñer aquí un enlace ao documento "API reference" que creaches describindo a forma de interaccionar coa API.
 
-  USUARIOS ||--o{ USUARIOS : "comercial asignado"
-  USUARIOS ||--o{ CONTROL_ES : "registra"
-  USUARIOS ||--o{ PEDIDOS : "realiza"
-  USUARIOS ||--o{ PRODUCTOS : "provee"
-  USUARIOS ||--o{ ACOMPAÑANTE : "tiene"
-  USUARIOS ||--o{ PRESENTACION_USUARIO : hace
-  PRESENTACION ||--o{ PRESENTACION_USUARIO : incluye
-  USUARIOS ||--o{ SOLICITUD : "realiza"
-  USUARIOS ||--o{ PRESENTACION : "se apunta a"
+## Uso
 
-  %% ─────────────────────────────
-  %% ACCESOS / CONTROL
-  %% ─────────────────────────────
+> _Tarefa_: **Indica a URL para poder acceder á túa aplicación web e os usuarios para poder probala na avaliación **.
 
-  CONTROL_ES {
-    int id PK
-    int usuario_id FK
-    datetime hora_entrada
-    datetime hora_salida
-    string observaciones
-    string tipoAcceso "ENUM:QR o Manual"
-  }
+## Sobre a persoa autora
 
-  %% ─────────────────────────────
-  %% PEDIDOS / PRODUCTOS
-  %% ─────────────────────────────
+Son unha persoa con perfil técnico orientado ao desenvolvemento web full-stack, con experiencia en frontend, backend, integración de APIs e traballo con bases de datos. Destaco especialmente no desenvolvemento "backend", sempre prestando atención á estrutura do código, á funcionalidade e á optimización do mesmo. Escollín este proxecto porque me permitía unir funcionalidades reais e útiles nunha aplicación completa, traballando tanto a parte visual como a lóxica de negocio e a administración de contido. A forma máis fiable de contacto é o meu correo electrónico profesional: antonlopez2004@gmail.com.
 
-  PEDIDOS {
-    int id PK
-    int cliente_id FK
-    datetime fecha_pedido
-    string estado
-    decimal total "Calc: suma de los subtotales"
-    string observaciones
-    datetime fecha_actualizacion
-  }
+## Licencia
 
-  DETALLE_PEDIDO {
-    int id PK
-    int pedido_id FK
-    int producto_id FK
-    int cantidad
-    decimal precio_unitario
-    decimal subtotal "Calc: cantidad × precio_unitario "
-  }
+[LICENSE](license)
 
-  PRODUCTOS {
-    int id PK
-    string nombre
-    string descripcion
-    decimal precio
-    string imagen_url
-    string qr_token "UNIQUE"
-    int proveedor_id FK
-  }
+## Memoria
 
-  PEDIDOS ||--o{ DETALLE_PEDIDO : "contiene"
-  PRODUCTOS ||--o{ DETALLE_PEDIDO : "incluye"
-
-  %% ─────────────────────────────
-  %% SOLICITUDES / STANDS / MOBILIARIO
-  %% ─────────────────────────────
-
-  SOLICITUD {
-    int id PK
-    int usuario_id FK
-    string observaciones
-    datetime fecha_solicitud
-    string estado
-  }
-
-  DETALLE_SOLICITUD_MOBILIARIO {
-    int id PK
-    int solicitud_id FK
-    int mobiliario_id FK
-    int cantidad
-    decimal precio_total
-  }
-
-  DETALLE_SOLICITUD_STAND {
-    int id PK
-    int solicitud_id FK
-    int stand_id FK
-    int cantidad
-    decimal precio_total
-  }
-
-  STAND {
-    int id PK
-    int solicitud_id FK
-    int numeroStand
-    decimal precio
-    decimal dimensiones
-    Enum estado "ENUM: Disponible, Pre-Reservado, Ocupado"
-  }
-
-  MOBILIARIO {
-    int id PK
-    int solicitud_id FK
-    string referencia
-    string descripcion
-    int stock
-    decimal precio
-  }
-
-  SOLICITUD ||--o{ DETALLE_SOLICITUD_MOBILIARIO : "tiene"
-  SOLICITUD ||--o{ DETALLE_SOLICITUD_STAND : "tiene"
-  STAND ||--o{ DETALLE_SOLICITUD_STAND : "se solicita"
-  MOBILIARIO ||--o{ DETALLE_SOLICITUD_MOBILIARIO : "se solicita"
-
-  SOLICITUD ||--o{ MOBILIARIO : "se solicita "
-  SOLICITUD ||--o{ STAND : "se solicita"
-
-  %% ─────────────────────────────
-  %% ACOMPAÑANTES / CONFIG / PRESENTACIÓN
-  %% ─────────────────────────────
-
-  ACOMPAÑANTE {
-    int id PK
-    int usuario_id FK
-    string nombre
-    string apellido
-    string qr_token "UNIQUE"
-  }
-
-  CONFIG {
-    string tipo
-    int valor
-    string valorStr
-    DateTime fecha_forum
-  }
-
-  PRESENTACION {
-    int id PK
-    int usuario_id FK
-    Datetime fecha_hora
-    string tema
-    string descripcion
-    int aforo
-  }
-
-  PRESENTACION_USUARIO{
-    int id PK
-    int presentacion_id FK
-    int usuario_id FK
-  }
-
-  EXTRA{
-    int id PK
-    int solicitud_id FK
-    string descripcion
-    int cantidad
-    Decimal precio
-  }
-
-  HISTORIAL_STANDS {
-    int id PK
-    int stand_id FK
-    int solicitud_origen_id FK
-    int solicitud_destino_id FK
-    int usuario_origen_id FK
-    int usuario_destino_id FK
-    string estado_anterior
-    string estado_nuevo
-    string accion
-    text observacion
-    datetime fecha
-  }
-
-
-  INCIDENCIAS {
-    int id PK
-    string titulo
-    text descripcion
-    int usuario_id FK
-    datetime fecha_creacion
-    string estado
-  }
-
-      %% Relaciones Incidencias
-    USUARIOS ||--o{ INCIDENCIAS : "crea"
-
-    %% Relaciones HistorialStands
-    STAND ||--o{ HISTORIAL_STANDS : "afecta"
-    SOLICITUD ||--o{ HISTORIAL_STANDS : "origen"
-    SOLICITUD ||--o{ HISTORIAL_STANDS : "destino"
-    USUARIOS ||--o{ HISTORIAL_STANDS : "origen"
-    USUARIOS ||--o{ HISTORIAL_STANDS : "destino"
-
-    %% Relaciones Extras
-    SOLICITUD ||--o{ EXTRA : "contiene"
-```
-
-## JUSTIFICACIÓN TABLAS
-
-- **Usuario**: Almacena a todas las personas que interactúan con la aplicación, independientemente del rol. Rol controla el acceso a cada sección, comercial_id auto-referencia a la misma tabla, un usuario con rol comercial se asigna a un usuario con rol cliente. Evitamos tabla intermedia innecesaria.
-
-- **Control_es**: Registra los accesos mediante QR. El diseño de una única fila por visita (hora_entrada y hora_salida) mejor que dos filas separadas para entrada y salida. (Facilita calculo duración visita, permite detectar el doble escaneo). Almacenamos el tipo de acceso para diferenciarlo de un acceso manual o por escaneo de QR.
-
-- **Presentacion**: Registra las "charlas" que se harán el dia del evento.
-
-- **Presentacion_usuario**: Almacena el historial de personas que se "anotan" a la presentación.
-
-- **Proveedores**: Tabla independiente para los proveedores del catálogo de productos. Permite filtrar el catálogo por proveedor de forma eficiente.
-
-- **Productos** : El catálogo. Referencia a proveedores mediante proveedor_id.
-
-- **Pedidos**: Cabecera del pedido. Contiene el total calculadoo, el estado (pendiente -> confirmado -> cancelado ) y la referencia al usuario que lo hizo.
-
-- **Detalle_pedido**: Líneas del pedido. Guarda precio_unitario. Si el precio de un producto cambia mañana, los pedidos de ayer deben mantener el precio original.
-
-- **Mobiliario**: Almacena el mobiliario existente.
-
-- **Stand**: Almacena los stands existentes.
-
-- **Detalle_solicitud_stand**: Almacena solicitudes de stands.
-
-- **Detalle_solicitud_mobiliario**: Almacena solicitudes de mobiliario.
-
-- **Solicitud**: Almacena las solicitudes de mobiliario y stands.
-
-- **Acompañante**: Esta tabla es creada para registar las personas que vayan acompañando a los clientes. Se relaciona con usuarios ya que varios de sus tipos pueden llevar acompañantes. Estes no tienen rol en la aplicación, si tendrán un codigo qr para el acceso al recinto.
-
-- **Config**: Esta tabla será usada simplemente para conteo.
-
-- **Incidencias**: Tabla destinada a registrar problemas, errores o solicitudes de soporte dentro del sistema. Incluye usuario creador, estado de la incidencia y fecha de creación, permitiendo su seguimiento y resolución.
-
-- **Historial_Stands**:Registra el historial de movimientos y cambios de estado de los stands. Incluye origen, destino, usuarios implicados y estados anteriores y nuevos.  
-  Permite trazabilidad completa de asignaciones, cambios y transferencias de stands.
-
-- **Extra**: Permite añadir elementos adicionales a una solicitud, con descripción, cantidad y precio. Se utiliza para servicios o productos no contemplados en tablas principales.
+1. [Estudo preliminar](doc/templates/1_estudo_preliminar.md)
+2. [Análise](doc/templates/2_analise.md)
+3. [Deseño](doc/templates/3_deseno.md)
+4. [Planificación e Orzamento](doc/templates/a3_orzamento.md)
+5. [Codificación e Probas](doc/templates/4_codificacion_probas.md)
+6. [Futuro e comercialización](doc/templates/5_manuais.md)

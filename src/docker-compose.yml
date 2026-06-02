@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  # Backend Django
+  web:
+    build:
+      context: ./backend
+    # Esperamos a que la DB esté sana, luego migramos y arrancamos
+    command: >
+      sh -c "echo 'Esperando a que la DB esté lista...' && 
+             python manage.py migrate && 
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./backend/app:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy  # <--- No arranca hasta que el healthcheck de abajo sea OK
+    environment:
+      - DEBUG=1
+      - DB_NAME=olea_db
+      - DB_USER=olea_user
+      - DB_PASSWORD=olea_pass
+      - DB_HOST=db
+      - DB_PORT=3306
+
+  # Base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_olea
+    restart: unless-stopped
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: olea_db
+      MYSQL_USER: olea_user
+      MYSQL_PASSWORD: olea_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - "3306:3306"
+    # Esta sección comprueba si MySQL responde 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=root_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Frontend Vue + Bootstrap
+  frontend:
+    image: node:20
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api  # URL del backend para las llamadas API
+      - CHOKIDAR_USEPOLLING=true  # Esto es útil para que Vite detecte cambios.
+    command: sh -c "npm install && npm run dev"

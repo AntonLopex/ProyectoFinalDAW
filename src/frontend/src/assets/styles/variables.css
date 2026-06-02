@@ -1,0 +1,23 @@
+:root {
+
+  --fondo-crema: #fefae0;
+  --fondo-bloque: #f8f9fa;
+
+  --color-olea: #606c38;
+  --color-acento: #dda15e;
+
+  --color-texto: #283618;
+  --color-alerta: #bc6c25;
+
+
+  --fuente-titulos: "Lora", serif;
+  --fuente-cuerpo: "Hind", sans-serif;
+
+  --border-radius: 12px;
+
+  --shadow-soft:
+    0 4px 12px rgba(0, 0, 0, 0.08);
+
+  --transition:
+    all 0.25s ease;
+}

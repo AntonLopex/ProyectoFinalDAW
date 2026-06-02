@@ -1,0 +1,748 @@
+[
+  {
+    "model": "usuarios.usuario",
+    "pk": 1,
+    "fields": {
+      "nombre": "Admin",
+      "apellido1": "García",
+      "apellido2": "López",
+      "nombre_usuario": "admin_chef",
+      "email": "admin@recetasapp.com",
+      "password_hash": "pbkdf2_sha256$720000$abc123$hashed_password_here",
+      "foto_perfil": null,
+      "biografia_y_enlaces": "Administrador de la plataforma. Amante de la cocina mediterránea.",
+      "rol": "admin",
+      "strikes_count": 0
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 2,
+    "fields": {
+      "nombre": "María",
+      "apellido1": "Fernández",
+      "apellido2": "Ruiz",
+      "nombre_usuario": "maricocinera",
+      "email": "maria.fernandez@gmail.com",
+      "password_hash": "pbkdf2_sha256$720000$def456$hashed_password_here",
+      "foto_perfil": null,
+      "biografia_y_enlaces": "Apasionada de la repostería y la cocina italiana. Sigo a @pastrychef_es.",
+      "rol": "registrado",
+      "strikes_count": 0
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 3,
+    "fields": {
+      "nombre": "Carlos",
+      "apellido1": "Martínez",
+      "apellido2": "Soto",
+      "nombre_usuario": "carloscocina",
+      "email": "carlos.martinez@hotmail.com",
+      "password_hash": "pbkdf2_sha256$720000$ghi789$hashed_password_here",
+      "foto_perfil": null,
+      "biografia_y_enlaces": "Chef aficionado. Especialista en arroces y paellas. Valencia ❤️",
+      "rol": "registrado",
+      "strikes_count": 1
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 4,
+    "fields": {
+      "nombre": "Lucía",
+      "apellido1": "Gómez",
+      "apellido2": "Herrera",
+      "nombre_usuario": "lucia_veggie",
+      "email": "lucia.gomez@outlook.com",
+      "password_hash": "pbkdf2_sha256$720000$jkl012$hashed_password_here",
+      "foto_perfil": null,
+      "biografia_y_enlaces": "Cocina vegana y vegetariana. Creo que comer sano puede ser delicioso.",
+      "rol": "registrado",
+      "strikes_count": 0
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 5,
+    "fields": {
+      "nombre": "Javier",
+      "apellido1": "Torres",
+      "apellido2": "Blanco",
+      "nombre_usuario": "javi_grill",
+      "email": "javier.torres@yahoo.es",
+      "password_hash": "pbkdf2_sha256$720000$mno345$hashed_password_here",
+      "foto_perfil": null,
+      "biografia_y_enlaces": "Fanático de las brasas y la carne a la parrilla. #BBQLife",
+      "rol": "registrado",
+      "strikes_count": 0
+    }
+  },
+
+  {
+    "model": "recetas.categoria",
+    "pk": 1,
+    "fields": {
+      "nombre": "Desayunos"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 2,
+    "fields": {
+      "nombre": "Entrantes"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 3,
+    "fields": {
+      "nombre": "Platos principales"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 4,
+    "fields": {
+      "nombre": "Postres"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 5,
+    "fields": {
+      "nombre": "Vegetariano"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 6,
+    "fields": {
+      "nombre": "Arroces y pastas"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 7,
+    "fields": {
+      "nombre": "Sopas y cremas"
+    }
+  },
+  {
+    "model": "recetas.categoria",
+    "pk": 8,
+    "fields": {
+      "nombre": "Carnes y aves"
+    }
+  },
+
+  {
+    "model": "recetas.receta",
+    "pk": 1,
+    "fields": {
+      "usuario": 2,
+      "titulo": "Tortilla española clásica",
+      "descripcion": "La auténtica tortilla española con patata y cebolla, jugosa por dentro y dorada por fuera. Una receta tradicional que nunca falla.",
+      "ingredientes": [
+        { "id": 1, "nombre": "Patatas medianas", "cantidad": "4 unidades" },
+        { "id": 2, "nombre": "Cebolla", "cantidad": "1 unidad" },
+        { "id": 3, "nombre": "Huevos", "cantidad": "6 unidades" },
+        {
+          "id": 4,
+          "nombre": "Aceite de oliva virgen extra",
+          "cantidad": "200 ml"
+        },
+        { "id": 5, "nombre": "Sal", "cantidad": "al gusto" }
+      ],
+      "elaboracion": [
+        {
+          "id": 1,
+          "paso": "Pelar y cortar las patatas en láminas finas. Picar la cebolla en juliana."
+        },
+        {
+          "id": 2,
+          "paso": "Calentar el aceite en una sartén a fuego medio y pochar las patatas y la cebolla durante 20 minutos hasta que estén blandas."
+        },
+        {
+          "id": 3,
+          "paso": "Escurrir bien el aceite y mezclar las patatas y cebolla con los huevos batidos. Salpimentar."
+        },
+        {
+          "id": 4,
+          "paso": "En la misma sartén con un poco de aceite, verter la mezcla a fuego medio-bajo durante 4-5 minutos."
+        },
+        {
+          "id": 5,
+          "paso": "Dar la vuelta con un plato y cocinar el otro lado 3-4 minutos más. Debe quedar jugosa por dentro."
+        }
+      ],
+      "raciones": "4",
+      "tiempo_de_elaboracion": "00:35:00",
+      "dificultad": "media",
+      "imagen": "recetas/tortilla.jpg",
+      "visible": true
+    }
+  },
+  {
+    "model": "recetas.receta",
+    "pk": 2,
+    "fields": {
+      "usuario": 3,
+      "titulo": "Paella valenciana",
+      "descripcion": "Paella valenciana auténtica con pollo, conejo, judías verdes y garrofón. Cocinada a leña siguiendo la receta tradicional de Valencia.",
+      "ingredientes": [
+        { "id": 1, "nombre": "Arroz bomba", "cantidad": "400 g" },
+        { "id": 2, "nombre": "Pollo troceado", "cantidad": "600 g" },
+        { "id": 3, "nombre": "Conejo troceado", "cantidad": "400 g" },
+        { "id": 4, "nombre": "Judías verdes planas", "cantidad": "200 g" },
+        { "id": 5, "nombre": "Garrofón (judión blanco)", "cantidad": "100 g" },
+        {
+          "id": 6,
+          "nombre": "Tomate natural rallado",
+          "cantidad": "2 unidades"
+        },
+        { "id": 7, "nombre": "Pimentón dulce", "cantidad": "1 cucharadita" },
+        { "id": 8, "nombre": "Azafrán", "cantidad": "1 pizca" },
+        { "id": 9, "nombre": "Aceite de oliva", "cantidad": "100 ml" },
+        {
+          "id": 10,
+          "nombre": "Caldo de pollo caliente",
+          "cantidad": "1200 ml"
+        },
+        { "id": 11, "nombre": "Sal", "cantidad": "al gusto" }
+      ],
+      "elaboracion": [
+        {
+          "id": 1,
+          "paso": "Calentar el aceite en la paellera y dorar el pollo y el conejo a fuego fuerte hasta que estén bien sellados."
+        },
+        {
+          "id": 2,
+          "paso": "Añadir las judías verdes y el garrofón, rehogar 5 minutos."
+        },
+        {
+          "id": 3,
+          "paso": "Incorporar el tomate rallado y el pimentón, sofreír 2 minutos con cuidado de no quemar el pimentón."
+        },
+        {
+          "id": 4,
+          "paso": "Verter el caldo caliente y el azafrán. Llevar a ebullición y cocinar 10 minutos."
+        },
+        {
+          "id": 5,
+          "paso": "Añadir el arroz distribuyéndolo en forma de cruz. Cocinar a fuego fuerte 8 minutos y luego a fuego medio 8 minutos más."
+        },
+        {
+          "id": 6,
+          "paso": "Dejar reposar 5 minutos tapado con papel de periódico antes de servir."
+        }
+      ],
+      "raciones": "6",
+      "tiempo_de_elaboracion": "01:00:00",
+      "dificultad": "dificil",
+      "imagen": "recetas/paella-valenciana-tradicional.jpg",
+      "visible": true
+    }
+  },
+  {
+    "model": "recetas.receta",
+    "pk": 3,
+    "fields": {
+      "usuario": 4,
+      "titulo": "Hummus casero",
+      "descripcion": "Hummus cremoso y suave hecho desde cero con garbanzos cocidos, tahini y limón. Perfecto como entrante o snack saludable.",
+      "ingredientes": [
+        { "id": 1, "nombre": "Garbanzos cocidos", "cantidad": "400 g" },
+        {
+          "id": 2,
+          "nombre": "Tahini (pasta de sésamo)",
+          "cantidad": "3 cucharadas"
+        },
+        { "id": 3, "nombre": "Limón (zumo)", "cantidad": "2 unidades" },
+        { "id": 4, "nombre": "Ajo", "cantidad": "1 diente" },
+        {
+          "id": 5,
+          "nombre": "Aceite de oliva virgen extra",
+          "cantidad": "3 cucharadas"
+        },
+        { "id": 6, "nombre": "Comino molido", "cantidad": "1/2 cucharadita" },
+        { "id": 7, "nombre": "Sal", "cantidad": "al gusto" },
+        { "id": 8, "nombre": "Pimentón para decorar", "cantidad": "al gusto" }
+      ],
+      "elaboracion": [
+        {
+          "id": 1,
+          "paso": "Reservar un poco del líquido de los garbanzos. Pelar los garbanzos quitando la piel para obtener una textura más suave."
+        },
+        {
+          "id": 2,
+          "paso": "Triturar todos los ingredientes en el procesador de alimentos hasta obtener una crema homogénea."
+        },
+        {
+          "id": 3,
+          "paso": "Si queda muy espeso, añadir el líquido de los garbanzos poco a poco hasta lograr la consistencia deseada."
+        },
+        { "id": 4, "paso": "Ajustar sal y limón al gusto." },
+        {
+          "id": 5,
+          "paso": "Servir en un plato hondo, hacer un hueco en el centro, añadir un chorrito de aceite de oliva y espolvorear pimentón."
+        }
+      ],
+      "raciones": "4",
+      "tiempo_de_elaboracion": "00:15:00",
+      "dificultad": "facil",
+      "imagen": "recetas/hummus.jpg",
+      "visible": true
+    }
+  },
+  {
+    "model": "recetas.receta",
+    "pk": 4,
+    "fields": {
+      "usuario": 5,
+      "titulo": "Costillas de cerdo a la barbacoa",
+      "descripcion": "Costillas de cerdo tiernas y jugosas con salsa barbacoa casera, ahumadas lentamente para conseguir ese sabor irresistible.",
+      "ingredientes": [
+        { "id": 1, "nombre": "Costillas de cerdo", "cantidad": "1.5 kg" },
+        { "id": 2, "nombre": "Salsa barbacoa", "cantidad": "200 ml" },
+        { "id": 3, "nombre": "Miel", "cantidad": "2 cucharadas" },
+        { "id": 4, "nombre": "Ajo en polvo", "cantidad": "1 cucharadita" },
+        { "id": 5, "nombre": "Pimentón ahumado", "cantidad": "1 cucharada" },
+        { "id": 6, "nombre": "Sal y pimienta negra", "cantidad": "al gusto" },
+        { "id": 7, "nombre": "Zumo de limón", "cantidad": "1 unidad" }
+      ],
+      "elaboracion": [
+        {
+          "id": 1,
+          "paso": "Mezclar la sal, pimienta, ajo en polvo y pimentón ahumado. Frotar generosamente por toda la pieza de costillas."
+        },
+        {
+          "id": 2,
+          "paso": "Envolver en papel de aluminio y dejar marinar en la nevera mínimo 2 horas (mejor toda la noche)."
+        },
+        {
+          "id": 3,
+          "paso": "Precalentar el horno a 150°C. Hornear las costillas envueltas en aluminio durante 2,5 horas."
+        },
+        {
+          "id": 4,
+          "paso": "Mezclar la salsa barbacoa con la miel y el zumo de limón."
+        },
+        {
+          "id": 5,
+          "paso": "Sacar las costillas del aluminio, pintar generosamente con la salsa y gratinar a 200°C durante 15 minutos hasta que caramelicen."
+        }
+      ],
+      "raciones": "4",
+      "tiempo_de_elaboracion": "03:00:00",
+      "dificultad": "media",
+      "imagen": "recetas/costillas.jpg",
+      "visible": true
+    }
+  },
+  {
+    "model": "recetas.receta",
+    "pk": 5,
+    "fields": {
+      "usuario": 2,
+      "titulo": "Tarta de queso al horno estilo Nueva York",
+      "descripcion": "La cremosa y clásica tarta de queso horneada, con base de galleta y una textura irresistible. Una de las mejores recetas de repostería que puedes hacer en casa.",
+      "ingredientes": [
+        {
+          "id": 1,
+          "nombre": "Queso crema (tipo Philadelphia)",
+          "cantidad": "600 g"
+        },
+        { "id": 2, "nombre": "Azúcar", "cantidad": "150 g" },
+        { "id": 3, "nombre": "Huevos", "cantidad": "3 unidades" },
+        { "id": 4, "nombre": "Nata líquida para montar", "cantidad": "150 ml" },
+        {
+          "id": 5,
+          "nombre": "Extracto de vainilla",
+          "cantidad": "1 cucharadita"
+        },
+        { "id": 6, "nombre": "Galletas tipo Digestive", "cantidad": "200 g" },
+        { "id": 7, "nombre": "Mantequilla fundida", "cantidad": "80 g" }
+      ],
+      "elaboracion": [
+        {
+          "id": 1,
+          "paso": "Triturar las galletas y mezclar con la mantequilla fundida. Forrar la base de un molde desmontable de 22cm y refrigerar 30 minutos."
+        },
+        {
+          "id": 2,
+          "paso": "Precalentar el horno a 160°C. Batir el queso crema con el azúcar hasta obtener una crema suave."
+        },
+        {
+          "id": 3,
+          "paso": "Añadir los huevos de uno en uno sin batir en exceso. Incorporar la nata y la vainilla."
+        },
+        {
+          "id": 4,
+          "paso": "Verter sobre la base de galleta. Hornear al baño María durante 55-60 minutos (el centro debe quedar ligeramente tembloroso)."
+        },
+        {
+          "id": 5,
+          "paso": "Apagar el horno y dejar enfriar dentro con la puerta entreabierta 1 hora."
+        },
+        { "id": 6, "paso": "Refrigerar mínimo 4 horas antes de servir." }
+      ],
+      "raciones": "8",
+      "tiempo_de_elaboracion": "01:30:00",
+      "dificultad": "media",
+      "imagen": "recetas/tartaQueso.jpg",
+      "visible": true
+    }
+  },
+  {
+    "model": "recetas.receta",
+    "pk": 6,
+    "fields": {
+      "usuario": 4,
+      "titulo": "Crema de calabaza con jengibre",
+      "descripcion": "Una crema de calabaza aterciopelada con toque de jengibre y coco, perfecta para los días fríos. Receta vegana y llena de sabor.",
+      "ingredientes": [
+        { "id": 1, "nombre": "Calabaza", "cantidad": "1 kg" },
+        { "id": 2, "nombre": "Cebolla", "cantidad": "1 unidad" },
+        { "id": 3, "nombre": "Jengibre fresco rallado", "cantidad": "2 cm" },
+        { "id": 4, "nombre": "Ajo", "cantidad": "2 dientes" },
+        { "id": 5, "nombre": "Leche de coco", "cantidad": "200 ml" },
+        { "id": 6, "nombre": "Caldo de verduras", "cantidad": "800 ml" },
+        { "id": 7, "nombre": "Aceite de oliva", "cantidad": "2 cucharadas" },
+        { "id": 8, "nombre": "Sal y pimienta", "cantidad": "al gusto" },
+        {
+          "id": 9,
+          "nombre": "Semillas de calabaza tostadas",
+          "cantidad": "al gusto"
+        }
+      ],
+      "elaboracion": [
+        {
+          "id": 1,
+          "paso": "Cortar la calabaza en cubos y la cebolla en juliana. Laminar el ajo."
+        },
+        {
+          "id": 2,
+          "paso": "Rehogar la cebolla y el ajo en aceite de oliva a fuego medio durante 5 minutos."
+        },
+        {
+          "id": 3,
+          "paso": "Añadir la calabaza, el jengibre y el caldo. Llevar a ebullición y cocinar 20 minutos."
+        },
+        {
+          "id": 4,
+          "paso": "Incorporar la leche de coco y triturar todo hasta obtener una crema fina."
+        },
+        {
+          "id": 5,
+          "paso": "Ajustar sal y pimienta. Servir caliente con semillas de calabaza tostadas por encima."
+        }
+      ],
+      "raciones": "4",
+      "tiempo_de_elaboracion": "00:40:00",
+      "dificultad": "facil",
+      "imagen": "recetas/crema.jpg",
+      "visible": true
+    }
+  },
+
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 1,
+    "fields": { "receta": 1, "categoria": 3 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 2,
+    "fields": { "receta": 2, "categoria": 3 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 3,
+    "fields": { "receta": 2, "categoria": 6 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 4,
+    "fields": { "receta": 3, "categoria": 2 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 5,
+    "fields": { "receta": 3, "categoria": 5 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 6,
+    "fields": { "receta": 4, "categoria": 3 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 7,
+    "fields": { "receta": 4, "categoria": 8 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 8,
+    "fields": { "receta": 5, "categoria": 4 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 9,
+    "fields": { "receta": 6, "categoria": 7 }
+  },
+  {
+    "model": "recetas.recetacategoria",
+    "pk": 10,
+    "fields": { "receta": 6, "categoria": 5 }
+  },
+
+  {
+    "model": "interacciones.comentario",
+    "pk": 1,
+    "fields": {
+      "receta": 1,
+      "usuario": 3,
+      "contenido": "Llevo años haciendo tortilla española y esta receta me parece de las mejores. El truco de pocharla bien lentamente marca la diferencia.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 2,
+    "fields": {
+      "receta": 1,
+      "usuario": 5,
+      "contenido": "¡Brutal! Yo añado un poco de chorizo y queda espectacular. Gracias por compartirla.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 3,
+    "fields": {
+      "receta": 2,
+      "usuario": 2,
+      "contenido": "La auténtica paella valenciana ❤️ Nada de mezclarla con marisco, esto es lo que toca. Excelente receta.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 4,
+    "fields": {
+      "receta": 2,
+      "usuario": 4,
+      "contenido": "Impresionante receta aunque yo como vegana la hago con verduras. ¿Alguien tiene una versión vegetariana?",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 5,
+    "fields": {
+      "receta": 3,
+      "usuario": 2,
+      "contenido": "El hummus me quedó cremosísimo siguiendo esta receta. El truco de quitar la piel a los garbanzos es una pasada.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 6,
+    "fields": {
+      "receta": 4,
+      "usuario": 1,
+      "contenido": "Las costillas perfectas para un domingo en familia. Me las comería ahora mismo.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 7,
+    "fields": {
+      "receta": 5,
+      "usuario": 3,
+      "contenido": "Hice esta tarta para el cumpleaños de mi madre y fue todo un éxito. Repito seguro.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 8,
+    "fields": {
+      "receta": 6,
+      "usuario": 5,
+      "contenido": "Qué rica esta crema, no esperaba que me gustase tanto siendo yo tan carnívoro jaja. El jengibre le da un toque muy especial.",
+      "visible": true
+    }
+  },
+  {
+    "model": "interacciones.comentario",
+    "pk": 9,
+    "fields": {
+      "receta": 3,
+      "usuario": 1,
+      "contenido": "Este comentario fue marcado como spam y está oculto.",
+      "visible": false
+    }
+  },
+
+  {
+    "model": "interacciones.like",
+    "pk": 1,
+    "fields": { "usuario": 1, "receta": 1 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 2,
+    "fields": { "usuario": 3, "receta": 1 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 3,
+    "fields": { "usuario": 4, "receta": 1 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 4,
+    "fields": { "usuario": 5, "receta": 1 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 5,
+    "fields": { "usuario": 1, "receta": 2 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 6,
+    "fields": { "usuario": 2, "receta": 2 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 7,
+    "fields": { "usuario": 4, "receta": 2 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 8,
+    "fields": { "usuario": 1, "receta": 3 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 9,
+    "fields": { "usuario": 2, "receta": 3 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 10,
+    "fields": { "usuario": 3, "receta": 3 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 11,
+    "fields": { "usuario": 1, "receta": 4 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 12,
+    "fields": { "usuario": 3, "receta": 4 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 13,
+    "fields": { "usuario": 4, "receta": 5 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 14,
+    "fields": { "usuario": 5, "receta": 5 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 15,
+    "fields": { "usuario": 3, "receta": 6 }
+  },
+  {
+    "model": "interacciones.like",
+    "pk": 16,
+    "fields": { "usuario": 5, "receta": 6 }
+  },
+
+  {
+    "model": "interacciones.favorito",
+    "pk": 1,
+    "fields": { "usuario": 1, "receta": 2 }
+  },
+  {
+    "model": "interacciones.favorito",
+    "pk": 2,
+    "fields": { "usuario": 3, "receta": 5 }
+  },
+  {
+    "model": "interacciones.favorito",
+    "pk": 3,
+    "fields": { "usuario": 4, "receta": 3 }
+  },
+  {
+    "model": "interacciones.favorito",
+    "pk": 4,
+    "fields": { "usuario": 5, "receta": 4 }
+  },
+  {
+    "model": "interacciones.favorito",
+    "pk": 5,
+    "fields": { "usuario": 2, "receta": 1 }
+  },
+  {
+    "model": "interacciones.favorito",
+    "pk": 6,
+    "fields": { "usuario": 1, "receta": 6 }
+  },
+
+  {
+    "model": "moderacion.reporte",
+    "pk": 1,
+    "fields": {
+      "informador": 2,
+      "receta": null,
+      "comentario": 9,
+      "motivo": "Este comentario contiene publicidad no deseada y enlaces sospechosos.",
+      "estado": "revisado"
+    }
+  },
+  {
+    "model": "moderacion.reporte",
+    "pk": 2,
+    "fields": {
+      "informador": 4,
+      "receta": 4,
+      "comentario": null,
+      "motivo": "La receta incluye ingredientes con afirmaciones de salud falsas y engañosas.",
+      "estado": "pendiente"
+    }
+  },
+  {
+    "model": "moderacion.reporte",
+    "pk": 3,
+    "fields": {
+      "informador": 1,
+      "receta": null,
+      "comentario": 2,
+      "motivo": "Lenguaje inapropiado en el comentario.",
+      "estado": "pendiente"
+    }
+  },
+
+  {
+    "model": "moderacion.strikelog",
+    "pk": 1,
+    "fields": {
+      "usuario_sancionado": 3,
+      "admin_responsable": 1,
+      "motivo": "Publicación de contenido inapropiado en comentarios reiteradas veces.",
+      "fecha": "2026-05-15T10:30:00Z"
+    }
+  }
+]

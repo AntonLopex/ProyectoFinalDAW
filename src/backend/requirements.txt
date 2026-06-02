@@ -1,0 +1,21 @@
+# Django framework
+Django>=4.2,<5.0
+
+# Manejo de imágenes (subidas de recetas, avatars)
+Pillow>=8.0,<10.0
+
+# Formularios con Bootstrap
+django-crispy-forms>=1.14.0
+
+# Conector MySQL para Django
+mysqlclient>=2.1.1
+
+# Utilidades extras y filtros
+django-filter>=23.1
+django-extensions>=3.3.1
+
+# CORS headers para permitir peticiones desde el frontend
+django-cors-headers>=3.14
+
+# Django REST Framework para APIs
+djangorestframework>=3.14.0
