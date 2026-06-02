@@ -6,14 +6,11 @@ A aplicación está deseñada con distintos niveis de acceso: visitantes anónim
 
 ## Instalación/Posta en marcha
 
-> _Tarefa_: **Indica os pasos a seguir para que poidamos probar a vosa aplicación nun contorno de desenvolvemento**.
-> Debes incluír carga de datos inicial automática para poder probar a app.
-> É necesario indicar as credenciais dos usuarios necesarios para probar a app.
-> No caso de usar unha API Rest debes poñer aquí un enlace ao documento "API reference" que creaches describindo a forma de interaccionar coa API.
+Para usar a web de maneira local, basta con baixar o repositorio, colocarse na carpeta `src/` e executar o comando `docker compose up --build`. A continuacion, se no proceso houbo algún erro na carga de datos, pode executar manualmente o seguinte comando: `docker compose run web python manage.py loaddata initia_data.json `. Con estos dous simples pasos contarás con unha web totalmente funcional e con datos reais para o seu uso.
 
 ## Uso
 
-> _Tarefa_: **Indica a URL para poder acceder á túa aplicación web e os usuarios para poder probala na avaliación **.
+- Para acceder á web localmente: `https://localhost:5173`.
 
 ## Sobre a persoa autora
 

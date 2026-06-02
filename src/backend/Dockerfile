@@ -27,6 +27,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiamos el código Django
 COPY app/ /app/
 
+# Aplicar migraciones
+RUN python manage.py migrate
+
+# Cargar fixtures initial_data.json
+RUN python manage.py loaddata initial_data.json
+
 # Exponer puerto Django
 EXPOSE 8000
 
