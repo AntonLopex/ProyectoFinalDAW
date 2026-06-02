@@ -1,0 +1,631 @@
+{% extends "base.html" %}
+
+{% block title %}Aviso Legal{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Page header ── */
+  .page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--dsg-border);
+  }
+
+  .page-header .breadcrumb-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dsg-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .page-header .breadcrumb-line i {
+    color: var(--dsg-orange);
+  }
+
+  .page-header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+    letter-spacing: 0.02em;
+  }
+
+  .page-header h1 span {
+    color: var(--dsg-orange);
+  }
+
+  .page-header .meta {
+    font-size: 0.82rem;
+    color: var(--dsg-muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .page-header .meta i {
+    color: var(--dsg-orange);
+    margin-right: 0.25rem;
+  }
+
+  /* ── TOC ── */
+  .toc-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-left: 3px solid var(--dsg-orange);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .toc-card h6 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dsg-orange);
+    margin-bottom: 0.85rem;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 1.5rem;
+  }
+
+  .toc-list li a {
+    font-size: 0.83rem;
+    color: var(--dsg-muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0;
+    transition: color 0.15s;
+  }
+
+  .toc-list li a:hover {
+    color: var(--dsg-orange);
+  }
+
+  .toc-list li a::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--dsg-surface2);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .toc-list li a:hover::before {
+    background: var(--dsg-orange);
+  }
+
+  /* ── Secciones ── */
+  .legal-section {
+    margin-bottom: 2.5rem;
+    scroll-margin-top: 72px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-badge {
+    background: rgba(249, 115, 22, 0.12);
+    color: var(--dsg-orange);
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin: 0;
+    color: var(--dsg-text);
+  }
+
+  .legal-section p {
+    color: #D1D5DB;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    margin-bottom: 0.85rem;
+  }
+
+  .legal-section p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Datos sociales ── */
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .data-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+  }
+
+  .data-card .entity-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dsg-text);
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.02em;
+  }
+
+  .data-card .entity-name .tag {
+    display: inline-block;
+    background: rgba(249, 115, 22, 0.12);
+    color: var(--dsg-orange);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    padding: 0.2rem 0;
+    border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+    gap: 0.5rem;
+  }
+
+  .data-row:last-child {
+    border-bottom: none;
+  }
+
+  .data-row .label {
+    color: var(--dsg-muted);
+    flex-shrink: 0;
+  }
+
+  .data-row .value {
+    color: var(--dsg-text);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* ── Listas legales ── */
+  .legal-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .legal-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.875rem;
+    color: #D1D5DB;
+    line-height: 1.6;
+  }
+
+  .legal-list li i {
+    color: var(--dsg-orange);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .legal-list li i.muted {
+    color: var(--dsg-muted);
+  }
+
+  /* ── Cookies ── */
+  .cookies-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .cookie-item {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .cookie-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(249, 115, 22, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cookie-icon i {
+    color: var(--dsg-orange);
+    font-size: 0.95rem;
+  }
+
+  .cookie-item strong {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dsg-text);
+    margin-bottom: 0.2rem;
+  }
+
+  .cookie-item p {
+    font-size: 0.82rem;
+    color: var(--dsg-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── Info box ── */
+  .info-box {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: #93C5FD;
+    line-height: 1.6;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .info-box i {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* ── Divisor ── */
+  .section-divider {
+    height: 1px;
+    background: var(--dsg-border);
+    margin: 2.5rem 0;
+  }
+
+  /* ── Contenedor máximo ── */
+  .legal-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .toc-list {
+      grid-template-columns: 1fr;
+    }
+
+    .data-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-wrap">
+
+  <!-- Cabecera -->
+  <div class="page-header">
+    <div class="breadcrumb-line">
+      <i class="bi bi-house-fill"></i>
+      <span>Inicio</span>
+      <i class="bi bi-chevron-right" style="font-size:0.65rem;"></i>
+      <span>Aviso legal</span>
+    </div>
+    <h1>Aviso <span>Legal</span></h1>
+    <div class="meta">
+      <span><i class="bi bi-calendar3"></i>Vigente desde 27/02/1992</span>
+      <span><i class="bi bi-geo-alt-fill"></i>Registro Mercantil de A Coruña</span>
+      <span><i class="bi bi-shield-check-fill"></i>Ley 34/2002 (LSSI-CE)</span>
+    </div>
+  </div>
+
+  <!-- Índice -->
+  <div class="toc-card">
+    <h6><i class="bi bi-list-ul me-1"></i>Índice de contenidos</h6>
+    <ul class="toc-list">
+      <li><a href="#dominios">Dominios y datos sociales</a></li>
+      <li><a href="#condiciones">Condiciones de uso</a></li>
+      <li><a href="#usuarios">Usuarios</a></li>
+      <li><a href="#uso">Uso del sitio web</a></li>
+      <li><a href="#modificacion">Modificación unilateral</a></li>
+      <li><a href="#hiperenlaces">Hiperenlaces</a></li>
+      <li><a href="#garantias">Exclusión de garantías</a></li>
+      <li><a href="#propiedad">Propiedad intelectual</a></li>
+      <li><a href="#legislacion">Legislación aplicable</a></li>
+      <li><a href="#cookies">Política de cookies</a></li>
+    </ul>
+  </div>
+
+  <!-- I. Dominios -->
+  <div class="legal-section" id="dominios">
+    <div class="section-header">
+      <span class="section-badge">I</span>
+      <h2>Dominios y datos sociales</h2>
+    </div>
+    <p>En cumplimiento de la <strong style="color:var(--dsg-text);">Ley 34/2002, de 11 de julio</strong>, de servicios
+      de la sociedad de la información y del comercio electrónico (artículo 10), los dominios <strong
+        style="color:var(--dsg-orange);">distrisantiago.es</strong> y <strong
+        style="color:var(--dsg-orange);">tienda.distrisantiago.es</strong> pertenecen a Distrisantiago Papelería S.L.
+    </p>
+    <div class="data-grid">
+      <div class="data-card">
+        <div class="entity-name">DISTRISANTIAGO PAPELERIA, S.L.<span class="tag">Principal</span></div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">B15363864</span></div>
+        <div class="data-row"><span class="label">R.M.</span><span class="value">A Coruña</span></div>
+        <div class="data-row"><span class="label">Tomo</span><span class="value">960</span></div>
+        <div class="data-row"><span class="label">Folio</span><span class="value">173</span></div>
+        <div class="data-row"><span class="label">Hoja</span><span class="value">3302</span></div>
+        <div class="data-row"><span class="label">Inscripción</span><span class="value">1ª — 27/02/1992</span></div>
+      </div>
+      <div class="data-card">
+        <div class="entity-name">DSG FARMA SA</div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">A15112139</span></div>
+        <div class="data-row"><span class="label">R.M.</span><span class="value">A Coruña</span></div>
+        <div class="data-row"><span class="label">Tomo</span><span class="value">547</span></div>
+        <div class="data-row"><span class="label">Libro</span><span class="value">302</span></div>
+        <div class="data-row"><span class="label">Folio</span><span class="value">135</span></div>
+        <div class="data-row"><span class="label">Hoja</span><span class="value">3.275</span></div>
+      </div>
+      <div class="data-card">
+        <div class="entity-name">DISTRISANTIAGO PAPELERIA VIGO, S.L.</div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">B36805331</span></div>
+        <div class="data-row"><span class="label">R.M.</span><span class="value">Pontevedra</span></div>
+        <div class="data-row"><span class="label">Tomo</span><span class="value">1774</span></div>
+        <div class="data-row"><span class="label">Folio</span><span class="value">069</span></div>
+        <div class="data-row"><span class="label">Hoja</span><span class="value">PO-16617</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- II. Condiciones -->
+  <div class="legal-section" id="condiciones">
+    <div class="section-header">
+      <span class="section-badge">II</span>
+      <h2>Condiciones de uso</h2>
+    </div>
+    <p>De conformidad con la Ley de Servicios de la Sociedad de la Información 34/2002, el usuario accede a recibir
+      comunicaciones de forma periódica en su correo electrónico. Si desea dejar de recibirlas, puede comunicarlo
+      mediante correo electrónico dirigido a <a href="mailto:atencionalcliente@distrisantiago.es"
+        style="color:var(--dsg-orange);">atencionalcliente@distrisantiago.es</a>, activándose la petición en un plazo
+      máximo de 10 días.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- III. Usuarios -->
+  <div class="legal-section" id="usuarios">
+    <div class="section-header">
+      <span class="section-badge">III</span>
+      <h2>Usuarios</h2>
+    </div>
+    <p>El acceso y/o uso del sitio web <strong style="color:var(--dsg-orange);">www.distrisantiago.es</strong> atribuye
+      a quien lo realiza la condición de usuario/a, aceptando desde ese momento, plenamente y sin reservas, las
+      presentes condiciones generales, así como las condiciones particulares que, en su caso, complementen, modifiquen o
+      sustituyan las condiciones generales en relación con determinados servicios y contenidos del sitio web.</p>
+    <p>El usuario debe aceptar las condiciones para iniciar el proceso de registro. Recibirá una clave de acceso por
+      email que podrá modificar en su panel de cuenta. Se compromete a hacer un uso diligente de sus credenciales y a
+      comunicar a Grupo DistriSantiago cualquier pérdida, robo o acceso no autorizado a las mismas.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- IV. Uso -->
+  <div class="legal-section" id="uso">
+    <div class="section-header">
+      <span class="section-badge">IV</span>
+      <h2>Uso del sitio web, sus servicios y contenidos</h2>
+    </div>
+    <p>El/la usuario/a se compromete a utilizar el sitio web y sus servicios sin contravenir la legislación vigente, la
+      buena fe, los usos generalmente aceptados y el orden público. Queda expresamente prohibido el uso del sitio con
+      fines ilícitos o lesivos contra Grupo DistriSantiago o cualquier tercero.</p>
+    <p>Respecto de los contenidos (informaciones, textos, gráficos, archivos de sonido y/o imagen, fotografías, diseños,
+      etc.), se prohíbe:</p>
+    <ul class="legal-list">
+      <li><i class="bi bi-x-circle-fill"></i>Su reproducción, distribución o modificación sin autorización de sus
+        legítimos titulares o sin que resulte legalmente permitido.</li>
+      <li><i class="bi bi-x-circle-fill"></i>Cualquier vulneración de los derechos de Grupo DistriSantiago o de sus
+        legítimos titulares.</li>
+      <li><i class="bi bi-x-circle-fill"></i>Su utilización para fines comerciales o publicitarios distintos de los
+        estrictamente permitidos.</li>
+      <li><i class="bi bi-x-circle-fill"></i>Cualquier intento de obtener los contenidos por medios distintos a los
+        habilitados, siempre que causen perjuicio al sitio web.</li>
+    </ul>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- V. Modificación -->
+  <div class="legal-section" id="modificacion">
+    <div class="section-header">
+      <span class="section-badge">V</span>
+      <h2>Modificación unilateral</h2>
+    </div>
+    <p>Grupo DistriSantiago podrá modificar unilateralmente y sin previo aviso, siempre que lo considere oportuno, la
+      estructura y diseño del sitio web, así como modificar o eliminar los servicios, los contenidos y las condiciones
+      de acceso y/o uso del mismo.</p>
+    <p>La duración de la prestación del servicio es de carácter indefinido. Sin perjuicio de lo anterior, Grupo
+      DistriSantiago se reserva el derecho de interrumpir, suspender o terminar la prestación del servicio o cualquiera
+      de los servicios que lo integran.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- VI. Hiperenlaces -->
+  <div class="legal-section" id="hiperenlaces">
+    <div class="section-header">
+      <span class="section-badge">VI</span>
+      <h2>Hiperenlaces</h2>
+    </div>
+    <p>El establecimiento de cualquier hiperenlace entre una página web y cualquiera de las páginas del sitio web de
+      Grupo DistriSantiago estará sometido a las siguientes condiciones:</p>
+    <ul class="legal-list">
+      <li><i class="bi bi-info-circle-fill"></i>No se permite la reproducción total ni parcial de ninguno de los
+        servicios ni contenidos del sitio web.</li>
+      <li><i class="bi bi-info-circle-fill"></i>Salvo consentimiento previo y expreso, la página vinculante no contendrá
+        ninguna marca, nombre comercial, logotipo, eslogan u otros signos distintivos de Grupo DistriSantiago.</li>
+      <li><i class="bi bi-info-circle-fill"></i>Bajo ninguna circunstancia, Grupo DistriSantiago será responsable de los
+        contenidos o servicios puestos a disposición en la página desde la que se realice el hiperenlace.</li>
+    </ul>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- VII. Garantías -->
+  <div class="legal-section" id="garantias">
+    <div class="section-header">
+      <span class="section-badge">VII</span>
+      <h2>Exclusión de garantías y responsabilidad</h2>
+    </div>
+    <p>Grupo DistriSantiago no otorga ninguna garantía ni se hace responsable de los daños y perjuicios de cualquier
+      naturaleza que pudieran derivar de:</p>
+    <ul class="legal-list">
+      <li><i class="bi bi-dash-circle-fill muted"></i>La falta de disponibilidad, mantenimiento y efectivo
+        funcionamiento del sitio web y/o de sus servicios o contenidos.</li>
+      <li><i class="bi bi-dash-circle-fill muted"></i>La falta de utilidad, adecuación o validez del sitio web para
+        satisfacer necesidades o expectativas de los usuarios.</li>
+      <li><i class="bi bi-dash-circle-fill muted"></i>La existencia de virus, programas maliciosos o lesivos en los
+        contenidos.</li>
+      <li><i class="bi bi-dash-circle-fill muted"></i>El uso ilícito, negligente, fraudulento o contrario a las
+        presentes condiciones por parte de los usuarios.</li>
+      <li><i class="bi bi-dash-circle-fill muted"></i>El incumplimiento por parte de terceros de sus obligaciones en
+        relación con los servicios prestados a través del sitio web.</li>
+    </ul>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- VIII. Propiedad intelectual -->
+  <div class="legal-section" id="propiedad">
+    <div class="section-header">
+      <span class="section-badge">VIII</span>
+      <h2>Propiedad intelectual</h2>
+    </div>
+    <p>La marca <strong style="color:var(--dsg-text);">Grupo DistriSantiago</strong> y su correspondiente marca gráfica
+      son marcas registradas. Queda prohibida su reproducción o uso sin autorización expresa de su titular, así como
+      cualquier otra marca del Grupo que aparezca en los sitios web indicados en este aviso.</p>
+    <p>Si cualquier usuario o tercero considera que se ha producido una violación de sus derechos de propiedad
+      intelectual, deberá notificarlo a Grupo DistriSantiago indicando: datos personales del titular, contenidos
+      protegidos y su ubicación en el sitio, acreditación de los derechos, y declaración expresa de veracidad de las
+      informaciones facilitadas.</p>
+    <div class="info-box mt-3">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>La legitimidad de los derechos de propiedad intelectual o industrial correspondientes a los contenidos
+        aportados por terceros es de la exclusiva responsabilidad de los mismos.</span>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- IX. Legislación -->
+  <div class="legal-section" id="legislacion">
+    <div class="section-header">
+      <span class="section-badge">IX</span>
+      <h2>Legislación aplicable y jurisdicción</h2>
+    </div>
+    <p>Las presentes Condiciones Generales se regirán por la <strong style="color:var(--dsg-text);">legislación
+        española</strong>. Grupo DistriSantiago y el usuario/a, con renuncia expresa a cualquier otro fuero, se someten
+      a la Jurisdicción de los Juzgados y Tribunales del domicilio del usuario para cuantas cuestiones pudieran
+      suscitarse derivadas de la prestación del servicio.</p>
+    <p>En el supuesto de que el usuario tenga su domicilio fuera de España, ambas partes se someten a la Jurisdicción de
+      los Juzgados y Tribunales de <strong style="color:var(--dsg-text);">Santiago de Compostela</strong>.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- X. Cookies -->
+  <div class="legal-section" id="cookies">
+    <div class="section-header">
+      <span class="section-badge">X</span>
+      <h2>Política de cookies</h2>
+    </div>
+    <p>Una cookie es un archivo de información que el servidor envía al dispositivo del usuario para almacenar y
+      recuperar información sobre la navegación. Las webs de Grupo DistriSantiago utilizan cookies únicamente para
+      mejorar la experiencia de navegación, sin ningún objeto publicitario. No se recogen datos personales a través de
+      las cookies. Todas las cookies propias son temporales y desaparecen al concluir la sesión.</p>
+    <div class="cookies-grid">
+      <div class="cookie-item">
+        <div class="cookie-icon"><i class="bi bi-gear-fill"></i></div>
+        <div>
+          <strong>Cookies técnicas</strong>
+          <p>Necesarias para la prestación de determinados servicios. Si se desactivan, no podrá recibir correctamente
+            los contenidos del sitio web.</p>
+        </div>
+      </div>
+      <div class="cookie-item">
+        <div class="cookie-icon"><i class="bi bi-bar-chart-fill"></i></div>
+        <div>
+          <strong>Cookies analíticas</strong>
+          <p>Para el seguimiento y análisis estadístico del comportamiento de los usuarios. Si se desactivan, el sitio
+            web seguirá funcionando con normalidad.</p>
+        </div>
+      </div>
+      <div class="cookie-item">
+        <div class="cookie-icon"><i class="bi bi-share-fill"></i></div>
+        <div>
+          <strong>Cookies de redes sociales</strong>
+          <p>Permiten interactuar con el contenido de plataformas sociales (Facebook, YouTube, Twitter, LinkedIn, etc.).
+            Sus condiciones se rigen por la política de privacidad de cada plataforma.</p>
+        </div>
+      </div>
+    </div>
+    <p class="mt-3">El usuario podrá en cualquier momento gestionar sus cookies desde la configuración del navegador:
+      <a href="http://support.google.com/chrome/bin/answer.py?hl=es&answer=95647" target="_blank"
+        style="color:var(--dsg-orange);">Chrome</a>,
+      <a href="http://windows.microsoft.com/es-es/windows7/how-to-manage-cookies-in-internet-explorer-9" target="_blank"
+        style="color:var(--dsg-orange);">Internet Explorer</a>,
+      <a href="http://support.mozilla.org/es/kb/habilitar-y-deshabilitar-cookies-que-los-sitios-we" target="_blank"
+        style="color:var(--dsg-orange);">Firefox</a>,
+      <a href="http://support.apple.com/kb/ph5042" target="_blank" style="color:var(--dsg-orange);">Safari</a>.
+    </p>
+    <p>Para más información, consulte nuestra <a href="#" style="color:var(--dsg-orange);">Política de Protección de
+        Datos</a>.</p>
+  </div>
+
+</div>
+{% endblock %}

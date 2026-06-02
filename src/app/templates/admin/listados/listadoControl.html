@@ -1,0 +1,461 @@
+{% extends 'admin/listados/listadoUsuariosBase.html' %}
+
+{% block extra_css %}
+<style>
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.85rem;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+  }
+
+  .action-btn-edit {
+    background: var(--dsg-surface2);
+    color: var(--dsg-muted);
+  }
+
+  .action-btn-edit:hover {
+    background: rgba(249, 115, 22, .15);
+    color: var(--dsg-orange);
+  }
+
+  .action-btn-delete {
+    background: rgba(239, 68, 68, .1);
+    color: #FCA5A5;
+  }
+
+  .action-btn-delete:hover {
+    background: rgba(239, 68, 68, .22);
+    color: #FCA5A5;
+  }
+
+  /* ── Filtros ── */
+  .dsg-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--dsg-border);
+  }
+
+  .dsg-filter-bar .dsg-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+  }
+
+  .dsg-filter-bar .dsg-search-wrap i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dsg-muted);
+    pointer-events: none;
+  }
+
+  .dsg-filter-bar input[type="text"] {
+    width: 100%;
+    height: 38px;
+    padding: 0 0.75rem 0 2.2rem;
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    border-radius: 8px;
+    color: var(--dsg-text);
+    font-size: 0.88rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .dsg-filter-bar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+  }
+
+  .dsg-filter-bar input[type="text"]::placeholder {
+    color: var(--dsg-muted);
+    opacity: 0.6;
+  }
+
+  .dsg-btn-filter {
+    height: 38px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    border: none;
+    background: var(--dsg-orange);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .dsg-btn-filter:hover {
+    background: var(--dsg-orange-dark);
+    transform: translateY(-1px);
+  }
+
+  .dsg-btn-order {
+    height: 38px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--dsg-border);
+    background: var(--dsg-surface2);
+    color: var(--dsg-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .dsg-btn-order:hover {
+    border-color: var(--dsg-orange);
+    color: var(--dsg-orange);
+  }
+
+  .dsg-btn-clear {
+    height: 38px;
+    padding: 0 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--dsg-border);
+    background: transparent;
+    color: var(--dsg-muted);
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .dsg-btn-clear:hover {
+    border-color: #FCA5A5;
+    color: #FCA5A5;
+  }
+
+  /* ── Paginación ── */
+  .dsg-page-link {
+    background: var(--dsg-surface2);
+    border-color: var(--dsg-border);
+    color: #fff;
+  }
+
+  .dsg-page-link:hover {
+    background: var(--dsg-surface2);
+    border-color: var(--dsg-orange);
+    color: var(--dsg-orange);
+  }
+
+  .dsg-page-link.active-page {
+    background: var(--dsg-orange);
+    border-color: var(--dsg-orange);
+    color: #fff;
+  }
+
+  .page-item.disabled .dsg-page-link {
+    background: var(--dsg-surface2);
+    border-color: var(--dsg-border);
+    color: var(--dsg-muted);
+    opacity: 0.5;
+  }
+
+  #paginacion-clientes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+{% endblock %}
+
+{# Flash messages #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% block titulo %}<h1>Listado de Usuarios-Control</h1>{% endblock %}
+{% block subtitulo %}<p>Gestión de usuarios-control registrados</p>{% endblock %}
+
+{% block cabecera_tabla %}
+<th>Controlador</th>
+<th>Nombre de usuario</th>
+<th>Fecha y hora de alta</th>
+<th>Acciones</th>
+{% endblock %}
+
+{% block cuerpo_tabla %}
+{% for u in usuarios %}
+<tr>
+  <td>
+    <div style="font-weight:500; color:#fff">{{ u.nombre_completo }}</div>
+    <div style="font-size:0.78rem; color:var(--dsg-muted);">{{ u.email }}</div>
+  </td>
+  <td style="color:var(--dsg-muted); font-size:.85rem;">{{ u.nombre_usuario }}</td>
+  <td style="color:var(--dsg-muted); font-size:.85rem; white-space:nowrap;">
+    <i class="bi bi-calendar3 me-1" style="color:var(--dsg-muted);"></i>
+    {{ u.fecha_alta if u.fecha_alta else '' }}
+  </td>
+  <td>
+    <div class="d-flex justify-content-center gap-2">
+      <a href="#" class="action-btn action-btn-edit editar" data-id="{{ u.id }}" data-nombre="{{ u.nombre }}"
+        data-apellido1="{{ u.apellido1 }}" data-apellido2="{{ u.apellido2 }}" data-usuario="{{ u.nombre_usuario }}"
+        data-email="{{ u.email }}" title="Editar">
+        <i class="bi bi-pencil"></i>
+      </a>
+      <button class="action-btn action-btn-delete eliminar" data-id="{{ u.id }}" title="Eliminar">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+  </td>
+</tr>
+{% endfor %}
+{% endblock %}
+
+{# ── Filtro: se inyecta dentro de list-card, justo antes de la tabla ── #}
+{% block filtros %}
+<form method="GET" action="" id="form-filtros" class="dsg-filter-bar">
+  <div class="dsg-search-wrap">
+    <i class="bi bi-search"></i>
+    <input type="text" name="busqueda" id="input-busqueda" value="{{ busqueda }}"
+      placeholder="Buscar por nombre o usuario…" autocomplete="off">
+  </div>
+
+  <a class="dsg-btn-order" href="?busqueda={{ busqueda }}&orden_dir={{ 'asc' if orden_dir == 'desc' else 'desc' }}">
+    <i class="bi bi-arrow-down-up"></i>
+    {{ 'Más antiguos primero' if orden_dir == 'desc' else 'Más recientes primero' }}
+  </a>
+
+  <button type="submit" class="dsg-btn-filter">
+    <i class="bi bi-funnel"></i> Filtrar
+  </button>
+
+  {% if busqueda or orden_dir != 'desc' %}
+  <a href="?" class="dsg-btn-clear">
+    <i class="bi bi-x-circle"></i> Limpiar
+  </a>
+  {% endif %}
+</form>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+
+{% if paginacion.pages > 1 %}
+<div id="paginacion-clientes">
+
+  <span style="font-size:.82rem; color:var(--dsg-muted);">
+    Mostrando {{ paginacion.first }} – {{ paginacion.last }} de {{ paginacion.total }} registros
+  </span>
+
+  <nav>
+    <ul class="pagination pagination-sm mb-0" style="gap:4px;">
+
+      <!-- Anterior -->
+      <li class="page-item {% if not paginacion.has_prev %}disabled{% endif %}">
+        <a class="page-link dsg-page-link"
+          href="{{ url_for(request.endpoint, page=paginacion.prev_num, busqueda=busqueda, orden_dir=orden_dir) }}">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+      </li>
+
+      <!-- Páginas -->
+      {% for p in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+      <li class="page-item">
+        <a class="page-link dsg-page-link {% if p == paginacion.page %}active-page{% endif %}"
+          href="{{ url_for(request.endpoint, page=p, busqueda=busqueda, orden_dir=orden_dir) }}">
+          {{ p }}
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link dsg-page-link">…</span>
+      </li>
+      {% endif %}
+      {% endfor %}
+
+      <!-- Siguiente -->
+      <li class="page-item {% if not paginacion.has_next %}disabled{% endif %}">
+        <a class="page-link dsg-page-link"
+          href="{{ url_for(request.endpoint, page=paginacion.next_num, busqueda=busqueda, orden_dir=orden_dir) }}">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+</div>
+{% endif %}
+
+{# ── Modal editar ── #}
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:600px;">
+    <div class="modal-content"
+      style="background:var(--dsg-surface); border:1px solid var(--dsg-border); border-radius:12px;">
+      <form method="POST" action="{{ url_for('router_admin.editarUsuarioControl') }}">
+        <div class="modal-header" style="border-color:var(--dsg-border); padding:1.5rem 2rem 1rem;">
+          <div>
+            <h5 class="modal-title mb-0" style="font-size:1.3rem; font-weight:700; color:var(--dsg-text);">Editar
+              usuario</h5>
+            <p style="color:var(--dsg-muted); font-size:0.82rem; margin:0;">Modificar datos del usuario de control</p>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:1.5rem 2rem 2rem;">
+          <input type="hidden" name="id" id="edit-id">
+          <div
+            style="font-size:0.68rem; font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--dsg-orange); margin:0 0 0.75rem; padding-bottom:0.4rem; border-bottom:1px solid rgba(249,115,22,0.2);">
+            Datos personales</div>
+          <div class="row g-3">
+            <div class="col-sm-4">
+              <label
+                style="font-size:0.7rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--dsg-muted); margin-bottom:0.3rem; display:block;">Nombre</label>
+              <input type="text" class="form-control" name="nombre" id="edit-nombre" placeholder="Nombre"
+                style="height:40px; font-size:0.9rem; background:var(--dsg-surface2); border:1px solid var(--dsg-border); color:var(--dsg-text); border-radius:6px;">
+            </div>
+            <div class="col-sm-4">
+              <label
+                style="font-size:0.7rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--dsg-muted); margin-bottom:0.3rem; display:block;">Primer
+                apellido</label>
+              <input type="text" class="form-control" name="apellido1" id="edit-apellido1" placeholder="Primer apellido"
+                style="height:40px; font-size:0.9rem; background:var(--dsg-surface2); border:1px solid var(--dsg-border); color:var(--dsg-text); border-radius:6px;">
+            </div>
+            <div class="col-sm-4">
+              <label
+                style="font-size:0.7rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--dsg-muted); margin-bottom:0.3rem; display:block;">Segundo
+                apellido</label>
+              <input type="text" class="form-control" name="apellido2" id="edit-apellido2"
+                placeholder="Segundo apellido"
+                style="height:40px; font-size:0.9rem; background:var(--dsg-surface2); border:1px solid var(--dsg-border); color:var(--dsg-text); border-radius:6px;">
+            </div>
+          </div>
+          <div
+            style="font-size:0.68rem; font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--dsg-orange); margin:1.5rem 0 0.75rem; padding-bottom:0.4rem; border-bottom:1px solid rgba(249,115,22,0.2);">
+            Acceso</div>
+          <div class="row g-3">
+            <div class="col-12">
+              <label
+                style="font-size:0.7rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--dsg-muted); margin-bottom:0.3rem; display:block;">Usuario</label>
+              <div style="position:relative;">
+                <i class="bi bi-person"
+                  style="position:absolute; left:0.7rem; top:50%; transform:translateY(-50%); color:var(--dsg-muted); font-size:0.9rem; pointer-events:none;"></i>
+                <input type="text" class="form-control" name="usuario" id="edit-usuario" placeholder="Nombre de usuario"
+                  style="height:40px; font-size:0.9rem; background:var(--dsg-surface2); border:1px solid var(--dsg-border); color:var(--dsg-text); border-radius:6px; padding-left:2.1rem;">
+              </div>
+            </div>
+            <div class="col-12">
+              <label
+                style="font-size:0.7rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--dsg-muted); margin-bottom:0.3rem; display:block;">Email</label>
+              <div style="position:relative;">
+                <i class="bi bi-envelope"
+                  style="position:absolute; left:0.7rem; top:50%; transform:translateY(-50%); color:var(--dsg-muted); font-size:0.9rem; pointer-events:none;"></i>
+                <input type="email" class="form-control" name="email" id="edit-email" placeholder="usuario@correo.com"
+                  style="height:40px; font-size:0.9rem; background:var(--dsg-surface2); border:1px solid var(--dsg-border); color:var(--dsg-text); border-radius:6px; padding-left:2.1rem;">
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn"
+            style="width:100%; height:44px; background:var(--dsg-orange); border:none; color:#fff; font-weight:600; font-size:0.95rem; border-radius:6px; letter-spacing:0.02em; margin-top:1.5rem; transition:background 0.15s, transform 0.1s;"
+            onmouseover="this.style.background='var(--dsg-orange-dark)'; this.style.transform='translateY(-1px)'"
+            onmouseout="this.style.background='var(--dsg-orange)'; this.style.transform='translateY(0)'">
+            <i class="bi bi-check2-circle me-2"></i>Guardar cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# ── Modal eliminar ── #}
+<div class="modal fade" id="modalEliminarUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content"
+      style="background:var(--dsg-surface); border:1px solid var(--dsg-border); border-radius:12px;">
+      <form method="POST" action="{{ url_for('router_admin.eliminarUsuarioControl') }}">
+        <div class="modal-body p-4 text-center">
+          <i class="bi bi-exclamation-triangle" style="font-size:2rem; color:#FCA5A5;"></i>
+          <h5 class="mt-3 mb-1" style="color:var(--dsg-text);">¿Eliminar usuario?</h5>
+          <p style="color:#fff; font-weight:500;" id="delete-nombre"></p>
+          <input type="hidden" name="id" id="delete-id">
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <button type="button" class="btn-dsg-outline btn" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger px-4">Eliminar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  /* ── Editar ── */
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest('.editar');
+    if (!btn) return;
+    e.preventDefault();
+    const res = await fetch(`/admin/dashboard/usuario-control/${btn.dataset.id}`);
+    const data = await res.json();
+    if (data.error) { alert(data.error); return; }
+    document.getElementById('edit-id').value = data.id;
+    document.getElementById('edit-nombre').value = data.nombre;
+    document.getElementById('edit-apellido1').value = data.apellido1;
+    document.getElementById('edit-apellido2').value = data.apellido2;
+    document.getElementById('edit-usuario').value = data.nombre_usuario;
+    document.getElementById('edit-email').value = data.email;
+    new bootstrap.Modal(document.getElementById('modalEditarUsuario')).show();
+  });
+
+  /* ── Eliminar ── */
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest('.eliminar');
+    if (!btn) return;
+    e.preventDefault();
+    const res = await fetch(`/admin/dashboard/usuario-control/eliminar/${btn.dataset.id}`);
+    const data = await res.json();
+    if (data.error) { alert(data.error); return; }
+    document.getElementById('delete-id').value = data.id;
+    document.getElementById('delete-nombre').textContent = data.nombre_completo;
+    new bootstrap.Modal(document.getElementById('modalEliminarUsuario')).show();
+  });
+
+  /* ── Búsqueda en tiempo real — filtra filas localmente ── */
+  const inputBusqueda = document.getElementById('input-busqueda');
+  if (inputBusqueda) {
+    inputBusqueda.addEventListener('input', function () {
+      const texto = this.value.toLowerCase().trim();
+      document.querySelectorAll('.table-list tbody tr').forEach(function (fila) {
+        fila.style.display = fila.textContent.toLowerCase().includes(texto) ? '' : 'none';
+      });
+    });
+  }
+</script>
+{% endblock %}

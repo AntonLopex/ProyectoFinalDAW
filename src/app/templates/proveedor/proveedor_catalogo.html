@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Productos{% endblock %}
+
+{% block content %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1><i class="bi bi-box-seam me-2" style="color:var(--dsg-orange)"></i>Mis Productos</h1>
+    <p>Consulta tu catálogo de productos</p>
+  </div>
+  {% if producto %}
+  <a href="{{ url_for('router_proveedor.productos') }}" onclick="showLoader('Cargando catálogo...')"
+    class="btn-dsg-outline btn btn-sm">
+    <i class="bi bi-arrow-left me-1"></i> Volver al catálogo
+  </a>
+  {% endif %}
+</div>
+
+
+<!-- ── Detalle de producto ────────────────────────────────────── -->
+{% if producto %}
+<div class="dsg-card mb-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h6 class="fw-600 mb-0">
+      <i class="bi bi-box me-2" style="color:var(--dsg-orange)"></i>Detalle del producto
+    </h6>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      {% if producto.imagen_url %}
+      <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}"
+        style="width:100%; border-radius:8px; border:1px solid var(--dsg-border); object-fit:fill; max-height:300px;">
+      {% else %}
+      <div style="width:100%; height:250px; background:var(--dsg-surface2); border-radius:8px;
+        border:1px solid var(--dsg-border); display:flex; align-items:center; justify-content:center;">
+        <i class="bi bi-image" style="font-size:3rem; color:var(--dsg-muted)"></i>
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-md-8">
+
+      <div class="producto-id-badge mb-2 d-inline-flex align-items-center gap-2">
+        <span id="producto-id">{{ producto.id }}</span>
+        <i class="bi bi-clipboard" style="cursor:pointer; font-size:0.9rem;" onclick="copiarID()" title="Copiar ID"></i>
+      </div>
+
+      <h2 style="font-size:1.5rem; font-weight:700; color:var(--dsg-text); margin-bottom:0.5rem;">
+        {{ producto.nombre }}
+      </h2>
+      <div style="font-size:2.2rem; font-weight:700; color:var(--dsg-orange); margin-bottom:1.25rem;">
+        {{ "%.2f"|format(producto.precio|float) }} €
+      </div>
+
+      {% if producto.descripcion %}
+      <div>
+        <div style="color:var(--dsg-muted); font-size:0.8rem; text-transform:uppercase;
+          letter-spacing:0.05em; margin-bottom:0.5rem;">Descripción</div>
+        <p style="line-height:1.7; color:var(--dsg-text); margin:0;">{{ producto.descripcion }}</p>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<!-- ── Filtros ────────────────────────────────────────────────── -->
+<div class="dsg-card mb-4">
+  <form id="form-filtros" method="GET" action="{{ url_for('router_proveedor.productos') }}"
+    class="d-flex flex-wrap gap-3 align-items-end">
+    <div>
+      <label class="form-label">Buscar producto</label>
+      <div style="position:relative;">
+        <i class="bi bi-search" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%);
+          color:var(--dsg-muted); pointer-events:none;"></i>
+        <input type="text" id="input-busqueda" name="busqueda" class="form-control"
+          style="width:240px; padding-left:2.25rem;" placeholder="Nombre o codigo..." value="{{ busqueda or '' }}"
+          autocomplete="off" />
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- ── Contador de resultados ─────────────────────────────────── -->
+<div id="contador-resultados" class="mb-3" style="color:var(--dsg-muted); font-size:0.85rem; display:none;">
+  <i class="bi bi-box-seam me-1"></i>
+  <span id="texto-contador"></span>
+</div>
+
+<!-- ── Grid de productos ──────────────────────────────────────── -->
+<div id="grid-productos" class="row g-3">
+  {% for p in productos %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="producto-card h-100 d-flex flex-column p-0">
+
+      <div class="producto-img-wrap">
+        {% if p.imagen_url %}
+        <img src="{{ p.imagen_url }}" alt="{{ p.nombre }}" class="producto-img" style="object-fit:unset;">
+        {% else %}
+        <div class="producto-img-placeholder">
+          <i class="bi bi-image"></i>
+        </div>
+        {% endif %}
+        <span class="producto-id-float">{{ p.id }}</span>
+      </div>
+
+      <div class="d-flex flex-column p-3" style="flex:1;">
+        <div class="producto-nombre">{{ p.nombre }}</div>
+        {% if p.descripcion %}
+        <div class="producto-desc d-none d-md-block">{{ p.descripcion }}</div>
+        {% endif %}
+        <div class="d-flex align-items-center justify-content-between mt-auto pt-2 producto-footer">
+          <span class="producto-precio">{{ "%.2f"|format(p.precio|float) }} €</span>
+          <a href="{{ url_for('router_proveedor.detalle_producto', producto_id=p.id) }}"
+            onclick="showLoader('Cargando detalle producto...')" class="btn btn-sm btn-accion btn-modo-ver"
+            title="Ver detalle">
+            <i class="bi bi-eye me-1"></i>Ver
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── Estado vacío ───────────────────────────────────────────── -->
+<div id="estado-vacio" class="dsg-card text-center py-5" {% if productos %}hidden{% endif %}>
+  <i class="bi bi-box" style="font-size:2.5rem; color:var(--dsg-muted)"></i>
+  <p style="color:var(--dsg-muted); margin-top:1rem; margin-bottom:1rem;">
+    {% if busqueda %}No se encontraron productos con ese criterio.{% else %}No tienes productos registrados.{% endif %}
+  </p>
+  {% if busqueda %}
+  <a href="{{ url_for('router_proveedor.productos') }}" onclick="showLoader('Limpiando filtros...')"
+    class="btn-dsg-outline btn btn-sm">
+    <i class="bi bi-x me-1"></i> Limpiar filtros
+  </a>
+  {% endif %}
+</div>
+
+<!-- ── Sentinel infinite scroll + spinner ────────────────────── -->
+<div id="scroll-sentinel" style="height:1px; margin-top:1rem;"></div>
+<div id="spinner-carga" class="text-center py-4" style="display:none;">
+  <div class="spinner-border" style="color:var(--dsg-orange); width:1.5rem; height:1.5rem;" role="status"></div>
+  <span class="ms-2" style="color:var(--dsg-muted); font-size:0.85rem;">Cargando más productos...</span>
+</div>
+<div id="fin-lista" class="text-center py-3" style="display:none;">
+  <span style="color:var(--dsg-muted); font-size:0.8rem;">
+    <i class="bi bi-check2-circle me-1" style="color:var(--dsg-orange)"></i>Todos los productos cargados
+  </span>
+</div>
+
+{% endif %}{# fin bloque detalle/listado #}
+
+
+<style>
+  .producto-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
+  }
+
+  .producto-card:hover {
+    border-color: var(--dsg-orange);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(255, 140, 0, 0.12);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .producto-card-animada {
+    animation: fadeInUp 0.28s ease both;
+  }
+
+  .producto-img-wrap {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .producto-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+
+  .producto-card:hover .producto-img {
+    transform: scale(1.04);
+  }
+
+  .producto-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--dsg-surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .producto-img-placeholder i {
+    font-size: 2.8rem;
+    color: var(--dsg-muted);
+  }
+
+  .producto-id-float {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    line-height: 1.4;
+  }
+
+  .producto-id-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(255, 140, 0, 0.1);
+    border: 1px solid rgba(255, 140, 0, 0.3);
+    color: var(--dsg-orange);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  .producto-nombre {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.35;
+    color: var(--dsg-text);
+  }
+
+  .producto-desc {
+    font-size: 0.82rem;
+    color: var(--dsg-muted);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .producto-footer {
+    border-top: 1px solid var(--dsg-border);
+  }
+
+  .producto-precio {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dsg-orange);
+  }
+
+  .btn-accion {
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    border: none;
+    background: var(--dsg-surface2);
+    color: var(--dsg-muted);
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+  }
+
+  .btn-accion:hover {
+    background: var(--dsg-surface);
+    color: var(--dsg-text);
+    transform: translateY(-1px);
+  }
+
+  .producto-id-badge i:hover {
+    color: var(--dsg-orange);
+    transform: scale(1.1);
+  }
+
+  #input-busqueda.buscando {
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, 0.15);
+  }
+
+  /* ══════════════════════════════════════════
+     Solo móvil — sin tocar desktop (≥768px)
+  ══════════════════════════════════════════ */
+  @media (max-width: 767.98px) {
+
+    /* Imagen más compacta en móvil (2 columnas) */
+    .producto-img-wrap {
+      height: 140px;
+    }
+
+    /* Nombre y precio más pequeños para caber en 2 columnas */
+    .producto-nombre {
+      font-size: 0.82rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .producto-precio {
+      font-size: 0.95rem;
+    }
+
+    /* Padding interior reducido */
+    .producto-card .d-flex.flex-column.p-3 {
+      padding: 0.6rem !important;
+    }
+
+    /* Filtros en una sola fila */
+    #form-filtros {
+      flex-wrap: nowrap !important;
+      gap: 0.5rem !important;
+    }
+
+    #form-filtros>div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Anular ancho fijo inline del input */
+    #input-busqueda {
+      width: 100% !important;
+    }
+
+    /* Labels y controles más compactos */
+    #form-filtros .form-label {
+      font-size: 0.72rem;
+      margin-bottom: 0.2rem;
+    }
+
+    #form-filtros .form-control {
+      font-size: 0.8rem;
+      padding-top: 0.3rem;
+      padding-bottom: 0.3rem;
+      height: auto;
+    }
+  }
+</style>
+
+<!-- Datos del servidor para JS -->
+<div id="catalogo-config" data-has-more="{{ 'true' if has_more else 'false' }}" data-busqueda="{{ busqueda or '' }}"
+  data-url="{{ url_for('router_proveedor.productos') }}" style="display:none;">
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ═══════════════════════════════════════════════════════════════
+  //  Estado global
+  // ═══════════════════════════════════════════════════════════════
+  const _cfg = document.getElementById('catalogo-config').dataset;
+  const PER_PAGE = 20;
+  let currentPage = 1;
+  let isLoading = false;
+  let hasMore = _cfg.hasMore === 'true';
+  let currentSearch = _cfg.busqueda;
+  const URL_CATALOGO = _cfg.url;
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Cargar productos via fetch
+  // ═══════════════════════════════════════════════════════════════
+  async function cargarProductos({ replace = false, page = 1 } = {}) {
+    if (isLoading) return;
+    if (!replace && !hasMore) return;
+
+    isLoading = true;
+
+    const inputBusqueda = document.getElementById('input-busqueda');
+    if (inputBusqueda) inputBusqueda.classList.add('buscando');
+
+    const spinner = document.getElementById('spinner-carga');
+    const finLista = document.getElementById('fin-lista');
+    const estadoVacio = document.getElementById('estado-vacio');
+    if (spinner) spinner.style.display = 'block';
+    if (finLista) finLista.style.display = 'none';
+
+    const params = new URLSearchParams({
+      busqueda: currentSearch,
+      page,
+      per_page: PER_PAGE,
+      formato: 'json'
+    });
+
+    try {
+      const res = await fetch(`${URL_CATALOGO}?${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const grid = document.getElementById('grid-productos');
+
+      if (replace) {
+        grid.innerHTML = data.html;
+        currentPage = 1;
+      } else {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = data.html;
+        const nuevasCards = tempDiv.querySelectorAll('.col-6');
+        nuevasCards.forEach((col, i) => {
+          const card = col.querySelector('.producto-card');
+          if (card) {
+            card.classList.add('producto-card-animada');
+            card.style.animationDelay = `${i * 40}ms`;
+          }
+          grid.appendChild(col);
+        });
+      }
+
+      hasMore = data.has_more;
+      currentPage = page;
+
+      actualizarContador(data.total, data.loaded, replace);
+
+      if (estadoVacio) {
+        if (data.total === 0) {
+          estadoVacio.removeAttribute('hidden');
+        } else {
+          estadoVacio.setAttribute('hidden', '');
+        }
+      }
+
+      if (!hasMore && data.total > 0) {
+        if (finLista) finLista.style.display = 'block';
+      }
+
+    } catch (err) {
+      console.error('Error cargando productos:', err);
+    } finally {
+      isLoading = false;
+      if (spinner) spinner.style.display = 'none';
+      const inputBusqueda = document.getElementById('input-busqueda');
+      if (inputBusqueda) inputBusqueda.classList.remove('buscando');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Contador
+  // ═══════════════════════════════════════════════════════════════
+  function actualizarContador(total, loaded, isReplace) {
+    const contador = document.getElementById('contador-resultados');
+    const texto = document.getElementById('texto-contador');
+    if (!contador || !texto) return;
+
+    if (total === 0) {
+      contador.style.display = 'none';
+      return;
+    }
+
+    contador.style.display = 'block';
+
+    const hayFiltros = currentSearch.trim() !== '';
+
+    if (isReplace && hayFiltros) {
+      texto.textContent = `${total} producto${total !== 1 ? 's' : ''} encontrado${total !== 1 ? 's' : ''}`;
+    } else {
+      const mostrados = Math.min(loaded || (currentPage * PER_PAGE), total);
+      texto.textContent = `Mostrando ${mostrados} de ${total} productos`;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Filtrado en tiempo real — debounce 300 ms
+  // ═══════════════════════════════════════════════════════════════
+  let debounceTimer;
+
+  const inputBusqueda = document.getElementById('input-busqueda');
+  if (inputBusqueda) {
+    inputBusqueda.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        currentSearch = this.value.trim();
+        hasMore = true;
+        cargarProductos({ replace: true, page: 1 });
+      }, 300);
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Infinite scroll
+  // ═══════════════════════════════════════════════════════════════
+  const sentinel = document.getElementById('scroll-sentinel');
+  if (sentinel) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore && !isLoading) {
+        cargarProductos({ replace: false, page: currentPage + 1 });
+      }
+    }, { rootMargin: '300px' });
+    observer.observe(sentinel);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Copiar ID en detalle
+  // ═══════════════════════════════════════════════════════════════
+  function copiarID() {
+    const id = document.getElementById('producto-id').innerText;
+    const icon = event.target;
+    navigator.clipboard.writeText(id).then(() => {
+      icon.classList.replace('bi-clipboard', 'bi-check');
+      setTimeout(() => icon.classList.replace('bi-check', 'bi-clipboard'), 1500);
+    });
+  }
+</script>
+{% endblock %}

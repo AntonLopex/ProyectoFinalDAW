@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Comercial{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1><i class="bi bi-briefcase me-2" style="color:var(--dsg-orange)"></i>Panel Comercial</h1>
+    <p>Bienvenido, {{ current_user.nombre }} — {{ now.strftime('%d/%m/%Y') }}</p>
+  </div>
+</div>
+
+<!-- ── Accesos rápidos ───────────────────────────────────────── -->
+<div class="row g-3">
+
+  <div class="col-md-4">
+    <a href="{{ url_for('router_comercial.mi_qr') }}" onclick="showLoader('Cargando tarjeta de acceso...')"
+      class="text-decoration-none">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3"
+        style="cursor:pointer; transition: border-color 0.15s;" onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.5rem; color:var(--dsg-orange)">
+          <i class="bi bi-qr-code"></i>
+        </div>
+        <div>
+          <div style="font-size:1.1rem; font-weight:600;">Mi QR</div>
+          <div style="color:var(--dsg-muted); font-size:0.85rem;">Ver mi tarjeta de acceso</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-4">
+    <a href="{{ url_for('router_comercial.mis_clientes') }}" onclick="showLoader('Cargando mis clientes...')"
+      class="text-decoration-none">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3"
+        style="cursor:pointer; transition: border-color 0.15s;" onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.5rem; color:var(--dsg-orange)">
+          <i class="bi bi-people"></i>
+        </div>
+        <div>
+          <div style="font-size:1.1rem; font-weight:600;">Mis clientes</div>
+          <div style="color:var(--dsg-muted); font-size:0.85rem;">Consulta y gestiona tu cartera de clientes</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-4">
+    <a href="{{ url_for('router_comercial.mis_pedidos') }}" onclick="showLoader('Cargando mis pedidos...')"
+      class="text-decoration-none">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3"
+        style="cursor:pointer; transition: border-color 0.15s;" onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.5rem; color:#60A5FA">
+          <i class="bi bi-bag"></i>
+        </div>
+        <div>
+          <div style="font-size:1.1rem; font-weight:600;">Pedidos</div>
+          <div style="color:var(--dsg-muted); font-size:0.85rem;">Seguimiento de pedidos de tus clientes</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-4">
+    <a href="{{ url_for('router_comercial.catalogo') }}" onclick="showLoader('Cargando catálogo...')"
+      class="text-decoration-none">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3"
+        style="cursor:pointer; transition: border-color 0.15s;" onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.5rem; color:#34D399">
+          <i class="bi bi-grid"></i>
+        </div>
+        <div>
+          <div style="font-size:1.1rem; font-weight:600;">Catálogo</div>
+          <div style="color:var(--dsg-muted); font-size:0.85rem;">Consulta el catálogo de productos</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

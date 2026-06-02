@@ -1,0 +1,645 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo cliente{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: var(--dsg-bg);
+  }
+
+  .form-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+  }
+
+  .main-content {
+    padding: 0 !important;
+  }
+
+  .form-box {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  /* ── Header ── */
+  .form-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .form-header .back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    color: var(--dsg-muted);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .form-header .back-btn:hover {
+    background: var(--dsg-surface);
+    color: var(--dsg-text);
+  }
+
+  .form-header-text h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--dsg-text);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .form-header-text p {
+    color: var(--dsg-muted);
+    font-size: 0.82rem;
+    margin: 0;
+  }
+
+  /* ── Card ── */
+  .form-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dsg-orange);
+    margin: 1.5rem 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+  }
+
+  .section-label:first-of-type {
+    margin-top: 0;
+  }
+
+  /* ── Labels ── */
+  .form-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dsg-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  /* ── Inputs ── */
+  .form-control,
+  .form-select {
+    height: 40px;
+    font-size: 0.9rem;
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    color: var(--dsg-text);
+    border-radius: 6px;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+    background: var(--dsg-surface2);
+    color: var(--dsg-text);
+  }
+
+  .form-control::placeholder {
+    color: var(--dsg-muted);
+    opacity: 0.6;
+  }
+
+  /* ── Icon wrap ── */
+  .input-icon-wrap {
+    position: relative;
+  }
+
+  .input-icon-wrap i {
+    position: absolute;
+    left: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dsg-muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+
+  .input-icon-wrap .form-control {
+    padding-left: 2.1rem;
+  }
+
+  /* ── Password feedback ── */
+  .input-error {
+    border: 1px solid #F87171 !important;
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15) !important;
+  }
+
+  .input-success {
+    border: 1px solid #34D399 !important;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15) !important;
+  }
+
+  /* ── Select2 theming ── */
+  .select2-container--default .select2-selection--single {
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    border-radius: 6px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    color: var(--dsg-text);
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--dsg-text);
+    line-height: normal;
+    padding: 0;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.5rem;
+  }
+
+  .select2-dropdown {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 6px;
+  }
+
+  .select2-container--default .select2-results__option--highlighted {
+    background: var(--dsg-orange) !important;
+    color: #fff;
+  }
+
+  .select2-container--default .select2-results__option {
+    color: var(--dsg-text);
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .select2-search--dropdown .select2-search__field {
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    color: var(--dsg-text);
+    border-radius: 4px;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .select2-search--dropdown .select2-search__field:focus {
+    outline: none;
+    border-color: var(--dsg-orange);
+  }
+
+  /* ── Acompañantes ── */
+  .acomp-row {
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .btn-add-acomp {
+    width: 100%;
+    height: 38px;
+    background: transparent;
+    border: 1px dashed var(--dsg-border);
+    border-radius: 8px;
+    color: var(--dsg-muted);
+    font-size: 0.82rem;
+    transition: border-color 0.15s, color 0.15s;
+    margin-top: 0.25rem;
+  }
+
+  .btn-add-acomp:hover {
+    border-color: var(--dsg-orange);
+    color: var(--dsg-orange);
+  }
+
+  .btn-rm-acomp {
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    color: #FCA5A5;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .btn-rm-acomp:hover {
+    background: rgba(239, 68, 68, 0.22);
+  }
+
+  /* ── Submit ── */
+  .btn-submit {
+    width: 100%;
+    height: 44px;
+    background: var(--dsg-orange);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 1.5rem;
+  }
+
+  .btn-submit:hover {
+    background: var(--dsg-orange-dark);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .btn-submit:active {
+    transform: translateY(0);
+  }
+
+  /* ── WTForms errors ── */
+  .invalid-feedback {
+    display: block;
+    font-size: 0.78rem;
+    color: #F87171;
+    margin-top: 0.25rem;
+  }
+
+  .field-error {
+    border-color: #F87171 !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Datos de comerciales para JS (sin Jinja dentro del script) -->
+<div id="comerciales-data" data-comerciales='{{ comerciales_js | tojson }}' style="display:none;">
+</div>
+
+<div class="form-wrapper">
+  <div class="form-box">
+
+    <!-- Header -->
+    <div class="form-header">
+      <a href="{{ url_for('router_admin.adminDashboard') }}" onclick="showLoader('Volviendo al dashboard...')"
+        class="back-btn">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div class="form-header-text">
+        <h1>Nuevo cliente</h1>
+        <p>Rellena los datos para dar de alta un cliente</p>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-card">
+      <form method="POST" action="{{ url_for('router_admin.crearUsuarioCliente') }}" novalidate>
+
+        {{ form.hidden_tag() }}
+
+        <!-- ── Datos personales ── -->
+        <div class="section-label">Datos personales</div>
+        <div class="row g-3">
+
+          <div class="col-12">
+            {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control" + (" field-error" if form.nombre.errors else ""), placeholder="Nombre",
+            autocomplete="given-name") }}
+            {% for e in form.nombre.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-sm-6">
+            {{ form.apellido1.label(class="form-label") }}
+            {{ form.apellido1(class="form-control" + (" field-error" if form.apellido1.errors else ""),
+            placeholder="Primer apellido", autocomplete="family-name") }}
+            {% for e in form.apellido1.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-sm-6">
+            {{ form.apellido2.label(class="form-label") }}
+            {{ form.apellido2(class="form-control", placeholder="Segundo apellido", autocomplete="off") }}
+          </div>
+
+        </div>
+
+        <!-- ── Acceso ── -->
+        <div class="section-label">Acceso</div>
+        <div class="row g-3">
+
+          <div class="col-12">
+            {{ form.email.label(class="form-label") }}
+            <div class="input-icon-wrap">
+              <i class="bi bi-envelope"></i>
+              {{ form.email(class="form-control" + (" field-error" if form.email.errors else ""),
+              placeholder="cliente@empresa.com", autocomplete="email") }}
+            </div>
+            {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-sm-6">
+            {{ form.password.label(class="form-label") }}
+            <div class="input-icon-wrap">
+              <i class="bi bi-lock"></i>
+              {{ form.password(class="form-control", id="password", placeholder="Mínimo 8 caracteres",
+              autocomplete="new-password") }}
+            </div>
+            {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-sm-6">
+            {{ form.confirmar_password.label(class="form-label") }}
+            <div class="input-icon-wrap">
+              <i class="bi bi-lock"></i>
+              {{ form.confirmar_password(class="form-control", id="password_confirm", placeholder="Repite la
+              contraseña", autocomplete="new-password") }}
+            </div>
+            <div id="passwordHelp" class="mt-1" style="font-size:0.78rem; color:var(--dsg-muted);">
+              Las contraseñas deben coincidir
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── Empresa ── -->
+        <div class="section-label">Empresa</div>
+        <div class="row g-3">
+
+          <div class="col-sm-8">
+            {{ form.nombre_empresa.label(class="form-label") }}
+            <div class="input-icon-wrap">
+              <i class="bi bi-building"></i>
+              {{ form.nombre_empresa(class="form-control" + (" field-error" if form.nombre_empresa.errors else ""),
+              placeholder="Nombre empresa", autocomplete="organization") }}
+            </div>
+            {% for e in form.nombre_empresa.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-sm-4">
+            {{ form.cif_empresa.label(class="form-label") }}
+            {{ form.cif_empresa(class="form-control", placeholder="B12345678", autocomplete="off") }}
+          </div>
+
+        </div>
+
+        <!-- ── Asignación ── -->
+        <div class="section-label">Asignación</div>
+        <div class="row g-3">
+
+          <div class="col-sm-4">
+            {{ form.codigo.label(class="form-label") }}
+            <div class="input-icon-wrap">
+              <i class="bi bi-upc"></i>
+              {{ form.codigo(class="form-control", placeholder="Ej: 12345", maxlength="5", autocomplete="off") }}
+            </div>
+          </div>
+
+          <div class="col-sm-8">
+            <label class="form-label" for="comercial_search">Comercial asignado</label>
+            <div style="position: relative;">
+              <input type="text" class="form-control" id="comercial_search" placeholder="Buscar comercial..."
+                autocomplete="off">
+              <div id="comercial_dropdown" style="
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--dsg-surface);
+                border: 1px solid var(--dsg-border);
+                border-radius: 6px;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1000;
+                margin-top: 2px;
+              "></div>
+            </div>
+            <input type="hidden" name="comercial_id" id="comercial_id_hidden" value="" aria-hidden="true">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="fecha_llegada">Fecha y hora de llegada estimada</label>
+            {% if form.fecha_llegada is defined %}
+            {{ form.fecha_llegada(class="form-control", type="datetime-local") }}
+            {% else %}
+            <input type="datetime-local" class="form-control" name="fecha_llegada" id="fecha_llegada" />
+            {% endif %}
+          </div>
+
+        </div>
+
+        <!-- ── Pernoctación ── -->
+        <div class="section-label">Pernoctación</div>
+
+        <label class="cena-toggle w-100" id="pernocta_usuario_toggle" style="
+          display:flex;
+          align-items:center;
+          gap:0.65rem;
+          background:var(--dsg-surface2);
+          border:1px solid var(--dsg-border);
+          border-radius:8px;
+          padding:0.6rem 0.9rem;
+          cursor:pointer;
+          transition:border-color 0.15s;
+          user-select:none;
+          margin:0;">
+
+          {{ form.pernocta(
+          class="form-check-input ms-0",
+          id="pernocta_usuario",
+          style="width:16px;height:16px;accent-color:#818CF8;cursor:pointer;"
+          ) if form.pernocta is defined else
+          '<input class="form-check-input ms-0" type="checkbox" name="pernocta_usuario" id="pernocta_usuario" value="1"
+            style="width:16px;height:16px;accent-color:#818CF8;cursor:pointer;">'
+          | safe
+          }}
+
+          <i class="bi bi-moon-stars" style="color:#818CF8; font-size:1rem;"></i>
+
+          <span style="font-size:0.85rem; color:var(--dsg-text);">
+            Se queda a dormir
+          </span>
+        </label>
+
+        <!-- ── Acompañantes ── -->
+        <div class="section-label">Acompañantes</div>
+
+        <div id="acompanantes-container"></div>
+
+        <button type="button" class="btn-add-acomp" onclick="añadirAcompanante()">
+          <i class="bi bi-person-plus me-1"></i> Añadir acompañante
+        </button>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-submit">
+          <i class="bi bi-person-check me-2"></i>Crear cliente
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  /* ── Validación contraseñas ── */
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('password_confirm');
+  const helpText = document.getElementById('passwordHelp');
+
+  function validarPasswords() {
+    const pass = password.value;
+    const confirm = confirmPassword.value;
+    if (confirm.length === 0) {
+      password.classList.remove('input-error', 'input-success');
+      confirmPassword.classList.remove('input-error', 'input-success');
+      helpText.style.color = 'var(--dsg-muted)';
+      helpText.textContent = 'Las contraseñas deben coincidir';
+      return;
+    }
+    if (pass === confirm) {
+      password.classList.add('input-success'); confirmPassword.classList.add('input-success');
+      password.classList.remove('input-error'); confirmPassword.classList.remove('input-error');
+      helpText.textContent = '✔ Las contraseñas coinciden';
+      helpText.style.color = '#34D399';
+    } else {
+      password.classList.add('input-error'); confirmPassword.classList.add('input-error');
+      password.classList.remove('input-success'); confirmPassword.classList.remove('input-success');
+      helpText.textContent = '✖ Las contraseñas no coinciden';
+      helpText.style.color = '#F87171';
+    }
+  }
+
+  password.addEventListener('input', validarPasswords);
+  confirmPassword.addEventListener('input', validarPasswords);
+
+  /* ── Comercial ── */
+  const comerciales = JSON.parse(document.getElementById('comerciales-data').dataset.comerciales);
+
+  const searchInput = document.getElementById('comercial_search');
+  const dropdown = document.getElementById('comercial_dropdown');
+  const hiddenInput = document.getElementById('comercial_id_hidden');
+
+  function renderOpciones(lista) {
+    dropdown.innerHTML = '';
+    if (!lista.length) {
+      dropdown.innerHTML = '<div style="padding: 0.5rem 0.75rem; color: var(--dsg-muted); font-size: 0.85rem;">Sin resultados</div>';
+    }
+    lista.forEach(function (c) {
+      const div = document.createElement('div');
+      div.textContent = c.nombre;
+      div.style.cssText = 'padding: 0.5rem 0.75rem; cursor: pointer; font-size: 0.88rem; color: var(--dsg-text);';
+      div.addEventListener('mouseenter', function () {
+        div.style.background = 'rgba(249, 115, 22, 0.15)';
+        div.style.color = 'var(--dsg-orange)';
+      });
+      div.addEventListener('mouseleave', function () {
+        div.style.background = '';
+        div.style.color = 'var(--dsg-text)';
+      });
+      div.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        searchInput.value = c.nombre;
+        hiddenInput.value = c.id;
+        dropdown.style.display = 'none';
+      });
+      dropdown.appendChild(div);
+    });
+    dropdown.style.display = 'block';
+  }
+
+  searchInput.addEventListener('focus', function () {
+    renderOpciones(comerciales);
+  });
+
+  searchInput.addEventListener('input', function () {
+    const texto = this.value.toLowerCase().trim();
+    hiddenInput.value = '';
+    const filtrados = comerciales.filter(function (c) {
+      return c.nombre.toLowerCase().includes(texto);
+    });
+    renderOpciones(filtrados);
+  });
+
+  searchInput.addEventListener('blur', function () {
+    setTimeout(function () {
+      dropdown.style.display = 'none';
+      const match = comerciales.find(function (c) {
+        return c.nombre.toLowerCase() === searchInput.value.toLowerCase();
+      });
+      if (!match) {
+        searchInput.value = '';
+        hiddenInput.value = '';
+      }
+    }, 150);
+  });
+
+  /* ── Acompañantes ── */
+  let contadorAc = 0;
+
+  function añadirAcompanante() {
+    contadorAc++;
+    const container = document.getElementById('acompanantes-container');
+    const div = document.createElement('div');
+    div.className = 'acomp-row';
+    div.id = 'acomp-' + contadorAc;
+    div.innerHTML =
+      '<div class="row g-2 align-items-center">' +
+      '<div class="col-sm-4">' +
+      '<input type="text" name="acompanante_nombre" class="form-control" placeholder="Nombre" />' +
+      '</div>' +
+      '<div class="col-sm-4">' +
+      '<input type="text" name="acompanante_apellido" class="form-control" placeholder="Apellidos" />' +
+      '</div>' +
+      '<div class="col-sm-2 d-flex align-items-center gap-1">' +
+      '<input class="form-check-input m-0" type="checkbox" name="acompanante_pernocta" value="1">' +
+      '<label class="form-check-label" style="font-size:0.78rem;">Pernocta</label>' +
+      '</div>' +
+      '<div class="col-sm-2 d-flex justify-content-end">' +
+      '<button type="button" class="btn-rm-acomp" onclick="eliminarAcompanante(' + contadorAc + ')">' +
+      '<i class="bi bi-trash"></i>' +
+      '</button>' +
+      '</div>' +
+      '</div>';
+    container.appendChild(div);
+  }
+
+  function eliminarAcompanante(id) {
+    const el = document.getElementById('acomp-' + id);
+    if (el) el.remove();
+  }
+</script>
+{% endblock %}

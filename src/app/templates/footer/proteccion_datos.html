@@ -1,0 +1,953 @@
+{% extends "base.html" %}
+
+{% block title %}Política de Privacidad{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Page header ── */
+  .page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--dsg-border);
+  }
+
+  .page-header .breadcrumb-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dsg-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .page-header .breadcrumb-line i {
+    color: var(--dsg-orange);
+  }
+
+  .page-header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+    letter-spacing: 0.02em;
+  }
+
+  .page-header h1 span {
+    color: var(--dsg-orange);
+  }
+
+  .page-header .meta {
+    font-size: 0.82rem;
+    color: var(--dsg-muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .page-header .meta i {
+    color: var(--dsg-orange);
+    margin-right: 0.25rem;
+  }
+
+  /* ── TOC ── */
+  .toc-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-left: 3px solid var(--dsg-orange);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .toc-card h6 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dsg-orange);
+    margin-bottom: 0.85rem;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 1.5rem;
+  }
+
+  .toc-list li a {
+    font-size: 0.83rem;
+    color: var(--dsg-muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0;
+    transition: color 0.15s;
+  }
+
+  .toc-list li a:hover {
+    color: var(--dsg-orange);
+  }
+
+  .toc-list li a::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--dsg-surface2);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .toc-list li a:hover::before {
+    background: var(--dsg-orange);
+  }
+
+  /* ── Secciones ── */
+  .legal-section {
+    margin-bottom: 2.5rem;
+    scroll-margin-top: 72px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-badge {
+    background: rgba(249, 115, 22, 0.12);
+    color: var(--dsg-orange);
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin: 0;
+    color: var(--dsg-text);
+  }
+
+  .legal-section p {
+    color: #D1D5DB;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    margin-bottom: 0.85rem;
+  }
+
+  .legal-section p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Datos del grupo ── */
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .data-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+  }
+
+  .data-card .entity-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dsg-text);
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.02em;
+  }
+
+  .data-card .entity-name .tag {
+    display: inline-block;
+    background: rgba(249, 115, 22, 0.12);
+    color: var(--dsg-orange);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    padding: 0.2rem 0;
+    border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+    gap: 0.5rem;
+  }
+
+  .data-row:last-child {
+    border-bottom: none;
+  }
+
+  .data-row .label {
+    color: var(--dsg-muted);
+    flex-shrink: 0;
+  }
+
+  .data-row .value {
+    color: var(--dsg-text);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* ── Listas legales ── */
+  .legal-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .legal-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.875rem;
+    color: #D1D5DB;
+    line-height: 1.6;
+  }
+
+  .legal-list li i {
+    color: var(--dsg-orange);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .legal-list li i.muted {
+    color: var(--dsg-muted);
+  }
+
+  /* ── Tabla de actividades ── */
+  .activities-table-wrap {
+    overflow-x: auto;
+    margin-top: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--dsg-border);
+  }
+
+  .activities-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  .activities-table thead tr {
+    background: rgba(249, 115, 22, 0.10);
+  }
+
+  .activities-table thead th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dsg-orange);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--dsg-border);
+  }
+
+  .activities-table tbody tr {
+    border-bottom: 1px solid var(--dsg-border);
+    transition: background 0.12s;
+  }
+
+  .activities-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .activities-table tbody tr:hover {
+    background: var(--dsg-surface);
+  }
+
+  .activities-table tbody td {
+    padding: 0.75rem 1rem;
+    color: #D1D5DB;
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  .activities-table tbody td:first-child {
+    font-weight: 600;
+    color: var(--dsg-text);
+    white-space: nowrap;
+  }
+
+  .badge-legitimacion {
+    display: inline-block;
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    padding: 0.1rem 0.4rem;
+    margin: 0.1rem 0;
+    color: var(--dsg-muted);
+    line-height: 1.4;
+  }
+
+  /* ── Info box ── */
+  .info-box {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: #93C5FD;
+    line-height: 1.6;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .info-box i {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* ── Warning box ── */
+  .warn-box {
+    background: rgba(234, 179, 8, 0.08);
+    border: 1px solid rgba(234, 179, 8, 0.25);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.875rem;
+    color: #FDE68A;
+    line-height: 1.6;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 1rem;
+  }
+
+  .warn-box i {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* ── Derechos grid ── */
+  .rights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .right-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .right-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(249, 115, 22, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .right-icon i {
+    color: var(--dsg-orange);
+    font-size: 0.9rem;
+  }
+
+  .right-card strong {
+    display: block;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--dsg-text);
+    margin-bottom: 0.25rem;
+  }
+
+  .right-card p {
+    font-size: 0.78rem !important;
+    color: var(--dsg-muted) !important;
+    margin: 0 !important;
+    line-height: 1.55 !important;
+  }
+
+  /* ── Contacto ── */
+  .contact-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.82rem;
+    color: var(--dsg-text);
+  }
+
+  .contact-item i {
+    color: var(--dsg-orange);
+  }
+
+  .contact-item a {
+    color: var(--dsg-orange);
+    text-decoration: none;
+  }
+
+  .contact-item a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── Divisor ── */
+  .section-divider {
+    height: 1px;
+    background: var(--dsg-border);
+    margin: 2.5rem 0;
+  }
+
+  /* ── Contenedor máximo ── */
+  .legal-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .toc-list {
+      grid-template-columns: 1fr;
+    }
+
+    .data-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .rights-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-wrap">
+
+  <!-- Cabecera -->
+  <div class="page-header">
+    <div class="breadcrumb-line">
+      <i class="bi bi-house-fill"></i>
+      <span>Inicio</span>
+      <i class="bi bi-chevron-right" style="font-size:0.65rem;"></i>
+      <span>Política de privacidad</span>
+    </div>
+    <h1>Política de <span>Privacidad</span></h1>
+    <div class="meta">
+      <span><i class="bi bi-calendar3"></i>Revisada el 20/10/2025</span>
+      <span><i class="bi bi-shield-check-fill"></i>RGPD (UE) 2016/679</span>
+      <span><i class="bi bi-file-earmark-lock2-fill"></i>LO 3/2018 (LOPDGDD)</span>
+    </div>
+  </div>
+
+  <!-- Índice -->
+  <div class="toc-card">
+    <h6><i class="bi bi-list-ul me-1"></i>Índice de contenidos</h6>
+    <ul class="toc-list">
+      <li><a href="#responsable">Responsable del tratamiento</a></li>
+      <li><a href="#donde">Dónde informamos</a></li>
+      <li><a href="#datos">Datos personales que tratamos</a></li>
+      <li><a href="#como">Cómo tratamos los datos</a></li>
+      <li><a href="#legitimacion">Legitimación del tratamiento</a></li>
+      <li><a href="#comunicaciones">Comunicaciones electrónicas</a></li>
+      <li><a href="#conservacion">Conservación de los datos</a></li>
+      <li><a href="#terceros">Cesión a terceros</a></li>
+      <li><a href="#derechos">Tus derechos</a></li>
+      <li><a href="#actividades">Registro de actividades</a></li>
+      <li><a href="#aceptacion">Aceptación y cambios</a></li>
+    </ul>
+  </div>
+
+  <!-- I. Responsable -->
+  <div class="legal-section" id="responsable">
+    <div class="section-header">
+      <span class="section-badge">I</span>
+      <h2>Responsable del tratamiento de tus datos</h2>
+    </div>
+    <p>Si tú, o una persona autorizada, nos has facilitado tus datos, te informamos de que <strong
+        style="color:var(--dsg-text);">DISTRISANTIAGO PAPELERIA, S.L.</strong>, con CIF <strong
+        style="color:var(--dsg-orange);">ESB15363864</strong>, es el responsable del tratamiento de los mismos. Estos
+      datos serán tratados de conformidad con lo dispuesto en las normativas vigentes sobre protección de datos
+      personales.</p>
+    <p>El Sitio Web puede incluir hipervínculos a páginas web de terceros distintos de <strong
+        style="color:var(--dsg-orange);">www.distrisantiago.es</strong>, los cuales no son operados por DISTRISANTIAGO
+      PAPELERIA, S.L. Sus titulares dispondrán de sus propias políticas de protección de datos, siendo responsables de
+      sus propias prácticas de privacidad.</p>
+    <p>DISTRISANTIAGO PAPELERIA, S.L. es parte de un grupo formado por las siguientes entidades:</p>
+    <div class="data-grid">
+      <div class="data-card">
+        <div class="entity-name">DISTRISANTIAGO PAPELERIA, S.L.<span class="tag">Principal</span></div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">ESB15363864</span></div>
+      </div>
+      <div class="data-card">
+        <div class="entity-name">OFIREYCO, S.L.</div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">ESB15342702</span></div>
+      </div>
+      <div class="data-card">
+        <div class="entity-name">DISTRISANTIAGO PAPELERIA VIGO, S.L.</div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">ESB36805331</span></div>
+      </div>
+      <div class="data-card">
+        <div class="entity-name">DSG FARMA, S.A.</div>
+        <div class="data-row"><span class="label">CIF</span><span class="value">ESA15112139</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- II. Dónde informamos -->
+  <div class="legal-section" id="donde">
+    <div class="section-header">
+      <span class="section-badge">II</span>
+      <h2>Dónde informamos</h2>
+    </div>
+    <p>Desde DISTRISANTIAGO PAPELERIA, S.L. informamos a través de la página web <a href="http://www.distrisantiago.es"
+        style="color:var(--dsg-orange);">www.distrisantiago.es</a> en el apartado correspondiente a la política de
+      privacidad. Más información en el <a href="/aviso-legal" style="color:var(--dsg-orange);">Aviso Legal</a>.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- III. Qué datos tratamos -->
+  <div class="legal-section" id="datos">
+    <div class="section-header">
+      <span class="section-badge">III</span>
+      <h2>Datos personales que tratamos</h2>
+    </div>
+    <p>Los datos personales que tratamos son:</p>
+    <ul class="legal-list">
+      <li><i class="bi bi-check-circle-fill"></i>Aquellos que tú decidas facilitarnos voluntariamente.</li>
+      <li><i class="bi bi-check-circle-fill"></i>Los datos derivados de las comunicaciones que mantengas con nosotros.
+      </li>
+      <li><i class="bi bi-check-circle-fill"></i>La información correspondiente a tu navegación en Servicios Online:
+        dirección IP o información derivada de cookies o dispositivos similares.</li>
+      <li><i class="bi bi-check-circle-fill"></i>Aquella información disponible en fuentes accesibles al público a la
+        que legítimamente podamos acceder.</li>
+      <li><i class="bi bi-check-circle-fill"></i>Los datos que se deriven de la relación contractual o precontractual,
+        incluida tu imagen, informándote siempre de la posibilidad de captar la misma.</li>
+      <li><i class="bi bi-check-circle-fill"></i>Los que terceras personas nos proporcionen sobre ti, existiendo base
+        legítima o habiendo obtenido tu consentimiento.</li>
+      <li><i class="bi bi-check-circle-fill"></i>Los datos de terceros que tú nos facilites, previo consentimiento del
+        tercero en cuestión.</li>
+    </ul>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- IV. Cómo tratamos -->
+  <div class="legal-section" id="como">
+    <div class="section-header">
+      <span class="section-badge">IV</span>
+      <h2>Cómo tratamos los datos</h2>
+    </div>
+    <p>En DISTRISANTIAGO PAPELERIA, S.L. tratamos tus datos personales en estricto cumplimiento de la legislación
+      vigente. Contamos con las medidas técnicas y organizativas adecuadas para garantizar un nivel óptimo de seguridad:
+      acceso restringido a personas autorizadas, integridad de los datos y sistemas reforzados.</p>
+    <p>Sin embargo, dado que no podemos garantizar la inexpugnabilidad de internet, nos comprometemos a comunicarte sin
+      dilación indebida cualquier violación de la seguridad de datos personales que sea probable que entrañe un alto
+      riesgo para tus derechos y libertades, de acuerdo con el artículo 4 del RGPD.</p>
+    <div class="info-box mt-3">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>Se entiende por violación de la seguridad toda destrucción, pérdida, alteración accidental o ilícita,
+        comunicación o acceso no autorizado a datos personales transmitidos, conservados o tratados de cualquier
+        forma.</span>
+    </div>
+    <p style="margin-top:0.85rem;">Informamos asimismo de un <strong style="color:var(--dsg-text);">tratamiento conjunto
+        de los datos</strong> por parte de todas las entidades del grupo detalladas en el punto I de esta política.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- V. Legitimación -->
+  <div class="legal-section" id="legitimacion">
+    <div class="section-header">
+      <span class="section-badge">V</span>
+      <h2>Legitimación del tratamiento</h2>
+    </div>
+    <p>La base de legitimación del tratamiento de datos personales será la que resulte de la <strong
+        style="color:var(--dsg-text);">relación contractual o precontractual</strong>, de la <strong
+        style="color:var(--dsg-text);">relación laboral</strong> o de cualquier otra que se requiera para el tratamiento
+      de datos, tales como el <strong style="color:var(--dsg-text);">consentimiento expreso</strong>.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- VI. Comunicaciones electrónicas -->
+  <div class="legal-section" id="comunicaciones">
+    <div class="section-header">
+      <span class="section-badge">VI</span>
+      <h2>Gestión de comunicaciones electrónicas</h2>
+    </div>
+    <p>De conformidad con la Ley 34/2002 (LSSI-CE) y la Directiva 2002/58/CE, puedes recibir comunicaciones comerciales
+      por vía electrónica cuando nos hayas otorgado tu consentimiento o se trate de productos o servicios similares a
+      los previamente contratados.</p>
+    <p>Si no deseas seguir recibiendo estas comunicaciones, puedes notificárnoslo por la misma vía indicando en el
+      asunto <strong style="color:var(--dsg-orange);">«BAJA COMUNICACIONES COMERCIALES»</strong>. Tu solicitud será
+      gestionada en un plazo máximo de 1 mes.</p>
+    <div class="warn-box">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>Los mensajes se dirigen exclusivamente a su destinatario y pueden contener información privilegiada o
+        confidencial. Si no eres el destinatario indicado, la utilización, divulgación o copia sin autorización está
+        prohibida por la legislación vigente.</span>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- VII. Conservación -->
+  <div class="legal-section" id="conservacion">
+    <div class="section-header">
+      <span class="section-badge">VII</span>
+      <h2>Conservación de los datos</h2>
+    </div>
+    <p>Los datos personales recopilados se conservarán mientras el interesado no solicite su supresión y, en todo caso,
+      mientras se mantenga la relación que originó el tratamiento, respetando los plazos legales de conservación
+      aplicables. Concluido dicho período, los datos serán eliminados de todos los sistemas de DISTRISANTIAGO PAPELERIA,
+      S.L.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- VIII. Terceros -->
+  <div class="legal-section" id="terceros">
+    <div class="section-header">
+      <span class="section-badge">VIII</span>
+      <h2>Cesión de datos a terceros</h2>
+    </div>
+    <p>No habrá cesión, transmisión o transferencia de datos personales salvo las ya informadas, o cuando sea
+      consecuencia de una obligación legal. Si la Administración Pública o Instituciones Autonómicas solicitan tus datos
+      en el ámbito de sus funciones legales, serán transmitidos.</p>
+    <p>De existir cualquier otra cesión no prevista, serás previamente informado para que, si procede, nos prestes tu
+      consentimiento.</p>
+    <p>Cuando sea necesario contratar servicios de asesores u otras empresas, el tratamiento por cuenta de terceros
+      estará regulado mediante un contrato escrito que especificará expresamente que el encargado tratará los datos
+      conforme a nuestras instrucciones y no los usará para fines distintos ni los comunicará a otras personas.</p>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- IX. Derechos -->
+  <div class="legal-section" id="derechos">
+    <div class="section-header">
+      <span class="section-badge">IX</span>
+      <h2>Tus derechos</h2>
+    </div>
+    <p>La normativa de protección de datos te confiere los siguientes derechos:</p>
+    <div class="rights-grid">
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-eye-fill"></i></div>
+        <div>
+          <strong>Acceso</strong>
+          <p>Obtener confirmación sobre si tratamos tus datos e información sobre su origen, finalidad y destinatarios.
+          </p>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-pencil-fill"></i></div>
+        <div>
+          <strong>Rectificación</strong>
+          <p>Solicitar la modificación de datos inexactos o incompletos en función de los fines del tratamiento.</p>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-trash-fill"></i></div>
+        <div>
+          <strong>Supresión («derecho al olvido»)</strong>
+          <p>Obtener la eliminación de tus datos cuando ya no sean necesarios, hayas retirado el consentimiento u otras
+            causas previstas en la ley.</p>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-lock-fill"></i></div>
+        <div>
+          <strong>Limitación del tratamiento</strong>
+          <p>Limitar el tratamiento cuando impugnes la exactitud de los datos, el tratamiento sea ilícito o los
+            necesites para reclamaciones.</p>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-arrow-left-right"></i></div>
+        <div>
+          <strong>Portabilidad</strong>
+          <p>Recibir tus datos en formato estructurado y de uso común, y transmitirlos a otro responsable cuando el
+            tratamiento sea automatizado.</p>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-hand-thumbs-down-fill"></i></div>
+        <div>
+          <strong>Oposición</strong>
+          <p>Que no se lleve a cabo o que cese el tratamiento de tus datos por parte de DISTRISANTIAGO PAPELERIA, S.L.
+          </p>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="right-icon"><i class="bi bi-robot"></i></div>
+        <div>
+          <strong>No automatización</strong>
+          <p>No ser objeto de decisiones basadas únicamente en tratamiento automatizado, incluida la elaboración de
+            perfiles.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem;">Para ejercer cualquiera de estos derechos puedes dirigirte a:</p>
+    <div class="contact-row">
+      <div class="contact-item">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>Vía Pasteur, 10 (Pol. Ind. Tambre) — 15890 Santiago de Compostela (A Coruña)</span>
+      </div>
+      <div class="contact-item">
+        <i class="bi bi-envelope-fill"></i>
+        <a href="mailto:atencionalcliente@distrisantiago.es">atencionalcliente@distrisantiago.es</a>
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-top:1rem;">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>La solicitud deberá incluir nombre y apellidos, petición concreta, domicilio y datos acreditativos. Puede
+        ser ejercida por el propio usuario o por un representante legal acreditado. Puedes retirar el consentimiento en
+        cualquier momento sin que afecte a la licitud del tratamiento previo.</span>
+    </div>
+
+    <p style="margin-top:1rem;">Si consideras que existe una infracción en el tratamiento de tus datos, puedes presentar
+      una reclamación ante la <strong style="color:var(--dsg-text);">Agencia Española de Protección de Datos
+        (AEPD)</strong>:</p>
+    <div class="contact-row">
+      <div class="contact-item">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>C/ Jorge Juan, 6 — 28001 Madrid</span>
+      </div>
+      <div class="contact-item">
+        <i class="bi bi-telephone-fill"></i>
+        <span>901 100 099</span>
+      </div>
+      <div class="contact-item">
+        <i class="bi bi-envelope-fill"></i>
+        <a href="mailto:ciudadano@agpd.es">ciudadano@agpd.es</a>
+      </div>
+      <div class="contact-item">
+        <i class="bi bi-globe"></i>
+        <a href="https://www.aepd.es" target="_blank">www.aepd.es</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- X. Registro de actividades -->
+  <div class="legal-section" id="actividades">
+    <div class="section-header">
+      <span class="section-badge">X</span>
+      <h2>Finalidades, legitimación y plazos de conservación</h2>
+    </div>
+    <p>A continuación se detallan las actividades de tratamiento de datos llevadas a cabo por las entidades del grupo:
+    </p>
+    <div class="activities-table-wrap">
+      <table class="activities-table">
+        <thead>
+          <tr>
+            <th>Actividad</th>
+            <th>Finalidad</th>
+            <th>Legitimación</th>
+            <th>Conservación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Gestión laboral</td>
+            <td>Formalización de contratos, control de expedientes y gestión de nóminas.</td>
+            <td><span class="badge-legitimacion">Relación contractual</span></td>
+            <td>5 años desde la finalización del contrato</td>
+          </tr>
+          <tr>
+            <td>Gestión fiscal y contable</td>
+            <td>Cumplimiento de obligaciones fiscales y contables.</td>
+            <td>
+              <span class="badge-legitimacion">Relación contractual</span>
+              <span class="badge-legitimacion">Obligación legal</span>
+              <span class="badge-legitimacion">Interés legítimo</span>
+            </td>
+            <td>5 años / plazo legal específico</td>
+          </tr>
+          <tr>
+            <td>Gestión de contactos</td>
+            <td>Mantener comunicaciones con los interesados.</td>
+            <td>
+              <span class="badge-legitimacion">Relación contractual</span>
+              <span class="badge-legitimacion">Interés legítimo</span>
+              <span class="badge-legitimacion">Consentimiento</span>
+            </td>
+            <td>5 años / hasta cancelación u oposición</td>
+          </tr>
+          <tr>
+            <td>Prevención de riesgos laborales</td>
+            <td>Cumplimiento de la normativa de PRL y vigilancia de la salud.</td>
+            <td>
+              <span class="badge-legitimacion">Relación contractual</span>
+              <span class="badge-legitimacion">Obligación legal</span>
+            </td>
+            <td>Hasta finalización contractual / plazo legal</td>
+          </tr>
+          <tr>
+            <td>Videovigilancia</td>
+            <td>Protección de activos y supervisión de la actividad laboral.</td>
+            <td><span class="badge-legitimacion">Interés legítimo</span></td>
+            <td>Máximo 1 mes</td>
+          </tr>
+          <tr>
+            <td>Gestión de candidatos/as</td>
+            <td>Selección de personal mediante currículos, entrevistas y pruebas.</td>
+            <td>
+              <span class="badge-legitimacion">Interés vital</span>
+              <span class="badge-legitimacion">Consentimiento</span>
+            </td>
+            <td>Finalizado el plazo para el que se solicita</td>
+          </tr>
+          <tr>
+            <td>Comunicación informativa</td>
+            <td>Difusión de actividades y notificaciones relevantes.</td>
+            <td>
+              <span class="badge-legitimacion">Interés legítimo</span>
+              <span class="badge-legitimacion">Consentimiento</span>
+            </td>
+            <td>Hasta cancelación u oposición</td>
+          </tr>
+          <tr>
+            <td>Gestión multimedia</td>
+            <td>Tratamiento de imágenes y vídeos para difusión en medios y redes sociales.</td>
+            <td><span class="badge-legitimacion">Consentimiento</span></td>
+            <td>Hasta cancelación u oposición / pérdida de uso</td>
+          </tr>
+          <tr>
+            <td>Gestión de clientes</td>
+            <td>Mantenimiento de la relación comercial, facturación, posventa, publicidad y fidelización.</td>
+            <td>
+              <span class="badge-legitimacion">Relación contractual</span>
+              <span class="badge-legitimacion">Relación comercial</span>
+            </td>
+            <td>5 años / plazo legal específico</td>
+          </tr>
+          <tr>
+            <td>Envío de publicidad</td>
+            <td>Información comercial, ofertas, eventos y productos a clientes y potenciales clientes.</td>
+            <td><span class="badge-legitimacion">Consentimiento</span></td>
+            <td>Hasta cancelación u oposición / pérdida de uso</td>
+          </tr>
+          <tr>
+            <td>Comercio electrónico</td>
+            <td>Elaboración y gestión de pedidos y compras a través de plataformas web.</td>
+            <td>
+              <span class="badge-legitimacion">Relación contractual</span>
+              <span class="badge-legitimacion">Relación comercial</span>
+            </td>
+            <td>5 años / plazo legal específico</td>
+          </tr>
+          <tr>
+            <td>Control laboral</td>
+            <td>Control de asistencia, vacaciones, registro de jornada y cumplimiento.</td>
+            <td>
+              <span class="badge-legitimacion">Relación contractual</span>
+              <span class="badge-legitimacion">Obligación legal</span>
+              <span class="badge-legitimacion">Interés legítimo</span>
+            </td>
+            <td>Hasta finalización de la relación contractual</td>
+          </tr>
+          <tr>
+            <td>Gestión de proveedores</td>
+            <td>Análisis, valoración, contratación y gestión de pagos a proveedores.</td>
+            <td><span class="badge-legitimacion">Relación contractual</span></td>
+            <td>5 años / plazo legal específico</td>
+          </tr>
+          <tr>
+            <td>Gestión web</td>
+            <td>Consultas, contactos y reclamaciones recibidas a través de la página web.</td>
+            <td><span class="badge-legitimacion">Consentimiento</span></td>
+            <td>Hasta cancelación u oposición / pérdida de uso</td>
+          </tr>
+          <tr>
+            <td>Canal de denuncias</td>
+            <td>Gestión de expedientes internos en materia de cumplimiento normativo.</td>
+            <td><span class="badge-legitimacion">Interés público</span></td>
+            <td>Plazo legalmente establecido</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- XI. Aceptación -->
+  <div class="legal-section" id="aceptacion">
+    <div class="section-header">
+      <span class="section-badge">XI</span>
+      <h2>Aceptación y cambios en esta política</h2>
+    </div>
+    <p>Es necesario que el usuario haya leído y esté conforme con las condiciones sobre protección de datos contenidas
+      en esta Política de Privacidad, aceptando el tratamiento de sus datos personales en la forma, plazos y finalidades
+      indicados. El uso del Sitio Web implicará la aceptación de esta Política.</p>
+    <p>DISTRISANTIAGO PAPELERIA, S.L. se reserva el derecho a modificar su Política de Privacidad de acuerdo a su propio
+      criterio o motivado por un cambio legislativo, jurisprudencial o doctrinal de la Agencia Española de Protección de
+      Datos. Los cambios no serán notificados de forma explícita; se recomienda consultar esta página periódicamente.
+    </p>
+    <div class="info-box mt-3">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>Esta Política de Privacidad ha sido actualizada para adaptarse al <strong>Reglamento (UE) 2016/679
+          (RGPD)</strong> y a la <strong>Ley Orgánica 3/2018, de 5 de diciembre (LOPDGDD)</strong>. Última revisión:
+        <strong>20/10/2025</strong>.</span>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

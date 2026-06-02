@@ -1,0 +1,1209 @@
+{% extends "base.html" %}
+
+{% block title %}Listado de Solicitudes{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Header con botón ── */
+    .sol-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 1.75rem;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .btn-solicitud-final {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        background: var(--dsg-orange);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .5rem 1.1rem;
+        font-size: .88rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: filter .18s, transform .18s;
+        white-space: nowrap;
+    }
+
+    .btn-solicitud-final:hover {
+        filter: brightness(1.12);
+        transform: translateY(-1px);
+        color: #fff;
+        text-decoration: none;
+    }
+
+    /* ── Proveedor bloque ── */
+    .proveedor-block {
+        margin-bottom: 0;
+    }
+
+    .proveedor-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0 1rem;
+    }
+
+    .proveedor-divider-label {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--dsg-muted);
+        white-space: nowrap;
+    }
+
+    .proveedor-divider-label i {
+        color: var(--dsg-orange);
+        font-size: .9rem;
+    }
+
+    .proveedor-divider-line {
+        flex: 1;
+        height: 1px;
+        background: var(--dsg-border);
+    }
+
+    /* ── Fila de 2 cards ── */
+    .sol-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        align-items: stretch;
+        margin-bottom: .25rem;
+    }
+
+    /* Las columnas internas también se estiran */
+    .sol-row>div {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* ── Card ── */
+    .sol-card {
+        background: var(--dsg-surface);
+        border: 1px solid var(--dsg-border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: border-color .18s, transform .18s;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        /* ocupa todo el alto disponible en la columna */
+        min-height: 0;
+    }
+
+    .sol-card:hover {
+        transform: translateY(-2px);
+    }
+
+    /* card vacía / placeholder */
+    .sol-card-empty {
+        background: transparent;
+        border: 1px dashed var(--dsg-border);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .4rem;
+        color: var(--dsg-muted);
+        font-size: .82rem;
+        opacity: .45;
+        min-height: 120px;
+    }
+
+    .sol-card-empty i {
+        font-size: 1.5rem;
+    }
+
+    .sol-card-bar {
+        height: 3px;
+        width: 100%;
+        flex-shrink: 0;
+    }
+
+    /* Verde — confirmado/aceptado/asignado */
+    .bar-confirmada,
+    .bar-aceptada,
+    .bar-asignado_por_admin {
+        background: #34D399;
+    }
+
+    /* Rojo — rechazado */
+    .bar-rechazada,
+    .bar-cancelada {
+        background: #F87171;
+    }
+
+    /* Amarillo — pendiente */
+    .bar-pendiente {
+        background: #FCD34D;
+    }
+
+    /* Naranja — pre-reservado */
+    .bar-pre_reservado {
+        background: var(--dsg-orange);
+    }
+
+    .bar-borrador {
+        background: #34D399;
+    }
+
+    .sol-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1rem 1.25rem .75rem;
+        gap: .75rem;
+    }
+
+    .sol-card-type-label {
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--dsg-muted);
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .sol-card-title {
+        font-weight: 700;
+        font-size: .95rem;
+        margin: 0;
+    }
+
+    .sol-card-meta {
+        font-size: .75rem;
+        color: var(--dsg-muted);
+        margin-top: 2px;
+    }
+
+    .sol-badge {
+        font-size: .7rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .sol-badge-pendiente {
+        background: rgba(252, 211, 77, .15);
+        color: #FCD34D;
+        border: 1px solid rgba(252, 211, 77, .3);
+    }
+
+    .sol-badge-confirmada {
+        background: rgba(52, 211, 153, .15);
+        color: #34D399;
+        border: 1px solid rgba(52, 211, 153, .3);
+    }
+
+    .sol-badge-rechazada {
+        background: rgba(248, 113, 113, .15);
+        color: #F87171;
+        border: 1px solid rgba(248, 113, 113, .3);
+    }
+
+    .sol-badge-pre_reservado {
+        background: rgba(249, 115, 22, .15);
+        color: var(--dsg-orange);
+        border: 1px solid rgba(249, 115, 22, .3);
+    }
+
+    .sol-card-body {
+        padding: 0 1.25rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+        flex: 1;
+    }
+
+    .sol-section-label {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--dsg-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: .55rem 0 .25rem;
+        border-top: 1px solid var(--dsg-border);
+    }
+
+    .sol-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: .87rem;
+        padding: 2px 0;
+    }
+
+    .sol-line-name {
+        color: var(--dsg-text);
+    }
+
+    .sol-line-muted {
+        color: var(--dsg-muted);
+        font-size: .76rem;
+        margin-left: 5px;
+    }
+
+    .sol-line-price {
+        font-weight: 600;
+        color: var(--dsg-text);
+        white-space: nowrap;
+    }
+
+    /* ── Extra edición ── */
+    .extra-edit-wrap {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .extra-price-display {
+        font-weight: 600;
+        color: var(--dsg-text);
+        white-space: nowrap;
+    }
+
+    .btn-edit-price {
+        background: none;
+        border: none;
+        color: var(--dsg-muted);
+        cursor: pointer;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: .85rem;
+        transition: color .15s, background .15s;
+        line-height: 1;
+    }
+
+    .btn-edit-price:hover {
+        color: var(--dsg-orange);
+        background: rgba(249, 115, 22, .08);
+    }
+
+    .extra-edit-form {
+        display: none;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    .extra-edit-form.active {
+        display: flex;
+    }
+
+    .extra-price-input {
+        width: 80px;
+        background: var(--dsg-surface2);
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-text);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: .82rem;
+        text-align: right;
+    }
+
+    .extra-price-input:focus {
+        outline: none;
+        border-color: var(--dsg-orange);
+        box-shadow: 0 0 0 2px rgba(249, 115, 22, .2);
+    }
+
+    .btn-cancel-edit {
+        background: none;
+        border: none;
+        color: var(--dsg-muted);
+        cursor: pointer;
+        font-size: .85rem;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color .15s;
+    }
+
+    .btn-cancel-edit:hover {
+        color: #F87171;
+    }
+
+    /* ── Footer ── */
+    .sol-card-foot {
+        background: rgba(255, 255, 255, .02);
+        border-top: 1px solid var(--dsg-border);
+        padding: .85rem 1.25rem;
+        margin-top: auto;
+    }
+
+    .sol-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: .87rem;
+    }
+
+    .sol-total-label {
+        color: var(--dsg-muted);
+    }
+
+    .sol-total-value {
+        font-weight: 700;
+        color: var(--dsg-orange);
+    }
+
+    .sol-actions {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+        padding: .75rem 1.25rem;
+        border-top: 1px solid var(--dsg-border);
+    }
+
+    .btn-cancelar {
+        background: rgba(248, 113, 113, .1);
+        color: #F87171;
+        border: 1px solid rgba(248, 113, 113, .3);
+        border-radius: 6px;
+        padding: .35rem .85rem;
+        font-size: .85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background .15s;
+    }
+
+    .btn-cancelar:hover {
+        background: rgba(248, 113, 113, .2);
+    }
+
+    .sol-obs {
+        font-size: .82rem;
+        color: var(--dsg-muted);
+        background: rgba(255, 255, 255, .03);
+        border-radius: 6px;
+        padding: .5rem .75rem;
+        border-left: 2px solid var(--dsg-border);
+        margin-top: .25rem;
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* ── Solicitud Final (modal) ── */
+    .desc-card {
+        background: var(--dsg-surface);
+        border: 1px solid var(--dsg-border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: border-color .18s, transform .18s;
+        overflow-y: auto;
+    }
+
+    .desc-card-bar {
+        height: 3px;
+        background: #34D399;
+    }
+
+    .desc-card-head {
+        padding: 1rem 1.25rem .75rem;
+        border-bottom: 1px solid var(--dsg-border);
+    }
+
+    .desc-proveedor {
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .desc-meta {
+        font-size: .78rem;
+        color: var(--dsg-muted);
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .desc-card-body {
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+
+    }
+
+    .desc-section-label {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--dsg-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: .5rem 0 .2rem;
+        border-top: 1px solid var(--dsg-border);
+    }
+
+    .desc-section-label:first-child {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .desc-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: .88rem;
+        padding: 3px 0;
+    }
+
+    .desc-line-name {
+        color: var(--dsg-text);
+    }
+
+    .desc-line-muted {
+        color: var(--dsg-muted);
+        font-size: .76rem;
+        margin-left: 5px;
+    }
+
+    .desc-line-price {
+        font-weight: 600;
+        color: var(--dsg-text);
+        white-space: nowrap;
+    }
+
+    .desc-card-foot {
+        background: rgba(255, 255, 255, .025);
+        border-top: 1px solid var(--dsg-border);
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: .6rem;
+    }
+
+    .desc-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: .88rem;
+    }
+
+    .desc-row-label {
+        color: var(--dsg-muted);
+    }
+
+    .desc-row-value {
+        font-weight: 600;
+        color: var(--dsg-text);
+    }
+
+    .desc-discount-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .desc-discount-label {
+        font-size: .85rem;
+        color: var(--dsg-muted);
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .desc-discount-input {
+        width: 110px;
+        background: var(--dsg-surface2);
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-text);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: .88rem;
+        text-align: right;
+        transition: border-color .15s;
+    }
+
+    .desc-discount-input:focus {
+        outline: none;
+        border-color: var(--dsg-orange);
+        box-shadow: 0 0 0 2px rgba(249, 115, 22, .2);
+    }
+
+    .desc-final-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: .65rem;
+        border-top: 1px solid var(--dsg-border);
+    }
+
+    .desc-final-label {
+        font-weight: 700;
+        font-size: .95rem;
+    }
+
+    .desc-final-value {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--dsg-orange);
+        transition: color .2s;
+    }
+
+    .desc-final-value.discounted {
+        color: #34D399;
+    }
+
+    .btn-edit-descuento {
+        background: transparent;
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-muted);
+        border-radius: 6px;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: border-color .15s, color .15s;
+        flex-shrink: 0;
+    }
+
+    .btn-edit-descuento:hover {
+        border-color: var(--dsg-orange);
+        color: var(--dsg-orange);
+    }
+
+    .input-hidden {
+        display: none;
+    }
+
+    .modal-final .modal-content {
+        background: var(--dsg-surface);
+        border: 1px solid var(--dsg-border);
+        border-radius: 16px;
+    }
+
+    .modal-final .modal-header {
+        border-bottom: 1px solid var(--dsg-border);
+        padding: 1.1rem 1.5rem;
+    }
+
+    .modal-final .modal-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- Page header -->
+<div class="sol-page-header">
+    <div class="page-header">
+        <h1><i class="bi bi-clipboard-data me-2" style="color:var(--dsg-orange)"></i>Listado de Solicitudes</h1>
+        <p>Gestión de solicitudes de stands y mobiliario</p>
+    </div>
+</div>
+
+{# Agrupar solicitudes por usuario (proveedor) #}
+{% set proveedores = {} %}
+{% for s in solicitudes %}
+{% set uid = s.usuario.id %}
+{% if uid not in proveedores %}
+{% set _ = proveedores.update({ uid: { 'usuario': s.usuario, 'stands': [], 'mob': [] } }) %}
+{% endif %}
+
+{% if s.detalles_stand|length > 0 %}
+{% set _ = proveedores[uid]['stands'].append(s) %}
+{% elif s.detalles_mobiliario|length > 0 %}
+{% set _ = proveedores[uid]['mob'].append(s) %}
+{% endif %}
+{% endfor %}
+
+{% if proveedores %}
+
+{% for uid, prov in proveedores.items() %}
+
+<div class="proveedor-divider">
+    <div class="proveedor-divider-label">
+        <i class="bi bi-person-fill"></i>
+        {{ prov.usuario.nombre.capitalize() }} {{ prov.usuario.apellido1.capitalize() }}
+        {% if prov.usuario.nombre_empresa %}&nbsp;·&nbsp;{{ prov.usuario.nombre_empresa }}{% endif %}
+    </div>
+    <div class="proveedor-divider-line"></div>
+    <button type="button" class="btn-dsg-outline" data-bs-toggle="modal" data-bs-target="#modal-final-{{ uid }}">
+        <i class="bi bi-file-earmark-check"></i> Solicitud final
+    </button>
+</div>
+
+<div class="sol-row proveedor-block">
+
+    <!-- STANDS -->
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+        {% set stands_visibles = prov.stands | selectattr('estado', '!=', 'rechazada') | list %}
+
+        {% if stands_visibles %}
+        {% for s in prov.stands %}
+        {% if s.estado != 'rechazada' %}
+        {% set stands = s.detalles_stand %}
+        {% set ns = namespace(total=0) %}
+
+        {% for d in stands %}
+        {% set ns.total = ns.total + d.precio_total|float %}
+        {% endfor %}
+
+        {% for e in s.extras %}
+        {% set ns.total = ns.total + ((e.precio|float * e.cantidad) if e.precio else 0) %}
+        {% endfor %}
+
+        <div class="sol-card">
+            <div class="sol-card-bar bar-{{ s.estado }}"></div>
+
+            <div class="sol-card-head">
+                <div>
+                    <div class="sol-card-title"><i class="bi bi-map"></i> Solicitud de Stand</div>
+                    <p class="sol-card-meta">
+                        <i class="bi bi-calendar3 me-1"></i>{{ s.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}
+                    </p>
+                </div>
+
+                {% if s.estado == 'pre_reservado' %}
+                <span class="sol-badge sol-badge-pendiente">Pre-reservado</span>
+                {% elif s.estado in ['asignado_por_admin', 'aceptada'] %}
+                <span class="sol-badge sol-badge-confirmada">
+                    {% if s.estado == 'asignado_por_admin' %}Asignado en mapa{% else %}Aceptado{% endif %}
+                </span>
+                {% else %}
+                <span class="sol-badge sol-badge-pendiente">{{ s.estado.capitalize() }}</span>
+                {% endif %}
+            </div>
+
+            <div class="sol-card-body">
+                <div class="sol-section-label"><i class="bi bi-map"></i> Stands</div>
+                {% for d in stands %}
+                <div class="sol-line">
+                    <div>
+                        <span class="sol-line-name">Stand #{{ d.stand.numero_stand }}</span>
+                        <span class="sol-line-muted">{{ d.stand.dimensiones }} m²</span>
+                    </div>
+                    <span class="sol-line-price">{{ "%.2f"|format(d.precio_total|float) }} €</span>
+                </div>
+                {% endfor %}
+
+                {% if s.observaciones %}
+                <div class="sol-obs"><i class="bi bi-chat-left-text me-1"></i>{{ s.observaciones }}</div>
+                {% endif %}
+            </div>
+
+            <div class="sol-card-foot">
+                <div class="sol-total-row">
+                    <span class="sol-total-label">Subtotal</span>
+                    <span class="sol-total-value">{{ "%.2f"|format(ns.total) }} €</span>
+                </div>
+            </div>
+
+            <div class="sol-actions">
+                {% if s.estado in ['pendiente', 'pre_reservado'] %}
+                <form action="{{ url_for('router_admin.cambiar_estado_solicitud', solicitud_id=s.id) }}" method="POST"
+                    onsubmit="showLoader('Actualizando...')">
+                    <input type="hidden" name="estado" value="confirmada">
+                    <input type="hidden" name="accion_stand" value="ocupado">
+                    <button type="submit" class="btn-dsg btn btn-sm">
+                        <i class="bi bi-check-circle me-1"></i>Confirmar
+                    </button>
+                </form>
+
+                <form action="{{ url_for('router_admin.cambiar_estado_solicitud', solicitud_id=s.id) }}" method="POST"
+                    onsubmit="showLoader('Actualizando...')">
+                    <input type="hidden" name="estado" value="rechazada">
+                    <input type="hidden" name="accion_stand" value="disponible">
+                    <button type="submit" class="btn-cancelar">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        {% else %}
+        <div class="sol-card-empty">
+            <i class="bi bi-map"></i>
+            <span>Sin solicitud de stand</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- MOBILIARIO -->
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+        {% if prov.mob %}
+        {% for s in prov.mob %}
+        {% set mob = s.detalles_mobiliario %}
+        {% set extras = s.extras %}
+        {% set ns = namespace(total=0) %}
+
+        {% for d in mob %}
+        {% set ns.total = ns.total + d.precio_total|float %}
+        {% endfor %}
+
+        {% for e in extras %}
+        {% set ns.total = ns.total + ((e.precio|float * e.cantidad) if e.precio else 0) %}
+        {% endfor %}
+
+        <div class="sol-card">
+            <div class="sol-card-bar bar-{{ s.estado }}"></div>
+
+            <div class="sol-card-head">
+                <div>
+                    <div class="sol-card-title"><i class="bi bi-box-seam"></i> Solicitud de Mobiliario</div>
+                    <p class="sol-card-meta">
+                        <i class="bi bi-calendar3 me-1"></i>{{ s.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}
+                    </p>
+                </div>
+
+                {% if s.estado == 'borrador' %}
+                <span class="sol-badge sol-badge-pendiente">Reserva provisional de mobiliario</span>
+                {% elif s.estado in ['confirmada', 'aceptada'] %}
+                <span class="sol-badge sol-badge-confirmada">{{ s.estado.capitalize() }}</span>
+                {% elif s.estado == 'rechazada' %}
+                <span class="sol-badge sol-badge-rechazada">Rechazado</span>
+                {% else %}
+                <span class="sol-badge sol-badge-confirmada">{{ s.estado.capitalize() }}</span>
+                {% endif %}
+            </div>
+
+            <div class="sol-card-body">
+                <div class="sol-section-label"><i class="bi bi-box-seam"></i> Mobiliario</div>
+
+                {% for d in mob %}
+                <div class="sol-line">
+                    <div>
+                        <span class="sol-line-name">{{ d.mobiliario.referencia }}</span>
+                        <span class="sol-line-muted">x{{ d.cantidad }}</span>
+                    </div>
+                    <span class="sol-line-price">{{ "%.2f"|format(d.precio_total|float) }} €</span>
+                </div>
+                {% endfor %}
+
+                {% if extras %}
+                <div class="sol-section-label"><i class="bi bi-plus-circle"></i> Extras</div>
+                {% for e in extras %}
+                <div class="sol-line">
+                    <div>
+                        <span class="sol-line-name">{{ e.descripcion }}</span>
+                        <span class="sol-line-muted">x{{ e.cantidad }}</span>
+                    </div>
+
+                    <div class="extra-edit-wrap">
+                        <span class="extra-price-display" id="price-display-{{ e.id }}">
+                            {{ "%.2f"|format((e.precio|float * e.cantidad) if e.precio else 0) }} €
+                        </span>
+
+                        <button type="button" class="btn-edit-price" data-extra-id="{{ e.id }}"
+                            onclick="toggleExtraEdit(this)" title="Editar precio">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <form id="extra-form-{{ e.id }}" class="extra-edit-form"
+                            action="{{ url_for('router_admin.guardar_precio_extra', extra_id=e.id) }}" method="POST"
+                            onsubmit="showLoader('Guardando...')">
+                            <input type="number" step="0.01" min="0" name="precio" class="extra-price-input"
+                                value="{{ '%.2f'|format(e.precio|float) if e.precio else '' }}" placeholder="0.00">
+                            <button type="submit" class="btn-dsg btn btn-sm px-2 py-1" title="Guardar">
+                                <i class="bi bi-check2"></i>
+                            </button>
+                            <button type="button" class="btn-cancel-edit" data-extra-id="{{ e.id }}"
+                                onclick="toggleExtraEdit(this)" title="Cancelar">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                {% if s.observaciones %}
+                <div class="sol-obs"><i class="bi bi-chat-left-text me-1"></i>{{ s.observaciones }}</div>
+                {% endif %}
+            </div>
+
+            <div class="sol-card-foot">
+                <div class="sol-total-row">
+                    <span class="sol-total-label">Subtotal</span>
+                    <span class="sol-total-value">{{ "%.2f"|format(ns.total) }} €</span>
+                </div>
+            </div>
+
+            <div class="sol-actions">
+                {% if s.estado in ['pendiente', 'pre_reservado'] %}
+                <form action="{{ url_for('router_admin.cambiar_estado_solicitud', solicitud_id=s.id) }}" method="POST"
+                    onsubmit="showLoader('Actualizando...')">
+                    <input type="hidden" name="estado" value="confirmada">
+                    <input type="hidden" name="accion_stand" value="ocupado">
+                    <button type="submit" class="btn-dsg btn btn-sm">
+                        <i class="bi bi-check-circle me-1"></i>Confirmar
+                    </button>
+                </form>
+
+                <form action="{{ url_for('router_admin.cambiar_estado_solicitud', solicitud_id=s.id) }}" method="POST"
+                    onsubmit="showLoader('Actualizando...')">
+                    <input type="hidden" name="estado" value="rechazada">
+                    <input type="hidden" name="accion_stand" value="disponible">
+                    <button type="submit" class="btn-cancelar">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="sol-card-empty">
+            <i class="bi bi-box-seam"></i>
+            <span>Sin solicitud de mobiliario</span>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div class="modal fade modal-final" id="modal-final-{{ uid }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" style="font-weight:700; margin:0;">
+                        <i class="bi bi-tags me-2" style="color:var(--dsg-orange)"></i>Aplicar Descuento
+                    </h5>
+                    <p style="font-size:.8rem; color:var(--dsg-muted); margin:.2rem 0 0;">
+                        {{ prov.usuario.nombre.capitalize() }} {{ prov.usuario.apellido1.capitalize() }}
+                        {% if prov.usuario.nombre_empresa %} · {{ prov.usuario.nombre_empresa }}{% endif %}
+                        {% if prov.usuario.nombre_usuario %} · <i class="bi bi-person me-1"></i>{{
+                        prov.usuario.nombre_usuario }}{% endif %}
+                    </p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                {% set todas_modal = prov.stands + prov.mob %}
+                {% set confirmadas_modal = [] %}
+
+                {% for s in prov.stands %}
+                {% if s.estado in ['confirmada', 'aceptada', 'asignado_por_admin', 'borrador'] %}
+                {% set _ = confirmadas_modal.append(s) %}
+                {% endif %}
+                {% endfor %}
+
+                {% set ns_modal = namespace(
+                stands=[],
+                mob=[],
+                extras=[],
+                total_stands=0,
+                total_mob=0,
+                total_extras=0
+                ) %}
+
+                {% for s in confirmadas_modal %}
+                {% for d in s.detalles_stand %}
+                {% set _ = ns_modal.stands.append(d) %}
+                {% set ns_modal.total_stands = ns_modal.total_stands + d.precio_total|float %}
+                {% endfor %}
+                {% endfor %}
+
+                {% for s in todas_modal %}
+                {% for d in s.detalles_mobiliario %}
+                {% set _ = ns_modal.mob.append(d) %}
+                {% set ns_modal.total_mob = ns_modal.total_mob + d.precio_total|float %}
+                {% endfor %}
+                {% for e in s.extras %}
+                {% set _ = ns_modal.extras.append(e) %}
+                {% set ns_modal.total_extras = ns_modal.total_extras + ((e.precio|float * e.cantidad) if e.precio else
+                0) %}
+                {% endfor %}
+                {% endfor %}
+
+                {% set total_bruto_modal = ns_modal.total_stands + ns_modal.total_mob + ns_modal.total_extras %}
+                {% set s_principal_modal = todas_modal[0] if todas_modal else none %}
+
+                {% if s_principal_modal and (ns_modal.stands or ns_modal.mob or ns_modal.extras) %}
+                {% set desc_guardado_modal = s_principal_modal.descuento|float %}
+                {% set total_final_modal = [total_bruto_modal - desc_guardado_modal, 0] | max %}
+
+                <div class="desc-card">
+                    <div class="desc-card-bar"></div>
+
+                    <div class="desc-card-head">
+                        <p class="desc-proveedor">
+                            {{ prov.usuario.nombre.capitalize() }} {{ prov.usuario.apellido1.capitalize() }}
+                        </p>
+                        <div class="desc-meta">
+                            <span><i class="bi bi-building me-1"></i>{{ prov.usuario.nombre_empresa or '—' }}</span>
+                            <span><i class="bi bi-person me-1"></i>{{ prov.usuario.nombre_usuario }}</span>
+                            <span><i class="bi bi-calendar3 me-1"></i>{{
+                                s_principal_modal.fecha_solicitud.strftime('%d/%m/%Y') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="desc-card-body">
+                        {% if ns_modal.stands %}
+                        <div class="desc-section-label"><i class="bi bi-map"></i> Stands</div>
+                        {% for d in ns_modal.stands %}
+                        <div class="desc-line">
+                            <div>
+                                <span class="desc-line-name">Stand #{{ d.stand.numero_stand }}</span>
+                                <span class="desc-line-muted">{{ d.stand.dimensiones }} m²</span>
+                            </div>
+                            <span class="desc-line-price">{{ "%.2f"|format(d.precio_total|float) }} €</span>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        {% if ns_modal.mob %}
+                        <div class="desc-section-label"><i class="bi bi-box-seam"></i> Mobiliario</div>
+                        {% for d in ns_modal.mob %}
+                        <div class="desc-line">
+                            <div>
+                                <span class="desc-line-name">{{ d.mobiliario.referencia }}</span>
+                                <span class="desc-line-muted">x{{ d.cantidad }}</span>
+                            </div>
+                            <span class="desc-line-price">{{ "%.2f"|format(d.precio_total|float) }} €</span>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        {% if ns_modal.extras %}
+                        <div class="desc-section-label"><i class="bi bi-plus-circle"></i> Extras</div>
+                        {% for e in ns_modal.extras %}
+                        <div class="desc-line">
+                            <div>
+                                <span class="desc-line-name">{{ e.descripcion }}</span>
+                                <span class="desc-line-muted">x{{ e.cantidad }}</span>
+                            </div>
+                            <span class="desc-line-price">
+                                {% if e.precio %}
+                                {{ "%.2f"|format(e.precio|float) }} €
+                                {% else %}
+                                <span style="color:var(--dsg-muted)">Pendiente</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <form action="{{ url_for('router_admin.aplica_descuento', solicitud_id=s_principal_modal.id) }}"
+                        method="POST">
+                        <div class="desc-card-foot">
+                            <div class="desc-row">
+                                <span class="desc-row-label">Subtotal</span>
+                                <span class="desc-row-value">{{ '%.2f'|format(total_bruto_modal) }} €</span>
+                            </div>
+
+                            <div class="desc-discount-row">
+                                <label class="desc-discount-label" for="descuento-modal-{{ uid }}">
+                                    <i class="bi bi-scissors"></i> Descuento (€)
+                                </label>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="number" id="descuento-modal-{{ uid }}" name="descuento"
+                                        class="desc-discount-input {% if desc_guardado_modal > 0 %}input-hidden{% endif %}"
+                                        min="0" max="{{ '%.2f'|format(total_bruto_modal) }}" step="0.01"
+                                        value="{{ '%.2f'|format(desc_guardado_modal) }}" placeholder="0.00"
+                                        data-id="modal-{{ uid }}" data-bruto="{{ '%.2f'|format(total_bruto_modal) }}"
+                                        oninput="calcularFinal(this)">
+
+                                    {% if desc_guardado_modal > 0 %}
+                                    <span id="discount-value-modal-{{ uid }}"
+                                        style="color:#34D399; font-weight:700; font-size:.9rem;">
+                                        - {{ '%.2f'|format(desc_guardado_modal) }} €
+                                    </span>
+                                    {% endif %}
+
+                                    <button type="button" class="btn-edit-descuento"
+                                        onclick="editarDescuento('modal-{{ uid }}')" title="Editar descuento">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="desc-final-row">
+                                <span class="desc-final-label">Total reserva</span>
+                                <span class="desc-final-value {% if desc_guardado_modal > 0 %}discounted{% endif %}"
+                                    id="final-modal-{{ uid }}">
+                                    {{ '%.2f'|format(total_final_modal) }} €
+                                </span>
+                            </div>
+
+                            <button type="submit" class="btn-dsg btn btn-sm w-100 mt-1">
+                                <i class="bi bi-check2 me-1"></i>Aplicar descuento
+                            </button>
+
+                            <button type="button" class="btn-dsg-outline btn btn-sm w-100 mt-1 btn-generar-pdf"
+                                data-url="{{ url_for('router_admin.generar_pdf_solicitudes', solicitud_id=s_principal_modal.id) }}"
+                                onclick="generarEnviarPdf(this)">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                                Generar y enviar PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div
+                    style="text-align:center; padding:3rem 1rem; color:var(--dsg-muted); border:1px dashed var(--dsg-border); border-radius:12px;">
+                    <i class="bi bi-clipboard-check" style="font-size:2.5rem; opacity:.4"></i>
+                    <p style="margin-top:.75rem; font-size:.95rem;">No hay solicitudes confirmadas para este proveedor.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+
+{% else %}
+<div
+    style="text-align:center; padding:3rem 1rem; color:var(--dsg-muted); border:1px dashed var(--dsg-border); border-radius:12px;">
+    <i class="bi bi-inbox" style="font-size:2.5rem; opacity:.4"></i>
+    <p style="margin-top:.5rem; font-size:.9rem;">No hay solicitudes registradas.</p>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleExtraEdit(btn) {
+        const id = btn.dataset.extraId;
+        const display = document.getElementById('price-display-' + id);
+        const form = document.getElementById('extra-form-' + id);
+        if (!display || !form) return;
+
+        const isOpen = form.classList.contains('active');
+
+        if (isOpen) {
+            form.classList.remove('active');
+            display.style.display = '';
+        } else {
+            form.classList.add('active');
+            display.style.display = 'none';
+            const input = form.querySelector('input[name="precio"]');
+            if (input) input.focus();
+        }
+    }
+
+    function calcularFinal(input) {
+        const id = input.dataset.id;
+        const bruto = parseFloat(input.dataset.bruto) || 0;
+        const desc = parseFloat(input.value) || 0;
+        const final = Math.max(0, bruto - desc);
+
+        const el = document.getElementById('final-' + id);
+        if (!el) return;
+
+        el.textContent = final.toFixed(2) + ' €';
+        el.classList.toggle('discounted', desc > 0);
+
+        const discountValue = document.getElementById('discount-value-' + id);
+        if (discountValue) {
+            discountValue.textContent = '- ' + desc.toFixed(2) + ' €';
+            discountValue.style.display = desc > 0 ? '' : 'none';
+        }
+    }
+
+    function editarDescuento(id) {
+        const input = document.getElementById('descuento-' + id);
+        const discountValue = document.getElementById('discount-value-' + id);
+        if (!input) return;
+
+        input.classList.remove('input-hidden');
+        input.focus();
+        if (discountValue) discountValue.style.display = 'none';
+    }
+
+    async function generarEnviarPdf(btn) {
+        const url = btn.dataset.url;
+        if (!url) return;
+
+        const originalHTML = btn.innerHTML;
+        const originalClass = btn.className;
+
+        btn.disabled = true;
+        btn.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Generando PDF...
+    `;
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const contentType = res.headers.get('content-type') || '';
+            const data = contentType.includes('application/json') ? await res.json() : await res.text();
+
+            if (!res.ok) {
+                throw new Error(typeof data === 'string' ? data : (data.error || 'ERROR_PDF'));
+            }
+
+            btn.disabled = false;
+            btn.className = originalClass + ' btn-success';
+            btn.innerHTML = `<i class="bi bi-check-lg"></i>`;
+
+            setTimeout(() => {
+                btn.className = originalClass;
+                btn.innerHTML = originalHTML;
+            }, 3000);
+
+        } catch (e) {
+            console.error('Error al generar/enviar PDF:', e);
+            alert('Ocurrió un error al generar o enviar el PDF.');
+            btn.disabled = false;
+            btn.className = originalClass;
+            btn.innerHTML = originalHTML;
+        }
+    }
+</script>
+{% endblock %}

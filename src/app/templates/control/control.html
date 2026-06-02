@@ -1,0 +1,1008 @@
+{% extends "base.html" %}
+
+{% block title %}Control de Accesos{% endblock %}
+
+{% block extra_css %}
+<style>
+  .btn-accion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+    color: var(--dsg-muted);
+    text-decoration: none;
+  }
+
+  .btn-accion:hover {
+    transform: scale(1.1);
+  }
+
+  .btn-accion.editar:hover {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60A5FA;
+  }
+
+  .btn-accion.eliminar:hover {
+    background: rgba(248, 113, 113, 0.15);
+    color: #F87171;
+  }
+
+  .btn-accion.salida:hover {
+    background: rgba(249, 115, 22, 0.15);
+    color: var(--dsg-orange);
+  }
+
+  .dsg-modal {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    color: var(--dsg-text);
+    border-radius: 12px;
+  }
+
+  .dsg-modal .modal-header {
+    border-bottom: 1px solid var(--dsg-border);
+  }
+
+  .dsg-modal .modal-footer {
+    border-top: 1px solid var(--dsg-border);
+    gap: 0.5rem;
+  }
+
+  .dsg-modal .modal-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .dsg-modal .btn-close {
+    filter: invert(1) grayscale(1) brightness(2);
+  }
+
+  .dsg-modal .form-control {
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    color: var(--dsg-text);
+    border-radius: 6px;
+  }
+
+  .dsg-modal .form-control:focus {
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    background: var(--dsg-surface2);
+    color: var(--dsg-text);
+  }
+
+  .btn-dsg-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #FCA5A5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .btn-dsg-danger:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #FCA5A5;
+  }
+
+  .table-list {
+    margin: 0;
+    color: var(--dsg-text);
+    --bs-table-bg: transparent;
+  }
+
+  .table-list thead th {
+    color: var(--dsg-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-color: var(--dsg-border);
+    padding: 0.6rem 0.9rem;
+    background: var(--dsg-surface2);
+  }
+
+  .table-list td {
+    border-color: var(--dsg-border);
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  .table-list tbody tr {
+    transition: background 0.15s;
+  }
+
+  .table-list tbody tr:hover {
+    background: var(--dsg-surface2);
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 0.6rem 1rem;
+  }
+
+  .stat-icon {
+    font-size: 1.2rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.15rem;
+  }
+
+  .stat-label {
+    color: var(--dsg-muted);
+    font-size: 0.75rem;
+  }
+
+  /* ── Paginación ── */
+  .dsg-page-link {
+    background: var(--dsg-surface2);
+    border-color: var(--dsg-border);
+    color: #fff;
+  }
+
+  .dsg-page-link:hover {
+    background: var(--dsg-surface2);
+    border-color: var(--dsg-orange);
+    color: var(--dsg-orange);
+  }
+
+  .dsg-page-link.active-page {
+    background: var(--dsg-orange);
+    border-color: var(--dsg-orange);
+    color: #fff;
+  }
+
+  .page-item.disabled .dsg-page-link {
+    background: var(--dsg-surface2);
+    border-color: var(--dsg-border);
+    color: var(--dsg-muted);
+    opacity: 0.5;
+  }
+
+  /* ── Escáner QR inline ── */
+  .qr-scan-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    margin-top: 0.5rem;
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px dashed rgba(249, 115, 22, 0.45);
+    border-radius: 8px;
+    color: var(--dsg-orange);
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .qr-scan-btn:hover {
+    background: rgba(249, 115, 22, 0.2);
+    border-color: var(--dsg-orange);
+  }
+
+  #qr-inline-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+    aspect-ratio: 1/1;
+    width: 100%;
+    display: none;
+  }
+
+  #qr-inline-wrap video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .qr-corner {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: var(--dsg-orange);
+    border-style: solid;
+    opacity: 0.9;
+  }
+
+  .qr-corner.tl {
+    top: 12px;
+    left: 12px;
+    border-width: 3px 0 0 3px;
+    border-radius: 3px 0 0 0;
+  }
+
+  .qr-corner.tr {
+    top: 12px;
+    right: 12px;
+    border-width: 3px 3px 0 0;
+    border-radius: 0 3px 0 0;
+  }
+
+  .qr-corner.bl {
+    bottom: 12px;
+    left: 12px;
+    border-width: 0 0 3px 3px;
+    border-radius: 0 0 0 3px;
+  }
+
+  .qr-corner.br {
+    bottom: 12px;
+    right: 12px;
+    border-width: 0 3px 3px 0;
+    border-radius: 0 0 3px 0;
+  }
+
+  #qr-scan-line {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--dsg-orange), transparent);
+    box-shadow: 0 0 8px var(--dsg-orange);
+    animation: scanLine 2s ease-in-out infinite;
+  }
+
+  @keyframes scanLine {
+    0% {
+      top: 14px;
+      opacity: 1;
+    }
+
+    48% {
+      opacity: 1;
+    }
+
+    50% {
+      top: calc(100% - 16px);
+      opacity: 0.6;
+    }
+
+    52% {
+      opacity: 1;
+    }
+
+    100% {
+      top: 14px;
+      opacity: 1;
+    }
+  }
+
+  #qr-inline-status {
+    font-size: 0.8rem;
+    color: var(--dsg-muted);
+    text-align: center;
+    padding: 0.4rem 0;
+    min-height: 1.6rem;
+  }
+
+  /* ── Cards móvil ── */
+  .acceso-card {
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .acceso-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .acceso-card-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .acceso-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    height: 34px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    width: 100%;
+  }
+
+  .acceso-action-btn:active {
+    opacity: 0.75;
+  }
+
+  .acceso-action-salida {
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px solid rgba(249, 115, 22, 0.25) !important;
+    color: var(--dsg-orange);
+  }
+
+  .acceso-action-editar {
+    background: rgba(96, 165, 250, 0.10);
+    border: 1px solid rgba(96, 165, 250, 0.25) !important;
+    color: #60A5FA;
+  }
+
+  .acceso-action-anular {
+    background: rgba(239, 68, 68, 0.10);
+    border: 1px solid rgba(239, 68, 68, 0.25) !important;
+    color: #FCA5A5;
+  }
+
+  .acceso-divider {
+    height: 1px;
+    background: var(--dsg-border);
+    margin: 0.65rem 0;
+    opacity: 0.6;
+  }
+
+  .list-count {
+    font-size: 0.72rem;
+    color: var(--dsg-muted);
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    border-radius: 20px;
+    padding: 0.2rem 0.6rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="page-header">
+  <div class="d-flex align-items-start align-items-sm-center justify-content-between flex-column flex-sm-row gap-3">
+    <div>
+      <h1><i class="bi bi-qr-code-scan me-2" style="color:var(--dsg-orange)"></i>Control de Accesos</h1>
+      <p>Gestión de entradas y salidas — {{ now.strftime('%d/%m/%Y') }}</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('router_control.exportar_accesos') }}" onclick="showLoader('Exportando datos de acceso...')"
+        class="btn-dsg-outline btn btn-sm">
+        <i class="bi bi-download me-1"></i>
+        <span class="d-none d-sm-inline">Exportar CSV</span>
+        <span class="d-inline d-sm-none">CSV</span>
+      </a>
+      <button class="btn-dsg-outline btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalEntradaManual">
+        <i class="bi bi-box-arrow-in-right me-1"></i>
+        <span class="d-none d-sm-inline">Entrada manual</span>
+        <span class="d-inline d-sm-none">Entrada</span>
+      </button>
+      <button class="btn-dsg btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalManual">
+        <i class="bi bi-person-plus me-1"></i>
+        <span class="d-none d-sm-inline">Registrar invitado</span>
+        <span class="d-inline d-sm-none">Invitado</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Fila: QR + Estadísticas ─────────────────────────────── -->
+<div class="row g-3 mb-4">
+
+  <!-- Escáner QR -->
+  <div class="col-lg-4">
+    <div class="dsg-card h-100">
+      <h6 style="font-weight:600; margin-bottom:1rem;">
+        <i class="bi bi-qr-code me-2" style="color:var(--dsg-orange)"></i>Escanear QR
+      </h6>
+
+      <form method="POST" action="{{ url_for('router_control.qr_scan') }}" id="formQR">
+        <div class="mb-2">
+          <label class="form-label">Código QR</label>
+          <input type="text" name="codigo_qr" id="inputQR" class="form-control"
+            placeholder="Escanea o introduce el código..." autofocus autocomplete="off" />
+        </div>
+        <button type="submit" class="btn-dsg btn w-100">
+          <i class="bi bi-arrow-right-circle me-1"></i> Registrar acceso
+        </button>
+      </form>
+
+      <button class="qr-scan-btn mt-2" id="btnAbrirCamara" onclick="toggleCamara()">
+        <i class="bi bi-camera" id="iconoCamara"></i>
+        <span id="textoCamara">Abrir lector de QR</span>
+      </button>
+
+      <div id="qr-inline-wrap" class="mt-2">
+        <video id="qr-video" playsinline muted></video>
+        <div class="qr-corner tl"></div>
+        <div class="qr-corner tr"></div>
+        <div class="qr-corner bl"></div>
+        <div class="qr-corner br"></div>
+        <div id="qr-scan-line"></div>
+        <canvas id="qr-canvas" style="display:none;"></canvas>
+      </div>
+      <div id="qr-inline-status"></div>
+
+      {% if resultado %}
+      <div class="mt-3 alert
+        {% if resultado.valido %}
+          {% if resultado.get('es_acompanante') %}alert-success
+          {% elif resultado.accion == 'entrada' %}alert-success
+          {% else %}alert-warning{% endif %}
+        {% else %}alert-danger{% endif %}
+        mb-0">
+        {% if resultado.valido %}
+        {% if resultado.get('es_acompanante') %}
+        <i class="bi bi-person-check me-1"></i>
+        Acceso permitido — <strong>{{ resultado.nombre }}</strong> (acompañante)
+        — {{ resultado.hora.strftime('%H:%M:%S') }}
+        {% else %}
+        <i
+          class="bi bi-{% if resultado.accion == 'entrada' %}box-arrow-in-right{% else %}box-arrow-right{% endif %} me-1"></i>
+        <strong>{{ resultado.accion | capitalize }}</strong> registrada — {{ resultado.hora.strftime('%H:%M:%S') }}
+        {% endif %}
+        {% else %}
+        <i class="bi bi-x-circle me-1"></i> {{ resultado.error }}
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="col-lg-8">
+    <div class="row g-3" style="height: 25vh;">
+
+      <div class="col-6 col-sm-3">
+        <div class="dsg-card stat-card h-100">
+          <div class="stat-icon" style="color:var(--dsg-orange)"><i class="bi bi-box-arrow-in-right"></i></div>
+          <div class="stat-value">{{ stats.entradas }}</div>
+          <div class="stat-label">Entradas hoy</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-3">
+        <div class="dsg-card stat-card h-100">
+          <div class="stat-icon" style="color:#60A5FA"><i class="bi bi-box-arrow-right"></i></div>
+          <div class="stat-value">{{ stats.salidas }}</div>
+          <div class="stat-label">Salidas hoy</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-3">
+        <div class="dsg-card stat-card h-100">
+          <div class="stat-icon" style="color:#34D399"><i class="bi bi-people"></i></div>
+          <div class="stat-value">{{ stats.dentro }}</div>
+          <div class="stat-label">Dentro ahora</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-3">
+        <div class="dsg-card stat-card h-100">
+          <div class="stat-icon" style="color:#F59E0B"><i class="bi bi-person-plus"></i></div>
+          <div class="stat-value">{{ stats.invitados }}</div>
+          <div class="stat-label">Invitados totales</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ── Listado con filtros ──────────────────────────────────── -->
+<div class="dsg-card">
+
+  <div class="d-flex flex-wrap gap-2 align-items-end mb-3">
+    <h6 style="font-weight:600; margin:0;" class="me-auto">
+      <i class="bi bi-clock-history me-2" style="color:var(--dsg-orange)"></i>Registros
+    </h6>
+    <form method="GET" action="{{ url_for('router_control.listar') }}" class="d-flex flex-wrap gap-2 w-100 w-sm-auto"
+      id="form-filtros">
+
+      <input type="text" name="empresa" class="form-control" style="min-width:140px; flex:1 1 140px;"
+        placeholder="Empresa..." value="{{ filtros.empresa or '' }}" />
+
+      <div class="position-relative" style="min-width:140px; flex:1 1 140px;">
+        <select name="estado" class="form-select pe-4">
+          <option value="">Todos</option>
+          <option value="dentro" {% if filtros.estado=='dentro' %}selected{% endif %}>Dentro</option>
+          <option value="fuera" {% if filtros.estado=='fuera' %}selected{% endif %}>Fuera</option>
+        </select>
+        <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-2"
+          style="pointer-events:none; color:var(--dsg-muted);"></i>
+      </div>
+
+      <div class="position-relative" style="min-width:140px; flex:1 1 140px;">
+        <select name="rol" class="form-select pe-4">
+          <option value="">Todos</option>
+          <option value="comercial" {% if filtros.rol=='comercial' %}selected{% endif %}>Comercial</option>
+          <option value="cliente" {% if filtros.rol=='cliente' %}selected{% endif %}>Cliente</option>
+        </select>
+        <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-2"
+          style="pointer-events:none; color:var(--dsg-muted);"></i>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn-dsg btn">
+          <i class="bi bi-funnel"></i> <span class="d-none d-sm-inline">Filtrar</span>
+        </button>
+        <a href="{{ url_for('router_control.listar') }}" onclick="showLoader('Limpiando filtros...')"
+          class="btn-dsg-outline btn">
+          <i class="bi bi-x"></i> <span class="d-none d-sm-inline">Limpiar</span>
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ══ VISTA ESCRITORIO (≥ md) ══════════════════════════════ -->
+  <div class="d-none d-md-block">
+    <div class="table-responsive">
+      <table class="table table-list align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Usuario</th>
+            <th>Nombre Usuario</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for acceso in accesos %}
+          <tr>
+            <td style="color:var(--dsg-muted); font-size:0.82rem;">{{ acceso.id }}</td>
+            <td>
+              <div style="font-weight:500; color:#fff;">{{acceso.usuario.nombre_empresa}}</div>
+              <div style="font-size:0.75rem; color:var(--dsg-muted);">{{ acceso.usuario.nombre }} {{
+                acceso.usuario.apellido1 }} {{ acceso.usuario.apellido2 }}</div>
+            </td>
+            <td style="color:#fff">{{ acceso.usuario.nombre_usuario or '—' }}</td>
+            <td style="font-size:0.88rem; color:#fff; white-space:nowrap;">{{ acceso.hora_entrada.strftime('%d/%m
+              %H:%M') }}</td>
+            <td style="font-size:0.88rem; color:#fff; white-space:nowrap;">
+              {% if acceso.hora_salida %}
+              {{ acceso.hora_salida.strftime('%d/%m %H:%M') }}
+              {% else %}
+              <span style="color:var(--dsg-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <span
+                class="badge-rol {% if acceso.tipo_acceso.value == 'QR' %}badge-comercial{% else %}badge-proveedor{% endif %}">
+                {{ acceso.tipo_acceso.value }}
+              </span>
+            </td>
+            <td>
+              {% if not acceso.hora_salida %}
+              <span class="badge-rol badge-cliente">Dentro</span>
+              {% else %}
+              <span class="badge-rol badge-control">Fuera</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-1">
+                {% if not acceso.hora_salida %}
+                <form method="POST" action="{{ url_for('router_control.salida_manual') }}">
+                  <input type="hidden" name="usuario_id" value="{{ acceso.usuario_id }}">
+                  <button type="submit" class="btn-accion salida" title="Registrar salida">
+                    <i class="bi bi-box-arrow-right"></i>
+                  </button>
+                </form>
+                {% endif %}
+                <button class="btn-accion editar" title="Corregir" data-bs-toggle="modal"
+                  data-bs-target="#modalCorregir" data-id="{{ acceso.id }}"
+                  data-entrada="{{ acceso.hora_entrada.strftime('%Y-%m-%dT%H:%M') }}"
+                  data-salida="{{ acceso.hora_salida.strftime('%Y-%m-%dT%H:%M') if acceso.hora_salida else '' }}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <form method="POST" action="{{ url_for('router_control.anular', acceso_id=acceso.id) }}"
+                  onsubmit="return confirm('¿Anular este registro?')">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button type="submit" class="btn-accion eliminar" title="Anular">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="text-center py-5" style="color:var(--dsg-muted);">
+              <i class="bi bi-inbox" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
+              Sin registros
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ VISTA MÓVIL (< md) ═══════════════════════════════════ -->
+  <div class="d-md-none">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <span style="font-size:0.8rem; color:var(--dsg-muted);">
+        <i class="bi bi-clock-history me-1"></i>Registros
+      </span>
+      <span class="list-count">{{ paginacion.total }} registros</span>
+    </div>
+
+    {% for acceso in accesos %}
+    <div class="acceso-card">
+
+      <!-- Cabecera: nombre + badge estado -->
+      <div class="d-flex align-items-start justify-content-between gap-2">
+        <div style="min-width:0;">
+          <div style="font-weight:600; font-size:0.95rem; color:#fff; line-height:1.2; margin-bottom:0.1rem;">
+            {{ acceso.usuario.nombre }} {{ acceso.usuario.apellido1 }}{% if acceso.usuario.apellido2 %} {{
+            acceso.usuario.apellido2 }}{% endif %}
+          </div>
+          <div style="font-size:0.75rem; color:var(--dsg-muted);">{{ acceso.usuario.email }}</div>
+        </div>
+        <div style="flex-shrink:0; padding-top:2px;">
+          {% if not acceso.hora_salida %}
+          <span class="badge-rol badge-cliente">Dentro</span>
+          {% else %}
+          <span class="badge-rol badge-control">Fuera</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Metadata: empresa, horarios, tipo -->
+      <div class="d-flex align-items-center gap-2 flex-wrap mt-2" style="font-size:0.75rem; color:var(--dsg-muted);">
+        {% if acceso.usuario.nombre_empresa %}
+        <span><i class="bi bi-building me-1"></i>{{ acceso.usuario.nombre_empresa }}</span>
+        <span style="color:var(--dsg-border);">·</span>
+        {% endif %}
+        <span><i class="bi bi-box-arrow-in-right me-1"></i>{{ acceso.hora_entrada.strftime('%d/%m %H:%M') }}</span>
+        {% if acceso.hora_salida %}
+        <span style="color:var(--dsg-border);">·</span>
+        <span><i class="bi bi-box-arrow-right me-1"></i>{{ acceso.hora_salida.strftime('%d/%m %H:%M') }}</span>
+        {% endif %}
+        <span style="color:var(--dsg-border);">·</span>
+        <span
+          class="badge-rol {% if acceso.tipo_acceso.value == 'QR' %}badge-comercial{% else %}badge-proveedor{% endif %}"
+          style="font-size:0.68rem; padding:0.15rem 0.45rem;">{{ acceso.tipo_acceso.value }}</span>
+      </div>
+
+      <div class="acceso-divider"></div>
+
+      <!-- Botones de acción -->
+      <div class="acceso-card-actions">
+        {% if not acceso.hora_salida %}
+        <form method="POST" action="{{ url_for('router_control.salida_manual') }}" style="flex:1;">
+          <input type="hidden" name="usuario_id" value="{{ acceso.usuario_id }}">
+          <button type="submit" class="acceso-action-btn acceso-action-salida">
+            <i class="bi bi-box-arrow-right"></i> Salida
+          </button>
+        </form>
+        {% endif %}
+
+        <button type="button" class="acceso-action-btn acceso-action-editar" data-bs-toggle="modal"
+          data-bs-target="#modalCorregir" data-id="{{ acceso.id }}"
+          data-entrada="{{ acceso.hora_entrada.strftime('%Y-%m-%dT%H:%M') }}"
+          data-salida="{{ acceso.hora_salida.strftime('%Y-%m-%dT%H:%M') if acceso.hora_salida else '' }}">
+          <i class="bi bi-pencil"></i> Corregir
+        </button>
+
+        <form method="POST" action="{{ url_for('router_control.anular', acceso_id=acceso.id) }}"
+          onsubmit="return confirm('¿Anular este registro?')" style="flex:1;">
+          <input type="hidden" name="_method" value="DELETE">
+          <button type="submit" class="acceso-action-btn acceso-action-anular">
+            <i class="bi bi-trash"></i> Anular
+          </button>
+        </form>
+      </div>
+
+    </div>
+    {% else %}
+    <div class="text-center py-5" style="color:var(--dsg-muted);">
+      <i class="bi bi-inbox" style="font-size:2rem; display:block; margin-bottom:0.5rem; opacity:0.4;"></i>
+      Sin registros
+    </div>
+    {% endfor %}
+
+  </div>
+  <!-- fin vista móvil -->
+
+  <!-- ── Paginación ── -->
+  {% if paginacion.pages > 1 %}
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 pt-3"
+    style="border-top: 1px solid var(--dsg-border);">
+
+    <span style="font-size:.82rem; color:var(--dsg-muted);">
+      Mostrando {{ paginacion.first }}–{{ paginacion.last }} de {{ paginacion.total }} registros
+    </span>
+
+    <nav>
+      <ul class="pagination pagination-sm mb-0" style="gap:4px;">
+
+        <li class="page-item {% if not paginacion.has_prev %}disabled{% endif %}">
+          <a class="page-link dsg-page-link" href="{{ url_for('router_control.listar', page=paginacion.prev_num,
+                       estado=filtros.estado, empresa=filtros.empresa, rol=filtros.rol) }}">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        </li>
+
+        {% for p in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+        <li class="page-item">
+          <a class="page-link dsg-page-link {% if p == paginacion.page %}active-page{% endif %}" href="{{ url_for('router_control.listar', page=p,
+                         estado=filtros.estado, empresa=filtros.empresa, rol=filtros.rol) }}">
+            {{ p }}
+          </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <span class="page-link dsg-page-link">…</span>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        <li class="page-item {% if not paginacion.has_next %}disabled{% endif %}">
+          <a class="page-link dsg-page-link" href="{{ url_for('router_control.listar', page=paginacion.next_num,
+                       estado=filtros.estado, empresa=filtros.empresa, rol=filtros.rol) }}">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+
+</div>
+
+
+<!-- ── Modal: Registrar invitado ─────────────────────────────── -->
+<div class="modal fade" id="modalManual" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content dsg-modal">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Registrar invitado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url_for('router_control.invitado_entrada') }}">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre completo <span style="color:var(--dsg-muted)">(informativo)</span></label>
+            <input type="text" name="nombre_completo" class="form-control" placeholder="Nombre y apellidos..." />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-dsg-outline btn" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn-dsg btn">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Registrar entrada
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Corregir acceso ────────────────────────────────── -->
+<div class="modal fade" id="modalCorregir" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content dsg-modal">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Corregir registro</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" id="formCorregir">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nueva hora de entrada</label>
+            <input type="datetime-local" name="nueva_hora_entrada" id="corregirEntrada" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nueva hora de salida</label>
+            <input type="datetime-local" name="nueva_hora_salida" id="corregirSalida" class="form-control" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-dsg-outline btn" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn-dsg btn">
+            <i class="bi bi-check2 me-1"></i> Guardar cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Entrada manual ─────────────────────────────────── -->
+<div class="modal fade" id="modalEntradaManual" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content dsg-modal">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-box-arrow-in-right me-2"></i>Entrada manual</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url_for('router_control.entrada_manual') }}">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Código de cliente o CIF</label>
+            <input type="text" name="codigo" class="form-control" placeholder="Ej: A1B2C o B12345678" autocomplete="off"
+              required />
+            <div style="font-size:0.78rem; color:var(--dsg-muted); margin-top:0.35rem;">
+              5 caracteres → código de cliente &nbsp;|&nbsp; Otro → CIF de empresa
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              Hora de entrada
+              <span style="color:var(--dsg-muted)">(opcional, usa la actual si no se indica)</span>
+            </label>
+            <input type="datetime-local" name="hora" class="form-control" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-dsg-outline btn" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn-dsg btn">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Registrar entrada
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/jsQR.min.js') }}"></script>
+<script>
+  /* ── Modal corregir ── */
+  document.getElementById('modalCorregir').addEventListener('show.bs.modal', function (e) {
+    const btn = e.relatedTarget;
+    document.getElementById('formCorregir').action = `/control/corregir/${btn.dataset.id}`;
+    document.getElementById('corregirEntrada').value = btn.dataset.entrada;
+    document.getElementById('corregirSalida').value = btn.dataset.salida;
+  });
+
+  /* ── Submit con Enter en inputQR ── */
+  document.getElementById('inputQR').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('formQR').submit(); }
+  });
+
+  /* ── Resetear a página 1 al filtrar ── */
+  document.getElementById('form-filtros').addEventListener('submit', function () {
+    const pageInput = this.querySelector('input[name="page"]');
+    if (pageInput) pageInput.value = 1;
+  });
+
+  /* ────────────────────────────────────────────────
+     ESCÁNER QR INLINE
+  ──────────────────────────────────────────────── */
+  (function () {
+    const wrap = document.getElementById('qr-inline-wrap');
+    const video = document.getElementById('qr-video');
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('qr-inline-status');
+    const btnToggle = document.getElementById('btnAbrirCamara');
+    const iconoCam = document.getElementById('iconoCamara');
+    const textoCam = document.getElementById('textoCamara');
+    const inputQR = document.getElementById('inputQR');
+
+    let stream = null, rafId = null, scanning = false;
+    let lastDetected = null, detectedCount = 0, lastTick = 0;
+    const CONFIRM_FRAMES = 2, TICK_INTERVAL = 150;
+
+    function setStatus(html, color) {
+      statusEl.innerHTML = html;
+      statusEl.style.color = color || 'var(--dsg-muted)';
+    }
+
+    window.toggleCamara = async function () {
+      if (scanning) { stopCamera(); return; }
+      await startCamera();
+    };
+
+    async function startCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setStatus('<i class="bi bi-exclamation-triangle me-1"></i>Requiere HTTPS para acceder a la cámara.', '#FCA5A5');
+        return;
+      }
+
+      scanning = true;
+      lastDetected = null; detectedCount = 0; lastTick = 0;
+
+      wrap.style.display = 'block';
+      iconoCam.className = 'bi bi-x-circle';
+      textoCam.textContent = 'Cerrar lector de QR';
+      setStatus('<i class="bi bi-camera me-1"></i>Iniciando cámara…');
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        video.srcObject = stream;
+        await video.play();
+        setStatus('<i class="bi bi-viewfinder me-1"></i>Apunta al código QR');
+        rafId = requestAnimationFrame(tick);
+      } catch (err) {
+        const msg = err.name === 'NotAllowedError'
+          ? 'Permiso de cámara denegado.'
+          : 'No se pudo acceder a la cámara.';
+        setStatus(`<i class="bi bi-exclamation-triangle me-1"></i>${msg}`, '#FCA5A5');
+        stopCamera();
+      }
+    }
+
+    function stopCamera() {
+      scanning = false;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+      video.srcObject = null;
+      wrap.style.display = 'none';
+      iconoCam.className = 'bi bi-camera';
+      textoCam.textContent = 'Abrir lector de QR';
+      setStatus('');
+    }
+
+    function tick(ts) {
+      if (!scanning) return;
+      rafId = requestAnimationFrame(tick);
+      if (ts - lastTick < TICK_INTERVAL) return;
+      lastTick = ts;
+      if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+
+      if (code) {
+        const data = code.data.trim();
+        if (data === lastDetected) { detectedCount++; }
+        else { lastDetected = data; detectedCount = 1; }
+
+        if (detectedCount >= CONFIRM_FRAMES) {
+          setStatus('<i class="bi bi-check2-circle me-1"></i>QR detectado, registrando…', '#34D399');
+          stopCamera();
+          inputQR.value = data;
+          document.getElementById('formQR').submit();
+        }
+      }
+    }
+  })();
+</script>
+{% endblock %}

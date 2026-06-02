@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear tarjeta de acreditación{% endblock %}
+
+{% block head_extra %}
+<style>
+  :root {
+    --badge-blue: #4DC8ED;
+    --badge-w: 255px;
+    --badge-h: 195px;
+  }
+
+  .badge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    animation: badgeIn .4s ease both;
+  }
+
+  @keyframes badgeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(.97);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .badge-lanyard {
+    width: 2px;
+    height: 44px;
+    background: repeating-linear-gradient(to bottom, #888 0 5px, transparent 5px 9px);
+  }
+
+  .badge-clip {
+    width: 36px;
+    height: 10px;
+    border-radius: 4px 4px 0 0;
+    background: #aaa;
+  }
+
+  .badge-card {
+    width: var(--badge-w);
+    height: var(--badge-h);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #4DC8ED;
+    box-shadow: 0 10px 40px rgba(77, 200, 237, .35);
+    font-family: 'Arial Black', Arial, sans-serif;
+    transition: box-shadow .35s, background .25s ease;
+  }
+
+  .badge-top-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 6px 4px;
+    min-height: 34px;
+  }
+
+  .badge-logo-ph {
+    height: 36px;
+    width: 112px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .25);
+  }
+
+  .badge-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    text-align: center;
+    gap: 2px;
+    color: #111;
+  }
+
+  .badge-nombre {
+    font-size: 0.95rem;
+    font-weight: 900;
+    line-height: 1.15;
+    color: #111;
+    word-break: break-word;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+  }
+
+  .badge-empresa {
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #111;
+    opacity: .92;
+    word-break: break-word;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    margin-top: 2px;
+  }
+
+  .badge-cargo-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    margin-top: 5px;
+  }
+
+  .badge-cargo-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #111;
+    opacity: .55;
+    white-space: nowrap;
+  }
+
+  .badge-cargo {
+    font-size: 0.6rem;
+    font-style: italic;
+    font-weight: 400;
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #111;
+    opacity: .9;
+  }
+
+  .badge-cliente {
+    font-size: 0.58rem;
+    font-weight: 800;
+    color: #111;
+    opacity: .95;
+    margin-top: 2px;
+  }
+
+  .badge-footer {
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+    padding: 7px 0;
+    text-align: center;
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  .badge-footer-text {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    color: #111;
+    text-transform: uppercase;
+  }
+
+  .preview-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    opacity: .4;
+    margin-bottom: .4rem;
+  }
+
+  .field-group {
+    transition: all .2s ease;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="page-header">
+  <h1>
+    <i class="bi bi-person-badge me-2" style="color:var(--dsg-orange)"></i>
+    Crear acreditación
+  </h1>
+  <p>Genera e imprime la tarjeta de identificación para colgar al cuello</p>
+</div>
+
+<div id="appData" data-color="{{ form.color if form and form.color else '' }}"
+  data-has-result="{{ 'true' if qr_base64 else 'false' }}" style="display:none;"></div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="dsg-card">
+      <form method="POST" action="{{ url_for('router_admin.crear_tarjeta_rol') }}">
+
+        <div class="mb-3 field-group" data-field="nombre">
+          <label class="form-label fw-semibold">Nombre completo</label>
+          <input type="text" name="nombre" id="inputNombre" class="form-control" placeholder="María García López"
+            maxlength="80" required value="{{ form.nombre if form and form.nombre else '' }}">
+        </div>
+
+        <div class="mb-3 field-group" data-field="cargo">
+          <label class="form-label fw-semibold">Cargo</label>
+          <input type="text" name="cargo" id="inputCargo" class="form-control" placeholder="Responsable de compras"
+            maxlength="80" value="{{ form.cargo if form and form.cargo else '' }}">
+        </div>
+
+        <div class="mb-3 field-group" data-field="empresa">
+          <label class="form-label fw-semibold">Nombre de empresa</label>
+          <input type="text" name="empresa" id="inputEmpresa" class="form-control" placeholder="Empresa S.L."
+            maxlength="120" value="{{ form.empresa if form and form.empresa else '' }}">
+        </div>
+
+        <div class="mb-3 field-group" data-field="codigo_cliente">
+          <label class="form-label fw-semibold">Código de cliente</label>
+          <input type="text" name="codigo_cliente" id="inputCodigoCliente" class="form-control" placeholder="C-001234"
+            maxlength="40" value="{{ form.codigo_cliente if form and form.codigo_cliente else '' }}">
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Rol</label>
+          <div style="position:relative; display:block;">
+            <div id="selectDot" data-initcolor="{{ form.color if form and form.color else '#888' }}" style="position:absolute; left:12px; top:50%; transform:translateY(-50%);
+                        width:13px; height:13px; border-radius:50%;
+                        pointer-events:none; z-index:5;"></div>
+
+            <select class="form-control" id="rolSelect" name="rol" style="padding-left:2.4rem; padding-right:2rem;"
+              required>
+              <option value="" {% if not form or not form.rol %}selected{% endif %}>
+                — Selecciona un rol —
+              </option>
+              {% for rol, cfg in roles.items() %}
+              <option value="{{ rol }}" data-color="{{ cfg.color }}" data-badge="{{ cfg.badge_rol }}"
+                data-fields="{{ cfg.fields|join(',') }}" {% if form and form.rol==rol %}selected{% endif %}>
+                {{ rol }}
+              </option>
+              {% endfor %}
+            </select>
+
+            <i class="bi bi-chevron-down" style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
+                      pointer-events:none; opacity:0.5; font-size:0.85rem;"></i>
+          </div>
+
+          <input type="hidden" name="color" id="selectedColor" value="{{ form.color if form and form.color else '' }}">
+          <input type="hidden" name="badge_rol" id="selectedBadgeRol"
+            value="{{ form.badge_rol if form and form.badge_rol else '' }}">
+        </div>
+
+        <button type="button" onclick="generarYAbrirPdf()" class="btn-dsg btn">
+          <i class="bi bi-magic me-1"></i>Generar acreditación
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6 d-flex flex-column align-items-center justify-content-start gap-2 pt-2">
+
+    {% if not qr_base64 %}
+    <div class="preview-label">Vista previa</div>
+    <div class="badge-wrap">
+      <div class="badge-lanyard"></div>
+      <div class="badge-clip"></div>
+      <div class="badge-card" id="badgeCard" data-color="{{ form.color if form and form.color else '#4DC8ED' }}">
+        <div class="badge-top-placeholder">
+          <div class="badge-logo-ph"></div>
+          <div class="badge-logo-ph"></div>
+        </div>
+
+        <div class="badge-center">
+          <div class="badge-nombre" id="prevNombre">
+            {{ form.nombre if form and form.nombre else 'NOMBRE' }}
+          </div>
+
+          {% if form and form.empresa %}
+          <div class="badge-empresa" id="prevEmpresa">
+            {{ form.empresa }}
+          </div>
+          {% else %}
+          <div class="badge-empresa" id="prevEmpresa" style="display:none;"></div>
+          {% endif %}
+
+          {% if form and form.cargo %}
+          <div class="badge-cargo-row" id="cargoWrap">
+            <span class="badge-cargo-label">Cargo:</span>
+            <span class="badge-cargo" id="prevCargo">{{ form.cargo }}</span>
+          </div>
+          {% else %}
+          <div class="badge-cargo-row" id="cargoWrap" style="display:none;">
+            <span class="badge-cargo-label">Cargo:</span>
+            <span class="badge-cargo" id="prevCargo"></span>
+          </div>
+          {% endif %}
+
+          {% if form and form.codigo_cliente %}
+          <div class="badge-cliente" id="prevCliente">
+            {{ form.codigo_cliente }}
+          </div>
+          {% else %}
+          <div class="badge-cliente" id="prevCliente" style="display:none;"></div>
+          {% endif %}
+
+          <div class="badge-footer">
+            <div class="badge-footer-text" id="prevRol">
+              {{ form.badge_rol if form and form.badge_rol else 'EXPOSITOR' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if qr_base64 %}
+      <div class="preview-label">Lista para imprimir</div>
+      <div class="badge-wrap">
+        <div class="badge-lanyard"></div>
+        <div class="badge-clip"></div>
+        <div class="badge-card" id="resultCard" data-color="{{ form.color if form and form.color else '#4DC8ED' }}"
+          data-badge-rol="{{ form.badge_rol if form and form.badge_rol else 'EXPOSITOR' }}">
+          <div class="badge-center">
+            <div class="badge-nombre">{{ form.nombre }}</div>
+
+            {% if form.empresa %}
+            <div class="badge-empresa">{{ form.empresa }}</div>
+            {% endif %}
+
+            {% if form.cargo %}
+            <div class="badge-cargo-row">
+              <span class="badge-cargo-label">Cargo:</span>
+              <span class="badge-cargo">{{ form.cargo }}</span>
+            </div>
+            {% endif %}
+
+            {% if form.codigo_cliente %}
+            <div class="badge-cliente">{{ form.codigo_cliente }}</div>
+            {% endif %}
+          </div>
+
+          <div class="badge-footer">
+            <div class="badge-footer-text">{{ form.badge_rol if form and form.badge_rol else 'EXPOSITOR' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="imprimirCard()" class="btn-dsg btn mt-2">
+        <i class="bi bi-printer me-1"></i>Imprimir
+      </button>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <script>
+    function generarYAbrirPdf() {
+      imprimirCard();
+    }
+
+    function imprimirCard() {
+      var nombre = (document.getElementById('inputNombre')?.value || '').trim();
+      var cargo = (document.getElementById('inputCargo')?.value || '').trim();
+      var empresa = (document.getElementById('inputEmpresa')?.value || '').trim();
+      var codigoCliente = (document.getElementById('inputCodigoCliente')?.value || '').trim();
+
+      var rolSelect = document.getElementById('rolSelect');
+      var opt = rolSelect ? rolSelect.options[rolSelect.selectedIndex] : null;
+
+      var color = document.getElementById('selectedColor')?.value || (opt?.dataset.color || '#4DC8ED');
+      var rol = document.getElementById('selectedBadgeRol')?.value || (opt?.dataset.badge || 'EXPOSITOR');
+
+      if (rolSelect?.value === 'cliente') rol = 'VISITANTE';
+      else if (rolSelect?.value === 'proveedor') rol = 'EXPOSITOR';
+      else if (rolSelect?.value === 'medios/prensa') rol = 'MEDIOS / PRENSA';
+      else if (rolSelect?.value === 'comercial') rol = 'COMERCIAL';
+      else if (rolSelect?.value === 'invitado') rol = 'INVITADO';
+      else if (rolSelect?.value === 'control') rol = 'CONTROL';
+
+      var logoDsg = '{{ url_for("static", filename="img/logo_dsg_blanco.png") | safe }}';
+      var logoForum = '{{ url_for("static", filename="img/logo_forum2026.png") | safe }}';
+
+      function abs(p) {
+        return p.startsWith('http') ? p : window.location.origin + p;
+      }
+
+      var html = [
+        '<!DOCTYPE html><html><head><meta charset="utf-8">',
+        '<title>Acreditación</title>',
+        '<style>',
+        '  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; box-sizing:border-box; margin:0; padding:0; }',
+        '  @page { size:85mm 65mm; margin:0; }',
+        '  html,body { width:85mm; height:65mm; background:#fff; }',
+        '  .badge-card { width:85mm; height:65mm; background:' + color + ' !important; display:flex; flex-direction:column; font-family:"Arial Black",Arial,sans-serif; overflow:hidden; }',
+        '  .badge-top { display:flex; align-items:center; justify-content:space-between; padding:3mm 3mm 1mm; }',
+        '  .badge-top img { height:26mm; object-fit:contain; }',
+        '  .badge-center { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 7mm; text-align:center; gap:1mm; }',
+        '  .badge-nombre { font-size:13pt; font-weight:900; color:#111; text-transform:uppercase; letter-spacing:.01em; line-height:1.15; }',
+        '  .badge-empresa { font-size:8pt; font-weight:700; color:#111; text-transform:uppercase; letter-spacing:.02em; line-height:1.1; }',
+        '  .badge-cargo-row { display:flex; flex-direction:column; align-items:center; gap:0.5mm; margin-top:1.5mm; }',
+        '  .badge-cargo-label { font-size:5.5pt; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#111; opacity:.55; white-space:nowrap; }',
+        '  .badge-cargo { font-size:8pt; font-style:italic; font-weight:400; font-family:Georgia,"Times New Roman",serif; color:#111; opacity:.85; }',
+        '  .badge-cliente { font-size:8pt; font-weight:800; color:#111; margin-top:1mm; }',
+        '  .badge-footer { background:#fff !important; border-radius:8pt 8pt 0 0; padding:3mm 0; text-align:center; width:80%; margin:0 auto; }',
+        '  .badge-footer-text { font-size:15pt; font-weight:900; letter-spacing:.08em; color:#111; text-transform:uppercase; }',
+        '</style></head><body>',
+        '<div class="badge-card">',
+        '  <div class="badge-top">',
+        '    <img src="' + abs(logoDsg) + '" alt="DSG">',
+        '    <img src="' + abs(logoForum) + '" alt="Forum 2026">',
+        '  </div>',
+        '  <div class="badge-center">',
+        '    <div class="badge-nombre">' + nombre + '</div>',
+        (empresa ? ('    <div class="badge-empresa">' + empresa + '</div>') : ''),
+        (cargo ? ('    <div class="badge-cargo-row"><span class="badge-cargo">' + cargo + '</span></div>') : ''),
+        (codigoCliente ? ('    <div class="badge-cliente">' + codigoCliente + '</div>') : ''),
+        '  </div>',
+        '  <div class="badge-footer">',
+        '    <div class="badge-footer-text">' + rol + '</div>',
+        '  </div>',
+        '</div>',
+        '<script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };<\/script>',
+        '</body></html>'
+      ].join('\n');
+
+      var win = window.open('', '_blank', 'width=500,height=380');
+      if (!win) return;
+      win.document.write(html);
+      win.document.close();
+    }
+    (function () {
+      var appData = document.getElementById('appData');
+      var hasResult = appData.dataset.hasResult === 'true';
+
+      var rolSel = document.getElementById('rolSelect');
+      var dot = document.getElementById('selectDot');
+      var hidCol = document.getElementById('selectedColor');
+      var hidBadge = document.getElementById('selectedBadgeRol');
+
+      var prevNom = document.getElementById('prevNombre');
+      var prevEmp = document.getElementById('prevEmpresa');
+      var prevCg = document.getElementById('prevCargo');
+      var prevRol = document.getElementById('prevRol');
+      var prevCliente = document.getElementById('prevCliente');
+      var cargoWrap = document.getElementById('cargoWrap');
+      var badgeCard = document.getElementById('badgeCard');
+
+      if (dot && dot.dataset.initcolor && dot.dataset.initcolor !== '#888') {
+        dot.style.background = dot.dataset.initcolor;
+      }
+
+      function applyCardColor() {
+        if (!rolSel) return;
+        var opt = rolSel.options[rolSel.selectedIndex];
+        var color = opt ? (opt.dataset.color || '#4DC8ED') : '#4DC8ED';
+        if (hidCol) hidCol.value = color;
+        if (dot) dot.style.background = color;
+        if (badgeCard) badgeCard.style.background = color;
+      }
+
+      function setBadgeRole(rolValue) {
+        var text = 'EXPOSITOR';
+        if (rolValue === 'cliente') text = 'VISITANTE';
+        else if (rolValue === 'medios/prensa') text = 'MEDIOS / PRENSA';
+        else if (rolValue === 'comercial') text = 'COMERCIAL';
+        else if (rolValue === 'invitado') text = 'INVITADO';
+        else if (rolValue === 'control') text = 'CONTROL';
+        else if (rolValue === 'proveedor') text = 'EXPOSITOR';
+
+        if (prevRol) prevRol.textContent = text;
+        if (hidBadge) hidBadge.value = text;
+      }
+
+      function setFieldVisibility() {
+        if (!rolSel) return;
+        var opt = rolSel.options[rolSel.selectedIndex];
+        var fields = (opt && opt.dataset.fields ? opt.dataset.fields : '').split(',').filter(Boolean);
+
+        document.querySelectorAll('.field-group').forEach(function (group) {
+          var name = group.dataset.field;
+          var visible = fields.includes(name);
+          group.style.display = visible ? '' : 'none';
+
+          var input = group.querySelector('input');
+          if (input) {
+            input.required = visible;
+            if (!visible) input.value = '';
+          }
+        });
+
+        if (cargoWrap) {
+          cargoWrap.style.display = fields.includes('cargo') ? '' : 'none';
+          if (!fields.includes('cargo') && prevCg) prevCg.textContent = '';
+          if (!fields.includes('cargo')) {
+            var cargoInput = document.getElementById('inputCargo');
+            if (cargoInput) cargoInput.value = '';
+          }
+        }
+
+        if (prevEmp) {
+          prevEmp.style.display = fields.includes('empresa') ? '' : 'none';
+          if (!fields.includes('empresa')) {
+            prevEmp.textContent = '';
+            var empInput = document.getElementById('inputEmpresa');
+            if (empInput) empInput.value = '';
+          }
+        }
+
+        if (prevCliente) {
+          prevCliente.style.display = fields.includes('codigo_cliente') ? '' : 'none';
+          if (!fields.includes('codigo_cliente')) {
+            prevCliente.textContent = '';
+            var cliInput = document.getElementById('inputCodigoCliente');
+            if (cliInput) cliInput.value = '';
+          }
+        }
+
+        setBadgeRole(rolSel.value);
+        refreshPreviewTexts();
+      }
+      function refreshPreviewTexts() {
+        if (prevNom) prevNom.textContent = (document.getElementById('inputNombre')?.value || '').trim() || 'NOMBRE';
+        if (prevEmp) prevEmp.textContent = (document.getElementById('inputEmpresa')?.value || '').trim() || '';
+        if (prevCg) prevCg.textContent = (document.getElementById('inputCargo')?.value || '').trim() || 'Jefe de ventas';
+        if (prevCliente) prevCliente.textContent = (document.getElementById('inputCodigoCliente')?.value || '').trim() || '';
+      }
+
+      if (!hasResult && rolSel) {
+        rolSel.addEventListener('change', function () {
+          applyCardColor();
+          setFieldVisibility();
+          refreshPreviewTexts();
+        });
+
+        ['inputNombre', 'inputCargo', 'inputEmpresa', 'inputCodigoCliente'].forEach(function (id) {
+          var inp = document.getElementById(id);
+          if (inp) inp.addEventListener('input', refreshPreviewTexts);
+        });
+
+        applyCardColor();
+        setFieldVisibility();
+        refreshPreviewTexts();
+      }
+
+      if (hasResult) {
+        applyCardColor();
+        setBadgeRole(rolSel ? rolSel.value : '');
+      }
+    })();
+  </script>
+
+  {% endblock %}

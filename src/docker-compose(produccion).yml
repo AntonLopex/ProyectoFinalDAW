@@ -1,0 +1,53 @@
+version: "2.4"
+
+services:
+  web:
+    container_name: forum_app
+    build: app/.
+    command: python run.py
+
+    ports:
+      - "preguntar:preguntar"
+
+    environment:
+      - DATABASE_URL=preguntar
+      - DB_USER=preguntar
+      - DB_PASSWORD=preguntar
+      - DB_HOST=preguntar
+      - DB_NAME=preguntar
+      - SECRET_KEY=preguntar
+      - DOCKER_TIMEZONE=Europe/Madrid
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    volumes:
+      - type: bind
+        source: app
+        target: /app
+
+  db:
+    image: mysql:8.0
+    container_name: forum_mysql_db
+    restart: unless-stopped
+    ports:
+      - "preguntar:preguntar"
+    environment:
+      MYSQL_ROOT_PASSWORD: preguntar
+      MYSQL_DATABASE: preguntar
+      MYSQL_USER: preguntar
+      MYSQL_PASSWORD: preguntar
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  mysql_data:

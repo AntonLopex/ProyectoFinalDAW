@@ -1,0 +1,768 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo de Productos{% endblock %}
+
+{% block content %}
+
+{% set modo_seleccion = request.args.get('modo') == 'seleccion' %}
+{% set pedido_id_sel = request.args.get('pedido_id', '') %}
+
+<!-- ══════════════════════════════════════════════════════════
+     BANNER MODO SELECCIÓN
+     ══════════════════════════════════════════════════════════ -->
+{% if modo_seleccion %}
+<div id="banner-seleccion" style="
+  position: sticky; top: 0; z-index: 200;
+  background: linear-gradient(90deg, rgba(255,140,0,.12) 0%, rgba(255,140,0,.05) 100%);
+  border-bottom: 1px solid rgba(255,140,0,.25);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-bottom: 1rem;
+">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <i class="bi bi-bag-plus" style="color:var(--dsg-orange); font-size:1.1rem;"></i>
+    <span style="color:#e8e8e8; font-size:0.9rem; font-weight:500;">
+      Selecciona los productos para añadir al pedido
+      <span style="color:var(--dsg-muted); font-weight:400;">#{{ pedido_id_sel }}</span>
+    </span>
+    <span id="badge-cnt" style="
+      background: var(--dsg-orange); color:#000;
+      font-size:0.7rem; font-weight:700;
+      border-radius:999px; padding:2px 8px;
+      display:none;
+    ">0 seleccionados</span>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <button id="btn-limpiar" onclick="limpiarSeleccion()" style="
+      background: transparent; color:var(--dsg-muted);
+      border: 1px solid var(--dsg-border); border-radius:8px;
+      padding: 7px 14px; font-size:0.82rem; font-weight:500;
+      cursor:pointer; display:none; align-items:center; gap:5px;
+      transition: all .15s;
+    " onmouseover="this.style.borderColor='#888'" onmouseout="this.style.borderColor='var(--dsg-border)'">
+      <i class="bi bi-x-circle"></i> Limpiar
+    </button>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Cabecera ────────────────────────────────────────────── -->
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1><i class="bi bi-grid me-2" style="color:var(--dsg-orange)"></i>Catálogo de productos</h1>
+    <p>
+      {% if modo_seleccion %}
+      Elige los productos que quieres añadir al pedido — puedes seleccionar y deseleccionar libremente
+      {% else %}
+      Consulta el catálogo completo de productos disponibles
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+
+<!-- ── Detalle de producto ────────────────────────────────────── -->
+{% if producto %}
+<div class="dsg-card mb-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h6 class="fw-600 mb-0">
+      <i class="bi bi-box me-2" style="color:var(--dsg-orange)"></i>Detalle del producto
+    </h6>
+    <a href="{{ url_for('router_comercial.catalogo') }}" onclick="showLoader('Cargando catálogo...')"
+      class="btn-dsg-outline btn btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Volver al catálogo
+    </a>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      {% if producto.imagen_url %}
+      <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}"
+        style="width:100%; border-radius:8px; border:1px solid var(--dsg-border); object-fit:fill; max-height:300px;">
+      {% else %}
+      <div style="width:100%; height:250px; background:var(--dsg-surface2); border-radius:8px;
+        border:1px solid var(--dsg-border); display:flex; align-items:center; justify-content:center;">
+        <i class="bi bi-image" style="font-size:3rem; color:var(--dsg-muted)"></i>
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-md-8">
+      <div class="producto-id-badge mb-2 d-inline-flex align-items-center gap-2">
+        <span id="producto-id">{{ producto.id }}</span>
+        <i class="bi bi-clipboard" style="cursor:pointer; font-size:0.9rem;" onclick="copiarID(event)"
+          title="Copiar ID"></i>
+      </div>
+      <h2 style="font-size:1.5rem; font-weight:700; color:var(--dsg-text); margin-bottom:0.5rem;">
+        {{ producto.nombre }}
+      </h2>
+      <div style="font-size:2.2rem; font-weight:700; color:var(--dsg-orange); margin-bottom:1.25rem;">
+        {{ "%.2f"|format(producto.precio|float) }} €
+      </div>
+      {% if producto.proveedor %}
+      <div class="mb-3">
+        <div
+          style="color:var(--dsg-muted); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">
+          Proveedor
+        </div>
+        <div style="font-weight:500; color:#ccc;">
+          <i class="bi bi-building me-1" style="color:var(--dsg-muted)"></i>
+          {{ producto.proveedor.nombre_empresa or producto.proveedor.nombre }}
+        </div>
+      </div>
+      {% endif %}
+      {% if producto.descripcion %}
+      <div>
+        <div
+          style="color:var(--dsg-muted); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">
+          Descripción
+        </div>
+        <p style="line-height:1.7; color:#bbb; margin:0;">{{ producto.descripcion }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<!-- ── Filtros ────────────────────────────────────────────── -->
+<div class="dsg-card mb-4">
+  <form id="form-filtros" method="GET" action="{{ url_for('router_comercial.catalogo') }}"
+    class="d-flex flex-wrap gap-3 align-items-end">
+    {% if modo_seleccion %}
+    <input type="hidden" name="modo" value="seleccion">
+    <input type="hidden" name="pedido_id" value="{{ pedido_id_sel }}">
+    {% endif %}
+    <div>
+      <label class="form-label">Buscar producto</label>
+      <div style="position:relative;">
+        <i class="bi bi-search" style="position:absolute; left:.75rem; top:50%; transform:translateY(-50%);
+          color:var(--dsg-muted); pointer-events:none;"></i>
+        <input type="text" id="input-busqueda" name="busqueda" class="form-control"
+          style="width:240px; padding-left:2.25rem;" placeholder="Nombre o código..." value="{{ busqueda or '' }}"
+          autocomplete="off" />
+      </div>
+    </div>
+    <div style="width:200px; position:relative;">
+      <label class="form-label">Proveedor</label>
+      <div class="position-relative">
+        <select id="select-proveedor" name="proveedor_id" class="form-select pe-4">
+          <option value="">Todos los proveedores</option>
+          {% for p in proveedores %}
+          <option value="{{ p.id }}" {% if proveedor_id==p.id %}selected{% endif %}>
+            {{ p.nombre_empresa or p.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+        <i class="bi bi-chevron-down position-absolute top-50 end-0 translate-middle-y me-2"
+          style="pointer-events:none; color:var(--dsg-muted);"></i>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- ── Contador ────────────────────────────────────────────── -->
+<div id="contador-resultados" class="mb-3" style="color:var(--dsg-muted); font-size:0.85rem; display:none;">
+  <i class="bi bi-box-seam me-1"></i>
+  <span id="texto-contador"></span>
+</div>
+
+<!-- ── Grid ───────────────────────────────────────────────── -->
+<div id="grid-productos" class="row g-3">
+  {% for p in productos %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="producto-card h-100 d-flex flex-column p-0" id="card-{{ p.id }}">
+      <div class="producto-img-wrap">
+        {% if p.imagen_url %}
+        <img src="{{ p.imagen_url }}" alt="{{ p.nombre }}" class="producto-img">
+        {% else %}
+        <div class="producto-img-placeholder">
+          <i class="bi bi-image"></i>
+        </div>
+        {% endif %}
+        <span class="producto-id-float">{{ p.id }}</span>
+        {% if modo_seleccion %}
+        <div class="check-overlay" id="check-{{ p.id }}">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+        {% endif %}
+      </div>
+      <div class="d-flex flex-column p-3" style="flex:1;">
+        <div class="producto-nombre">{{ p.nombre }}</div>
+        {% if p.proveedor %}
+        <div class="producto-proveedor d-none d-md-block">
+          <i class="bi bi-building me-1"></i>{{ p.proveedor.nombre_empresa or p.proveedor.nombre }}
+        </div>
+        {% endif %}
+        {% if p.descripcion %}
+        <div class="producto-desc d-none d-md-block">{{ p.descripcion }}</div>
+        {% endif %}
+        <div style="border-top:1px solid var(--dsg-border); padding-top:.75rem; margin-top:auto;">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="producto-precio">{{ "%.2f"|format(p.precio|float) }} €</span>
+            {% if modo_seleccion %}
+            <button id="btn-add-{{ p.id }}" class="btn btn-sm btn-añadir" data-id="{{ p.id }}"
+              data-nombre="{{ p.nombre|e }}" data-precio="{{ p.precio }}" title="Añadir / quitar del pedido">
+              <i class="bi bi-plus me-1"></i>Añadir
+            </button>
+            {% else %}
+            <a href="{{ url_for('router_comercial.detalle_producto', producto_id=p.id) }}"
+              onclick="showLoader('Cargando detalle de producto...')" class="btn btn-sm btn-accion" title="Ver detalle">
+              <i class="bi bi-eye me-1"></i>Ver
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Estado vacío -->
+<div id="estado-vacio" class="dsg-card text-center py-5" {% if productos %}hidden{% endif %}>
+  <i class="bi bi-inbox" style="font-size:2.5rem; color:var(--dsg-muted)"></i>
+  <p style="color:var(--dsg-muted); margin-top:1rem; margin-bottom:1rem;">No se encontraron productos.</p>
+  <a href="{{ url_for('router_comercial.catalogo') }}" onclick="showLoader('Cargando catálogo...')"
+    class="btn-dsg-outline btn btn-sm">
+    <i class="bi bi-x me-1"></i> Limpiar filtros
+  </a>
+</div>
+
+<!-- Scroll sentinel -->
+<div id="scroll-sentinel" style="height:1px; margin-top:1rem;"></div>
+<div id="spinner-carga" class="text-center py-4" style="display:none;">
+  <div class="spinner-border" style="color:var(--dsg-orange); width:1.5rem; height:1.5rem;" role="status"></div>
+  <span class="ms-2" style="color:var(--dsg-muted); font-size:.85rem;">Cargando más productos...</span>
+</div>
+<div id="fin-lista" class="text-center py-3" style="display:none;">
+  <span style="color:var(--dsg-muted); font-size:.8rem;">
+    <i class="bi bi-check2-circle me-1" style="color:var(--dsg-orange)"></i>Todos los productos cargados
+  </span>
+</div>
+
+{% endif %}{# fin detalle/catálogo #}
+
+
+<style>
+  .producto-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color .18s, transform .18s, box-shadow .18s;
+  }
+
+  .producto-card:hover {
+    border-color: var(--dsg-orange);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(255, 140, 0, .12);
+  }
+
+  .producto-card.seleccionada {
+    border-color: var(--dsg-orange) !important;
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, .3), 0 8px 24px rgba(255, 140, 0, .15);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .producto-card-animada {
+    animation: fadeInUp .28s ease both;
+  }
+
+  .producto-img-wrap {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .producto-img {
+    width: 100%;
+    height: 100%;
+    object-fit: unset;
+    display: block;
+    transition: transform .35s ease;
+  }
+
+  .producto-card:hover .producto-img {
+    transform: scale(1.04);
+  }
+
+  .producto-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--dsg-surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .producto-img-placeholder i {
+    font-size: 2.8rem;
+    color: var(--dsg-muted);
+  }
+
+  .producto-id-float {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, .15);
+  }
+
+  /* Check overlay */
+  .check-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--dsg-orange);
+    color: #000;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    font-weight: 700;
+  }
+
+  .check-overlay.visible {
+    display: flex;
+  }
+
+  .producto-id-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(255, 140, 0, .1);
+    border: 1px solid rgba(255, 140, 0, .3);
+    color: var(--dsg-orange);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  .producto-nombre {
+    font-weight: 600;
+    font-size: .95rem;
+    margin-bottom: .25rem;
+    line-height: 1.35;
+    color: var(--dsg-text);
+  }
+
+  .producto-proveedor {
+    font-size: .75rem;
+    color: var(--dsg-muted);
+    margin-bottom: .5rem;
+  }
+
+  .producto-desc {
+    font-size: .82rem;
+    color: var(--dsg-muted);
+    line-height: 1.5;
+    margin-bottom: .75rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .producto-precio {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dsg-orange);
+  }
+
+  .btn-añadir {
+    padding: .25rem .65rem;
+    border-radius: 6px;
+    font-size: .8rem;
+    border: 1px solid rgba(255, 140, 0, .3);
+    background: rgba(255, 140, 0, .08);
+    color: var(--dsg-orange);
+    transition: all .15s;
+  }
+
+  .btn-añadir:hover {
+    background: rgba(255, 140, 0, .2);
+    border-color: var(--dsg-orange);
+    color: var(--dsg-orange);
+  }
+
+  .btn-añadir.añadido {
+    background: rgba(255, 140, 0, .25);
+    border-color: var(--dsg-orange);
+    color: var(--dsg-orange);
+    font-weight: 600;
+  }
+
+  .btn-añadir.quitar {
+    background: rgba(255, 80, 80, .12);
+    border-color: rgba(255, 80, 80, .4);
+    color: #ff6b6b;
+    font-weight: 600;
+  }
+
+  .btn-añadir.quitar:hover {
+    background: rgba(255, 80, 80, .25);
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+
+  .btn-accion {
+    padding: .25rem .5rem;
+    border-radius: 5px;
+    font-size: .8rem;
+    border: none;
+    background: var(--dsg-surface2);
+    color: var(--dsg-muted);
+    transition: background .15s, color .15s, transform .1s;
+  }
+
+  .btn-accion:hover {
+    background: var(--dsg-surface);
+    color: var(--dsg-text);
+    transform: translateY(-1px);
+  }
+
+  #input-busqueda.buscando {
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, .15);
+  }
+
+  /* ══════════════════════════════════════════
+     Solo móvil — sin tocar desktop (≥768px)
+  ══════════════════════════════════════════ */
+  @media (max-width: 767.98px) {
+
+    /* Imagen más compacta en móvil (2 columnas) */
+    .producto-img-wrap {
+      height: 140px;
+    }
+
+    /* Nombre y precio más pequeños para caber en 2 columnas */
+    .producto-nombre {
+      font-size: 0.82rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .producto-precio {
+      font-size: 0.95rem;
+    }
+
+    /* Padding interior reducido */
+    .producto-card .d-flex.flex-column.p-3 {
+      padding: 0.6rem !important;
+    }
+
+    /* Filtros en una sola fila */
+    #form-filtros {
+      flex-wrap: nowrap !important;
+      gap: 0.5rem !important;
+    }
+
+    #form-filtros>div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Anular anchos fijos inline */
+    #input-busqueda {
+      width: 100% !important;
+    }
+
+    #form-filtros>div[style*="width:200px"],
+    #form-filtros>div[style*="width: 200px"] {
+      width: auto !important;
+    }
+
+    /* Labels y controles más compactos */
+    #form-filtros .form-label {
+      font-size: 0.72rem;
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #form-filtros .form-control,
+    #form-filtros .form-select {
+      font-size: 0.8rem;
+      padding-top: 0.3rem;
+      padding-bottom: 0.3rem;
+      height: auto;
+    }
+  }
+</style>
+
+<!-- Config para JS -->
+<div id="catalogo-config" data-has-more="{{ 'true' if has_more else 'false' }}" data-busqueda="{{ busqueda or '' }}"
+  data-proveedor="{{ proveedor_id or '' }}" data-url="{{ url_for('router_comercial.catalogo') }}"
+  data-modo="{{ 'seleccion' if modo_seleccion else '' }}" data-pedido-id="{{ pedido_id_sel }}" style="display:none;">
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ═══════════════════════════════════════════════════════════════
+  //  Config global
+  // ═══════════════════════════════════════════════════════════════
+  const cfgEl = document.getElementById('catalogo-config');
+  const _cfg = cfgEl ? cfgEl.dataset : {};
+
+  const PER_PAGE = 20;
+  const URL_CATALOGO = _cfg.url;
+  const MODO_SEL = _cfg.modo === 'seleccion';
+  const PEDIDO_ID = _cfg.pedidoId || '';
+
+  let currentPage = 1;
+  let isLoading = false;
+  let hasMore = _cfg.hasMore === 'true';
+  let currentSearch = _cfg.busqueda || '';
+  let currentProveedor = _cfg.proveedor || '';
+
+  // ─── Estado de selección ──────────────────────────────────────
+  const seleccionados = new Set();
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Toggle producto (añadir / quitar)
+  // ═══════════════════════════════════════════════════════════════
+  function toggleProducto(id) {
+    id = String(id);
+    if (seleccionados.has(id)) {
+      seleccionados.delete(id);
+      marcarCard(id, false);
+    } else {
+      seleccionados.add(id);
+      marcarCard(id, true);
+    }
+    actualizarBanner();
+  }
+
+  function marcarCard(id, activo) {
+    id = String(id);
+    const card = document.getElementById(`card-${id}`);
+    const check = document.getElementById(`check-${id}`);
+    const btn = document.getElementById(`btn-add-${id}`);
+
+    if (!card) return;
+
+    if (activo) {
+      card.classList.add('seleccionada');
+      if (check) check.classList.add('visible');
+      if (btn) {
+        btn.classList.add('añadido', 'quitar');
+        btn.innerHTML = '<i class="bi bi-dash me-1"></i>Quitar';
+      }
+    } else {
+      card.classList.remove('seleccionada');
+      if (check) check.classList.remove('visible');
+      if (btn) {
+        btn.classList.remove('añadido', 'quitar');
+        btn.innerHTML = '<i class="bi bi-plus me-1"></i>Añadir';
+      }
+    }
+  }
+
+  function actualizarBanner() {
+    const n = seleccionados.size;
+    const badge = document.getElementById('badge-cnt');
+    const limpiar = document.getElementById('btn-limpiar');
+
+    if (badge) {
+      badge.style.display = n > 0 ? 'inline' : 'none';
+      if (n > 0) badge.textContent = `${n} seleccionado${n !== 1 ? 's' : ''}`;
+    }
+    if (limpiar) {
+      limpiar.style.display = n > 0 ? 'flex' : 'none';
+    }
+  }
+
+  function limpiarSeleccion() {
+    [...seleccionados].forEach(id => {
+      seleccionados.delete(id);
+      marcarCard(id, false);
+    });
+    actualizarBanner();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  Carga de productos (infinite scroll + filtros)
+  // ═══════════════════════════════════════════════════════════════
+  async function cargarProductos({ replace = false, page = 1 } = {}) {
+    if (isLoading) return;
+    if (!replace && !hasMore) return;
+
+    isLoading = true;
+
+    const inputBusqueda = document.getElementById('input-busqueda');
+    if (inputBusqueda) inputBusqueda.classList.add('buscando');
+
+    const spinner = document.getElementById('spinner-carga');
+    const finLista = document.getElementById('fin-lista');
+    const vacio = document.getElementById('estado-vacio');
+
+    if (spinner) spinner.style.display = 'block';
+    if (finLista) finLista.style.display = 'none';
+
+    const params = new URLSearchParams({
+      busqueda: currentSearch,
+      proveedor_id: currentProveedor,
+      page,
+      per_page: PER_PAGE,
+      formato: 'json',
+    });
+
+    if (MODO_SEL) {
+      params.set('modo', 'seleccion');
+      params.set('pedido_id', PEDIDO_ID);
+    }
+
+    try {
+      const res = await fetch(`${URL_CATALOGO}?${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      const grid = document.getElementById('grid-productos');
+
+      if (replace) {
+        grid.innerHTML = data.html;
+        currentPage = 1;
+      } else {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = data.html;
+        tmp.querySelectorAll('.col-6').forEach((col, i) => {
+          const card = col.querySelector('.producto-card');
+          if (card) {
+            card.classList.add('producto-card-animada');
+            card.style.animationDelay = `${i * 40}ms`;
+          }
+          grid.appendChild(col);
+        });
+      }
+
+      hasMore = data.has_more;
+      currentPage = page;
+
+      actualizarContador(data.total, data.loaded, replace);
+
+      if (vacio) {
+        if (data.total === 0) vacio.removeAttribute('hidden');
+        else vacio.setAttribute('hidden', '');
+      }
+
+      if (!hasMore && data.total > 0 && finLista) {
+        finLista.style.display = 'block';
+      }
+
+      if (MODO_SEL) {
+        seleccionados.forEach(id => marcarCard(id, true));
+      }
+
+    } catch (err) {
+      console.error('Error cargando productos:', err);
+    } finally {
+      isLoading = false;
+      if (inputBusqueda) inputBusqueda.classList.remove('buscando');
+      if (spinner) spinner.style.display = 'none';
+    }
+  }
+
+  function actualizarContador(total, loaded, isReplace) {
+    const cnt = document.getElementById('contador-resultados');
+    const texto = document.getElementById('texto-contador');
+
+    if (!cnt || !texto) return;
+    if (total === 0) { cnt.style.display = 'none'; return; }
+
+    cnt.style.display = 'block';
+    const hayFiltros = currentSearch.trim() !== '' || currentProveedor !== '';
+
+    texto.textContent = (isReplace && hayFiltros)
+      ? `${total} producto${total !== 1 ? 's' : ''} encontrado${total !== 1 ? 's' : ''}`
+      : `Mostrando ${Math.min(loaded, total)} de ${total} productos`;
+  }
+
+  // ── Filtros ─────────────────────────────────────────────────
+  let debounceTimer;
+
+  const inputBusqueda = document.getElementById('input-busqueda');
+  if (inputBusqueda) {
+    inputBusqueda.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        currentSearch = this.value.trim();
+        hasMore = true;
+        cargarProductos({ replace: true, page: 1 });
+      }, 300);
+    });
+  }
+
+  const selectProveedor = document.getElementById('select-proveedor');
+  if (selectProveedor) {
+    selectProveedor.addEventListener('change', function () {
+      currentProveedor = this.value;
+      hasMore = true;
+      cargarProductos({ replace: true, page: 1 });
+    });
+  }
+
+  // ── Infinite scroll ─────────────────────────────────────────
+  const sentinel = document.getElementById('scroll-sentinel');
+  if (sentinel) {
+    new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore && !isLoading) {
+        cargarProductos({ replace: false, page: currentPage + 1 });
+      }
+    }, { rootMargin: '300px' }).observe(sentinel);
+  }
+
+  // ── Delegar click en botones Añadir/Quitar ───────────────────
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-añadir');
+    if (!btn) return;
+    toggleProducto(btn.dataset.id);
+  });
+
+  // ── Copiar ID ────────────────────────────────────────────────
+  function copiarID(event) {
+    const id = document.getElementById('producto-id')?.innerText;
+    if (!id) return;
+    const icon = event?.target;
+    navigator.clipboard.writeText(id).then(() => {
+      if (!icon) return;
+      icon.classList.replace('bi-clipboard', 'bi-check');
+      setTimeout(() => icon.classList.replace('bi-check', 'bi-clipboard'), 1500);
+    });
+  }
+</script>
+{% endblock %}
+

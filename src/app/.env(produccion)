@@ -1,0 +1,18 @@
+#CONFIG BASE DATOS
+
+MYSQL_USER="preguntar"
+MYSQL_PASSWORD="preguntar"
+MYSQL_HOST ="preguntar"
+MYSQL_PORT =preguntar
+MYSQL_DB ="preguntar"
+SEC_KEY ="preguntar"
+
+
+#CONFIG EMAIL
+MAIL_SERVER=preguntar
+MAIL_PORT=preguntar
+MAIL_USE_TLS=preguntar
+MAIL_USERNAME=preguntar
+MAIL_PASSWORD=preguntar
+MAIL_SENDER_NAME= preguntar
+

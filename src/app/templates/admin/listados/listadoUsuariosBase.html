@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Listado{% endblock %}
+
+{% block extra_css %}
+<style>
+    .list-card {
+        background: var(--dsg-surface);
+        border: 1px solid var(--dsg-border);
+        border-radius: 10px;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .list-card:hover {
+        border-color: var(--dsg-orange);
+    }
+
+    .list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--dsg-border);
+    }
+
+    .list-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .table-list {
+        margin: 0;
+    }
+
+    .table-list tbody tr {
+        transition: all 0.15s ease;
+        animation: fadeInFila 0.2s ease;
+    }
+
+    .table-list tbody tr:hover {
+        background: var(--dsg-surface2);
+        transform: scale(1.000);
+    }
+
+    .table-list td,
+    .table-list th {
+        color: #ffff;
+        padding: 0.75rem 0.9rem;
+        vertical-align: middle;
+    }
+
+    .btn-icon {
+        border: none;
+        background: transparent;
+        color: var(--dsg-muted);
+        font-size: 1rem;
+        transition: all 0.15s ease;
+        padding: 0.25rem;
+        border-radius: 6px;
+    }
+
+    .btn-icon:hover {
+        color: var(--dsg-text);
+        background: rgba(249, 115, 22, 0.12);
+        transform: scale(1.15);
+    }
+
+    .btn-icon.editar:hover { color: #60A5FA; }
+    .btn-icon.eliminar:hover { color: #F87171; }
+
+    .estado-vacio {
+        text-align: center;
+        padding: 2.5rem;
+        color: var(--dsg-muted);
+    }
+
+    .estado-vacio i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    a { text-decoration: none; }
+
+    .dsg-modal {
+        background: var(--dsg-surface);
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-text);
+        border-radius: 12px;
+    }
+
+    .dsg-modal .modal-header { border-bottom: 1px solid var(--dsg-border); }
+    .dsg-modal .modal-footer { border-top: 1px solid var(--dsg-border); }
+
+    .dsg-modal .form-control {
+        background: var(--dsg-surface2);
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-text);
+    }
+
+    .dsg-modal .form-control:focus {
+        border-color: var(--dsg-orange);
+        box-shadow: none;
+    }
+
+    .dsg-modal .btn {
+        background: var(--dsg-orange);
+        color: #fff;
+        border: none;
+        transition: background 0.2s ease;
+    }
+
+    .dsg-modal .btn-cancelar {
+        background: var(--dsg-muted);
+        color: #fff;
+        border: none;
+        transition: background 0.2s ease;
+    }
+
+    @keyframes fadeInFila {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    {% block titulo %}{% endblock %}
+    {% block subtitulo %}{% endblock %}
+</div>
+
+<div class="list-card">
+
+    <div class="list-header">
+        <h5 class="list-title">{{ titulo or "Registros" }}</h5>
+        {% block acciones_superiores %}{% endblock %}
+    </div>
+
+    {% block filtros %}{% endblock %}
+
+    <div class="table-responsive">
+        <table class="table table-list align-middle">
+            <thead class="text-center">
+                <tr>
+                    {% block cabecera_tabla %}{% endblock %}
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% block cuerpo_tabla %}{% endblock %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

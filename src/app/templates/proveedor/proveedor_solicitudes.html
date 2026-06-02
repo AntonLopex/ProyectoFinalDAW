@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Solicitudes{% endblock %}
+
+{% block extra_css %}
+<style>
+  .section-title {
+    margin-top: 34px;
+    font-weight: 700;
+    color: var(--dsg-orange);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+  }
+
+  .section-divider {
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg,
+        var(--dsg-orange),
+        rgba(255, 140, 0, 0.2));
+    margin-top: 6px;
+    margin-bottom: 18px;
+  }
+
+  .solicitud-card {
+    background: var(--dsg-surface2);
+    border: 1px solid var(--dsg-border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .solicitud-card:hover {
+    border-color: var(--dsg-orange);
+  }
+
+  .solicitud-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .solicitud-id {
+    font-weight: 700;
+  }
+
+  .solicitud-date {
+    font-size: 0.75rem;
+    color: var(--dsg-muted);
+  }
+
+  .solicitud-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .solicitud-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .muted {
+    color: var(--dsg-muted);
+    font-size: 0.8rem;
+  }
+
+  .empty-box {
+    text-align: center;
+    padding: 50px 20px;
+  }
+
+  .empty-box i {
+    font-size: 2.8rem;
+    color: var(--dsg-muted);
+  }
+
+  .solicitud-line+.solicitud-line {
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+  }
+
+  .solicitud-total-line {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    margin-top: 8px;
+    border-top: 1px solid var(--dsg-orange);
+    font-weight: 700;
+    color: var(--dsg-orange);
+  }
+
+  .section-block {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--dsg-border);
+  }
+
+  .section-title-small {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dsg-orange);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .extras-block {
+    background: rgba(255, 140, 0, 0.05);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px dashed var(--dsg-orange);
+  }
+
+  /* =========================
+     TICKET GLOBAL
+  ========================== */
+
+  .ticket-global {
+    margin-top: 40px;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(148, 163, 184, 0.06);
+    border: 1px solid var(--dsg-border);
+  }
+
+  .ticket-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+    color: #cbd5e1;
+  }
+
+  .ticket-row.discount {
+    color: #22c55e;
+  }
+
+  .ticket-divider {
+    height: 1px;
+    background: var(--dsg-border);
+    margin: 10px 0;
+  }
+
+  .ticket-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--dsg-orange);
+  }
+
+  /* =========================
+     BOTÓN GENERAR PDF
+  ========================== */
+
+  .pdf-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 32px;
+    margin-bottom: 40px;
+  }
+
+  .btn-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--dsg-orange);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 10px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-pdf:hover:not(:disabled) {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  .btn-pdf:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .btn-pdf .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 2px;
+  }
+
+  /* Toast de confirmación */
+  .pdf-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    min-width: 280px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+
+  .pdf-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .pdf-toast.success {
+    background: #166534;
+    border: 1px solid #22c55e;
+    color: #dcfce7;
+  }
+
+  .pdf-toast.error {
+    background: #7f1d1d;
+    border: 1px solid #ef4444;
+    color: #fee2e2;
+  }
+
+  @media (max-width: 576px) {
+    .page-header {
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+
+    .page-header>div:first-child {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .page-header>div:first-child h1 {
+      font-size: 1.1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .page-header>div:first-child p {
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0;
+    }
+
+    .page-header>div:last-child {
+      flex-shrink: 0;
+      flex-wrap: nowrap !important;
+    }
+
+    .page-header .btn-dsg {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="page-header d-flex justify-content-between flex-wrap gap-3">
+
+  <div>
+    <h1>
+      <i class="bi bi-clipboard-check me-2" style="color:var(--dsg-orange)"></i>
+      Mis Solicitudes
+    </h1>
+    <p>Historial de solicitudes</p>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap align-items-center">
+    {% if config and config.fecha_fin_reservas and config.fecha_fin_reservas >= now %}
+    <a href="{{ url_for('router_proveedor.mapa_stands') }}" onclick="showLoader('Cargando mapa de stands...')"
+      class="btn-dsg">
+      <i class="bi bi-map me-1"></i> Stands
+    </a>
+    {%else%}
+    <a href="{{ url_for('router_proveedor.mapa_stands') }}" onclick="showLoader('Cargando mapa de stands...')"
+      class="btn-dsg">
+      <i class="bi bi-map me-1"></i> Ver mapa
+    </a>
+    {% endif %}
+    {% if config and config.fecha_fin_reservas and config.fecha_fin_reservas >= now %}
+    <a href="{{ url_for('router_proveedor.catalogo_mobiliario') }}"
+      onclick="showLoader('Cargando catálogo de mobiliario...')" class="btn-dsg">
+      <i class="bi bi-boxes me-1"></i> Mobiliario
+    </a>
+    {% endif %}
+  </div>
+
+</div>
+
+{% if solicitudes %}
+
+{% set solicitudes_stands = [] %}
+{% set solicitudes_mobiliario = [] %}
+
+{% for s in solicitudes %}
+{% set has_stands = s.detalles_stand|length > 0 %}
+{% set has_mobiliario = s.detalles_mobiliario | length > 0 %}
+
+{% if has_stands and not has_mobiliario %}
+{% set _ = solicitudes_stands.append(s) %}
+{% elif has_mobiliario and not has_stands %}
+{% set _ = solicitudes_mobiliario.append(s) %}
+{% else %}
+{% set _ = solicitudes_mobiliario.append(s) %}
+{% endif %}
+{% endfor %}
+
+{% macro render_solicitudes(lista, titulo, icono) %}
+
+<div class="section-title">
+  <i class="bi {{ icono }}"></i>
+  {{ titulo }}
+</div>
+<div class="section-divider"></div>
+
+{% for solicitud in lista if solicitud.estado != 'cancelada_admin' %}
+
+<div class="solicitud-card mb-3">
+
+  <div class="solicitud-header">
+
+    <div class="solicitud-id">
+      Solicitud -
+      <span class="solicitud-date">
+        {{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}
+      </span>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+
+
+      <!-- ✅ ESTADO -->
+      <div>
+        {% if solicitud.estado == 'pendiente' %}
+        <span class="badge-rol badge-comercial">Pendiente</span>
+
+        {% elif solicitud.estado == 'confirmada' %}
+        <span class="badge-rol badge-cliente">Confirmada</span>
+
+        {% elif solicitud.estado == 'rechazada' %}
+        <span class="badge-rol badge-control">Rechazada</span>
+
+        {% elif solicitud.estado == 'pre_reservado' %}
+        <span class="badge-rol badge-admin">Pre-reservado</span>
+        {% elif solicitud.estado == 'asignado_por_admin' %}
+        <span class="badge-rol badge-cliente">Asignado por el administrador</span>
+
+
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+  <div class="solicitud-body">
+
+    <!-- =========================
+       STANDS
+  ========================== -->
+    {% if solicitud.detalles_stand| length > 0 %}
+    <div class="section-block">
+      <div class="section-title-small">Stands</div>
+
+      {% for d in solicitud.detalles_stand %}
+      <div class="solicitud-line">
+        <div>
+          Stand #{{ d.stand.numero_stand }}
+          <span class="muted">{{ d.stand.dimensiones }} m²</span>
+        </div>
+        <div>{{ "%.2f"|format(d.precio_total|float) }} €</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <!-- =========================
+       MOBILIARIO
+  ========================== -->
+    {% if solicitud.detalles_mobiliario| length > 0 %}
+    <div class="section-block">
+      <div class="section-title-small">Mobiliario</div>
+
+      {% for d in solicitud.detalles_mobiliario %}
+      <div class="solicitud-line">
+        <div>
+          {{ d.mobiliario.referencia }}
+          <span class="muted">x{{ d.cantidad }}</span>
+        </div>
+
+        <div>
+          <div>{{ "%.2f"|format((d.precio_total|float / d.cantidad)) }} €/ud</div>
+          <div style="color:var(--dsg-muted)">
+            Total: {{ "%.2f"|format(d.precio_total|float) }} €
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <!-- =========================
+       EXTRAS (DESTACADOS)
+  ========================== -->
+    {% if solicitud.extras|length > 0 %}
+    <div class="section-block extras-block">
+
+      <div class="section-title-small">
+        Extras:
+      </div>
+
+      {% for e in solicitud.extras %}
+      <div class="solicitud-line extra-line">
+
+        <div>
+
+          {{ e.descripcion }}
+          <span class="muted">x{{ e.cantidad }}</span>
+        </div>
+
+        <div>
+          {% if e.precio %}
+          <div>{{ "%.2f"|format(e.precio|float) }} €/ud</div>
+          <div style="color:var(--dsg-muted)">
+            Total: {{ "%.2f"|format(e.precio|float * e.cantidad) }} €
+          </div>
+          {% else %}
+          —
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+    {% endif %}
+
+  </div>
+
+  {% set total_stands = (
+  solicitud.detalles_stand | sum(attribute='precio_total')
+  if solicitud.estado in ['confirmada', 'pre_reservado','asignado_por_admin']
+  else 0
+  ) %} {% set total_mob = solicitud.detalles_mobiliario | sum(attribute='precio_total') | default(0) %}
+
+  {% set total_extras = namespace(value=0) %}
+  {% for e in solicitud.extras %}
+  {% if e.precio %}
+  {% set total_extras.value = total_extras.value + (e.precio|float * e.cantidad) %}
+  {% endif %}
+  {% endfor %}
+
+  <div class="solicitud-total-line">
+    <div>Total:</div>
+    <div>
+      {{ "%.2f"|format(
+      (total_stands|float) +
+      (total_mob|float) +
+      (total_extras.value|float)
+      ) }} €
+    </div>
+  </div>
+
+</div>
+</div>
+
+{% endfor %}
+
+
+{% endmacro %}
+
+{{ render_solicitudes(solicitudes_stands, "Solicitudes de Stands", "bi-map") }}
+{{ render_solicitudes(solicitudes_mobiliario, "Solicitudes de Mobiliario", "bi-boxes") }}
+
+
+<div class="section-title">
+  <i class="bi bi-receipt"></i>
+  Ticket:
+</div>
+<div class="section-divider"></div>
+
+<div class="ticket-global">
+
+  {% set ns = namespace(
+  total_stands=0,
+  total_mob=0,
+  total_extras=0,
+  total_final_bd=0
+  ) %}
+
+  {# =========================
+  SUBTOTAL (calculado)
+  ========================= #}
+  {% for s in solicitudes %}
+
+  {% if s.estado in ['confirmada', 'pre_reservado','asignado_por_admin'] %}
+  {% for d in s.detalles_stand %}
+  {% set ns.total_stands = ns.total_stands + (d.precio_total|float or 0) %}
+  {% endfor %}
+  {% endif %}
+
+  {% for d in s.detalles_mobiliario %}
+  {% set ns.total_mob = ns.total_mob + (d.precio_total|float or 0) %}
+  {% endfor %}
+
+  {% for e in s.extras %}
+  {% if e.precio %}
+  {% set ns.total_extras = ns.total_extras + ((e.precio|float or 0) * e.cantidad) %}
+  {% endif %}
+  {% endfor %}
+
+  {% endfor %}
+
+  {% set subtotal = ns.total_stands + ns.total_mob + ns.total_extras %}
+
+  {# =========================
+  TOTAL FINAL BD
+  ========================= #}
+
+  {% set ns.total_final_bd = 0 %}
+  {% set ns.descuento_total = 0 %}
+
+  {% for s in solicitudes %}
+
+  {% if s.precio_final is not none %}
+  {% set ns.total_final_bd =(subtotal | float) - (s.descuento|float) %}
+  {% endif %}
+
+  {% if s.descuento is not none %}
+  {% set ns.descuento_total = (s.descuento|float) %}
+  {% endif %}
+
+  {% endfor %}<div class="ticket-row">
+    <span>Stands</span>
+    <span>{{ "%.2f"|format(ns.total_stands) }} €</span>
+  </div>
+
+  <div class="ticket-row">
+    <span>Mobiliario</span>
+    <span>{{ "%.2f"|format(ns.total_mob) }} €</span>
+  </div>
+
+  <div class="ticket-row">
+    <span>Extras</span>
+    <span>{{ "%.2f"|format(ns.total_extras) }} €</span>
+  </div>
+
+  <div class="ticket-row">
+    <span>Subtotal</span>
+    <span>{{ "%.2f"|format(subtotal) }} €</span>
+  </div>
+
+  <div class="ticket-row discount">
+    <span>Descuento</span>
+    <span>- {{ "%.2f"|format(ns.descuento_total) }} €</span>
+  </div>
+
+  <div class="ticket-divider"></div>
+  <div class="ticket-total">
+    <span>Total</span>
+    <span>
+
+      {% if ns.total_final_bd > 0 %}
+      {{ "%.2f"|format(ns.total_final_bd) }} €
+      {% else %}
+      {{ "%.2f"|format(subtotal) }} €
+      {% endif %}
+
+    </span>
+  </div>
+
+</div>
+
+<!-- =========================================================
+     BOTÓN GENERAR Y ENVIAR PDF
+========================================================== -->
+
+{% else %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 300px; margin-top: 40px;">
+
+  <div class="solicitud-card text-center" style="max-width: 420px; width: 100%;">
+
+    <div style="font-size: 2.5rem; color: var(--dsg-muted); margin-bottom: 10px;">
+      <i class="bi bi-inbox"></i>
+    </div>
+
+    <h4 style="margin-bottom: 6px; color: var(--dsg-orange); font-weight: 700;">
+      No tienes solicitudes aún
+    </h4>
+
+    <p style="color: var(--dsg-muted); font-size: 0.9rem;">
+      Cuando realices un pedido de stands, mobiliario o extras aparecerá aquí.
+    </p>
+
+    <a href="{{ url_for('router_proveedor.mapa_stands') }}" onclick="showLoader('Cargando mapa de stands...')"
+      class="btn-dsg mt-2">
+      <i class="bi bi-plus-circle me-1"></i>
+      Crear primera solicitud
+    </a>
+
+  </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- Toast de feedback -->
+<div id="pdfToast" class="pdf-toast">
+  <i id="pdfToastIcon" class="bi"></i>
+  <span id="pdfToastMsg"></span>
+</div>
+
+
+{% endblock %}

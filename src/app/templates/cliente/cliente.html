@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Panel{% endblock %}
+
+{% block content %}
+
+
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1><i class="bi bi-briefcase me-2" style="color:var(--dsg-orange)"></i>Panel Cliente</h1>
+    <p>Bienvenido, {{ current_user.nombre.capitalize() }} — {{ now.strftime('%d/%m/%Y') }}</p>
+  </div>
+</div>
+
+<!-- ── Accesos rápidos ───────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+
+  <div class="col-md-3">
+    <a href="{{ url_for('router_cliente.mi_qr') }}" onclick="showLoader('Cargando tarjeta de acceso...')"
+      class="text-decoration-none">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.2rem; color:var(--dsg-orange)">
+          <i class="bi bi-qr-code"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;">Mi QR</div>
+          <div style="color:var(--dsg-muted); font-size:0.82rem;">Ver mi tarjeta de acceso</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{{ url_for('router_cliente.catalogo') }}" class="text-decoration-none"
+      onclick="showLoader('Cargando catálogo...');">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.2rem; color:#34D399">
+          <i class="bi bi-grid"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;">Catálogo</div>
+          <div style="color:var(--dsg-muted); font-size:0.82rem;">Ver productos disponibles</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{{ url_for('router_cliente.carrito') }}" class="text-decoration-none"
+      onclick="showLoader('Cargando carrito...');">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.2rem; color:#60A5FA">
+          <i class="bi bi-cart"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;">Carrito</div>
+          <div style="color:var(--dsg-muted); font-size:0.82rem;">
+            {% if total_carrito > 0 %}
+            {{ total_carrito }} producto{% if total_carrito > 1 %}s{% endif %}
+            {% else %}
+            Vacío
+            {% endif %}
+          </div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{{ url_for('router_cliente.mis_pedidos') }}" class="text-decoration-none"
+      onclick="showLoader('Cargando pedidos...');">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.2rem; color:#F59E0B">
+          <i class="bi bi-bag"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;">Mis pedidos</div>
+          <div style="color:var(--dsg-muted); font-size:0.82rem;">Ver historial de pedidos</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{{ url_for('router_cliente.mapa') }}" class="text-decoration-none"
+      onclick="showLoader('Cargando mapa...');">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.2rem; color:#f55858">
+          <i class="bi bi-map"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;">Mapa</div>
+          <div style="color:var(--dsg-muted); font-size:0.82rem;">Ver ubicación de stands</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <a href="{{ url_for('router_cliente.presentaciones') }}" class="text-decoration-none"
+      onclick="showLoader('Cargando presentaciones...');">
+      <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='var(--dsg-orange)'"
+        onmouseout="this.style.borderColor='var(--dsg-border)'">
+        <div style="font-size:2.2rem; color:#C084FC">
+          <i class="bi bi-easel2"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;">Presentaciones</div>
+          <div style="color:var(--dsg-muted); font-size:0.82rem;">
+            {% if presentaciones_inscritas > 0 %}
+            {{ presentaciones_inscritas }} inscripción{% if presentaciones_inscritas > 1 %}es{% endif %}
+            {% else %}
+            Ver y apuntarte
+            {% endif %}
+          </div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-3">
+    <div class="dsg-card h-100 d-flex align-items-center gap-3" style="cursor:pointer; transition:border-color 0.15s;"
+      onmouseover="this.style.borderColor='var(--dsg-orange)'" onmouseout="this.style.borderColor='var(--dsg-border)'"
+      onclick="abrirEscaner()">
+      <div style="font-size:2.2rem; color:#FB923C">
+        <i class="bi bi-qr-code-scan"></i>
+      </div>
+      <div>
+        <div style="font-weight:600;">Abrir escaner de QRs</div>
+        <div style="color:var(--dsg-muted); font-size:0.82rem;">Apunta al QR </div>
+      </div>
+      <i class="bi bi-chevron-right ms-auto" style="color:var(--dsg-muted)"></i>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Pedidos recientes ──────────────────────────────────────── -->
+{% if pedidos_recientes %}
+<div class="dsg-card">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="fw-600 mb-0">
+      <i class="bi bi-clock-history me-2" style="color:var(--dsg-orange)"></i>Pedidos recientes
+    </h6>
+    <a href="{{ url_for('router_cliente.mis_pedidos') }}" onclick="showLoader('Cargando todos los pedidos...')" class="btn-dsg-outline btn btn-sm">
+      Ver todos
+    </a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Detalles</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos_recientes %}
+        <tr>
+          <td style="color: #fff;">{{ p.id }}</td>
+          <td style="color: #fff;">{{ p.fecha_pedido.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>
+            {% if p.estado == 'pendiente' %}
+            <span class="badge-rol badge-comercial">Pendiente</span>
+            {% elif p.estado == 'confirmado' %}
+            <span class="badge-rol badge-cliente">Confirmado</span>
+            {% else %}
+            <span class="badge-rol badge-control">Cancelado</span>
+            {% endif %}
+          </td>
+          <td style="font-weight:600; color:var(--dsg-orange)">{{ "%.2f"|format(p.total) }} €</td>
+          <td>
+            <a href="{{ url_for('router_cliente.detalle_pedido', pedido_id=p.id) }}" onclick="showLoader('Cargando detalle del pedido...')" class="btn btn-sm"
+              style="background:var(--dsg-surface2); color:var(--dsg-muted); width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="dsg-card text-center py-4">
+  <i class="bi bi-bag" style="font-size:2rem; color:var(--dsg-muted)"></i>
+  <p style="color:var(--dsg-muted); margin-top:0.75rem; margin-bottom:1rem;">Aún no has realizado ningún pedido.</p>
+  <a href="{{ url_for('router_cliente.catalogo') }}" onclick="showLoader('Cargando catálogo...')" class="btn-dsg btn btn-sm">
+    <i class="bi bi-grid me-1"></i> Ver catálogo
+  </a>
+</div>
+{% endif %}
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL: ESCÁNER QR DE PRODUCTO
+════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalQRScanner" tabindex="-1" aria-labelledby="modalQRScannerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+    <div class="modal-content"
+      style="background:var(--dsg-card,#1e1e1e); border:1px solid var(--dsg-border); border-radius:16px; overflow:hidden;">
+
+      <div class="modal-header" style="border-color:var(--dsg-border); padding:1rem 1.25rem;">
+        <h5 class="modal-title d-flex align-items-center gap-2" id="modalQRScannerLabel">
+          <i class="bi bi-qr-code-scan" style="color:var(--dsg-orange); font-size:1.2rem;"></i>
+          Escanear producto
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-0" style="position:relative;">
+
+        <div id="qr-viewfinder"
+          style="position:relative; width:100%; background:#000; aspect-ratio:1/1; overflow:hidden;">
+          <video id="qr-video" style="width:100%; height:100%; object-fit:cover; display:block;" playsinline
+            muted></video>
+
+          <div id="qr-frame"
+            style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+            <div style="width:200px; height:200px; position:relative;">
+              <span
+                style="position:absolute;top:0;left:0;width:28px;height:28px;border-top:3px solid var(--dsg-orange);border-left:3px solid var(--dsg-orange);border-radius:3px 0 0 0;"></span>
+              <span
+                style="position:absolute;top:0;right:0;width:28px;height:28px;border-top:3px solid var(--dsg-orange);border-right:3px solid var(--dsg-orange);border-radius:0 3px 0 0;"></span>
+              <span
+                style="position:absolute;bottom:0;left:0;width:28px;height:28px;border-bottom:3px solid var(--dsg-orange);border-left:3px solid var(--dsg-orange);border-radius:0 0 0 3px;"></span>
+              <span
+                style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-bottom:3px solid var(--dsg-orange);border-right:3px solid var(--dsg-orange);border-radius:0 0 3px 0;"></span>
+              <div id="scan-line"
+                style="position:absolute; left:4px; right:4px; top:4px; height:2px; background:linear-gradient(90deg, transparent, var(--dsg-orange), transparent); animation:scanLine 2s ease-in-out infinite; box-shadow:0 0 8px var(--dsg-orange);">
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 220px 220px at center, transparent 90px, rgba(0,0,0,0.55) 91px);">
+          </div>
+        </div>
+
+        <div id="qr-status"
+          style="padding:1rem 1.25rem; min-height:64px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.4rem;">
+          <div id="qr-msg" style="color:var(--dsg-muted); font-size:0.85rem; text-align:center;">
+            <i class="bi bi-camera me-1"></i>Iniciando cámara…
+          </div>
+          <div id="qr-progress-wrap"
+            style="width:80%; height:3px; background:var(--dsg-surface2); border-radius:99px; overflow:hidden; display:none;">
+            <div id="qr-progress-bar"
+              style="height:100%; width:0%; background:var(--dsg-orange); transition:width 0.15s; border-radius:99px;">
+            </div>
+          </div>
+        </div>
+
+        <canvas id="qr-canvas" style="display:none;"></canvas>
+      </div>
+
+      <div class="modal-footer justify-content-center text-center"
+        style="border-color:var(--dsg-border); padding:0.75rem 1.25rem;">
+        <small style="color:var(--dsg-muted); font-size:0.78rem;">
+          <i class="bi bi-shield-check me-1"></i>La cámara solo se usa mientras el modal está abierto.
+        </small>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes scanLine {
+    0% {
+      top: 4px;
+      opacity: 1;
+    }
+
+    48% {
+      opacity: 1;
+    }
+
+    50% {
+      top: calc(100% - 6px);
+      opacity: 0.6;
+    }
+
+    52% {
+      opacity: 1;
+    }
+
+    100% {
+      top: 4px;
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  function abrirEscaner() {
+    var modalEl = document.getElementById('modalQRScanner');
+    var instancia = bootstrap.Modal.getOrCreateInstance(modalEl);
+    instancia.show();
+  }
+</script>
+
+<script src="{{ url_for('static', filename='js/jsQR.min.js') }}"></script>
+
+<script>
+  (function () {
+    const SCAN_ROUTE_BASE = "/catalogo/scan/__TOKEN__";
+
+    let stream = null;
+    let rafId = null;
+    let scanning = false;
+    let lastDetected = null;
+    let detectedCount = 0;
+    let lastTick = 0;
+    const CONFIRM_FRAMES = 2;
+    const TICK_INTERVAL = 150;
+
+    const modal = document.getElementById('modalQRScanner');
+    const video = document.getElementById('qr-video');
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+    const msgEl = document.getElementById('qr-msg');
+    const progressW = document.getElementById('qr-progress-wrap');
+    const progressB = document.getElementById('qr-progress-bar');
+
+    function setMsg(html, color) {
+      msgEl.innerHTML = html;
+      msgEl.style.color = color || 'var(--dsg-muted)';
+    }
+
+    async function startCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setMsg('<i class="bi bi-exclamation-triangle me-1"></i>La cámara requiere conexión segura (HTTPS).', '#FCA5A5');
+        return;
+      }
+
+      scanning = true;
+      lastDetected = null;
+      detectedCount = 0;
+      lastTick = 0;
+      setMsg('<i class="bi bi-camera me-1"></i>Iniciando cámara…');
+      progressW.style.display = 'none';
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width:  { ideal: 1920 },
+            height: { ideal: 1080 }
+          }
+        });
+        video.srcObject = stream;
+        await video.play();
+        setMsg('<i class="bi bi-viewfinder me-1"></i>Apunta al código QR del producto');
+        progressW.style.display = 'block';
+        rafId = requestAnimationFrame(tick);
+      } catch (err) {
+        console.error(err);
+        if (err.name === 'NotAllowedError') {
+          setMsg('<i class="bi bi-exclamation-triangle me-1"></i>Permiso de cámara denegado. Actívalo en la configuración del navegador.', '#FCA5A5');
+        } else {
+          setMsg('<i class="bi bi-exclamation-triangle me-1"></i>No se pudo acceder a la cámara.', '#FCA5A5');
+        }
+        progressW.style.display = 'none';
+      }
+    }
+
+    function stopCamera() {
+      scanning = false;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+    }
+
+    function resolverUrl(data) {
+      if (data.startsWith('http://') || data.startsWith('https://')) return data;
+      const token = data.includes('/') ? data.split('/').pop() : data;
+      return SCAN_ROUTE_BASE.replace('__TOKEN__', encodeURIComponent(token));
+    }
+
+    function tick(timestamp) {
+      if (!scanning) return;
+      rafId = requestAnimationFrame(tick);
+
+      if (timestamp - lastTick < TICK_INTERVAL) return;
+      lastTick = timestamp;
+
+      if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: 'attemptBoth'
+      });
+
+      if (code) {
+        const data = code.data.trim();
+        if (data === lastDetected) {
+          detectedCount++;
+        } else {
+          lastDetected = data;
+          detectedCount = 1;
+        }
+
+        const pct = Math.min((detectedCount / CONFIRM_FRAMES) * 100, 100);
+        progressB.style.width = pct + '%';
+
+        if (detectedCount >= CONFIRM_FRAMES) {
+          scanning = false;
+          stopCamera();
+          progressB.style.width = '100%';
+          progressB.style.background = '#34D399';
+          setMsg('<i class="bi bi-check2-circle me-1"></i>QR detectado, redirigiendo…', '#34D399');
+          setTimeout(() => { window.location.href = resolverUrl(data); }, 350);
+        }
+      }
+    }
+
+    modal.addEventListener('shown.bs.modal', startCamera);
+    modal.addEventListener('hide.bs.modal', stopCamera);
+  })();
+</script>
+
+{% endblock %}

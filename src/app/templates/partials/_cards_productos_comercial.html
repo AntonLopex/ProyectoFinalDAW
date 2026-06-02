@@ -1,0 +1,44 @@
+{% for p in productos %}
+<div class="col-6 col-md-4 col-lg-3">
+    <div class="producto-card h-100 d-flex flex-column p-0">
+        <div class="producto-img-wrap">
+            {% if p.imagen_url %}
+            <img src="{{ p.imagen_url }}" alt="{{ p.nombre }}" class="producto-img">
+            {% else %}
+            <div class="producto-img-placeholder">
+                <i class="bi bi-image"></i>
+            </div>
+            {% endif %}
+            <span class="producto-id-float">{{ p.id }}</span>
+        </div>
+        <div class="d-flex flex-column p-3" style="flex:1;">
+            <div class="producto-nombre">{{ p.nombre }}</div>
+            {% if p.proveedor.rol ==  %}
+            <div class="producto-proveedor d-none d-md-block">
+                <i class="bi bi-building me-1"></i>{{ p.proveedor.nombre_empresa or p.proveedor.nombre }}
+            </div>
+            {% endif %}
+            {% if p.descripcion %}
+            <div class="producto-desc d-none d-md-block">{{ p.descripcion }}</div>
+            {% endif %}
+            <div style="border-top:1px solid var(--dsg-border); padding-top:0.75rem; margin-top:auto;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="producto-precio">{{ "%.2f"|format(p.precio|float) }} €</span>
+
+                    {% if current_user.rol == 'proveedor' %}
+                    <a href="{{ url_for('router_proveedor.detalle_producto', producto_id=p.id) }}"
+                        class="btn btn-sm btn-accion btn-modo-ver" title="Ver detalle">
+                        <i class="bi bi-eye me-1"></i>Ver
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('router_comercial.detalle_producto', producto_id=p.id) }}"
+                        class="btn btn-sm btn-accion btn-modo-ver" title="Ver detalle">
+                        <i class="bi bi-eye me-1"></i>Ver
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

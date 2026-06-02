@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* En login no hay sidebar ni topbar con nav — centrado total */
+  body {
+    background: var(--dsg-bg);
+  }
+
+  .login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .main-content {
+    margin-top: 0 !important;
+    padding: 0 !important;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .login-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-logo .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--dsg-orange);
+  }
+
+  .login-logo .brand {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dsg-text);
+    letter-spacing: 0.02em;
+  }
+
+  .login-logo .brand span {
+    color: var(--dsg-orange);
+  }
+
+  .login-header p {
+    color: var(--dsg-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .login-card {
+    background: var(--dsg-surface);
+    border: 1px solid var(--dsg-border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  .login-card .form-control {
+    height: 44px;
+    font-size: 0.95rem;
+  }
+
+  .login-card .form-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .btn-login {
+    width: 100%;
+    height: 44px;
+    background: var(--dsg-orange);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn-login:hover {
+    background: var(--dsg-orange-dark);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .btn-login:active {
+    transform: translateY(0);
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: 0.8rem;
+    color: var(--dsg-muted);
+  }
+
+  .login-footer a {
+    color: var(--dsg-orange);
+    text-decoration: none;
+  }
+
+  .login-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .input-icon-wrap {
+    position: relative;
+  }
+
+  .input-icon-wrap i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dsg-muted);
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
+
+  .input-icon-wrap .form-control {
+    padding-left: 2.25rem;
+  }
+
+  .divider {
+    border-color: var(--dsg-border);
+    margin: 1.5rem 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-box">
+
+    <div class="login-header">
+      <div class="login-logo">
+        <span class="dot"></span>
+        <span class="brand">Forum <span>{{SHORT_YEAR}}</span></span>
+      </div>
+      <p>Portal de gestión DSG — acceso restringido</p>
+    </div>
+
+    <!-- Mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="login-card">
+      <form method="POST" action="{{ url_for('router_index.home') }}" novalidate>
+        {{ form.hidden_tag() if form is defined }}
+
+        <div class="mb-3">
+          <label for="nombre_usuario" class="form-label">Nombre de usuario</label>
+          <div class="input-icon-wrap">
+            <i class="bi bi-person"></i>
+            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario"
+              placeholder="Tu nombre de usuario" value="{{ request.form.get('nombre_usuario', '') }}"
+              autocomplete="username" required />
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <label for="password" class="form-label mb-0">Contraseña</label>
+            <a href="{{ url_for('router_index.recuperar_contraseña') }}" class="text-decoration-none"
+              style="font-size:0.78rem; color: var(--dsg-orange);">
+              ¿Olvidaste la contraseña?
+            </a>
+          </div>
+          <div class="input-icon-wrap mt-1">
+            <i class="bi bi-lock"></i>
+            <input type="password" class="form-control" id="password" name="password" placeholder="*************"
+              autocomplete="current-password" required />
+          </div>
+        </div>
+
+        <button type="submit" onclick="showLoader(); this.form.submit();" class="btn btn-login">
+          Entrar
+        </button>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      Forum {{SHORT_YEAR}} &mdash; Grupo DSG &copy; {{CURRENT_YEAR}}.
+    </div>
+
+  </div>
+</div>
+{% endblock %}

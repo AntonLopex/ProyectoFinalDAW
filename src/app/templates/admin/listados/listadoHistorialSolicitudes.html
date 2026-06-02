@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Auditoría ERP{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge-action {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 99px;
+    }
+
+    .badge-admin {
+        background: rgba(59, 130, 246, .15);
+        color: #93c5fd;
+    }
+
+    .badge-map {
+        background: rgba(34, 197, 94, .15);
+        color: #6EE7B7;
+    }
+
+    .badge-error {
+        background: rgba(239, 68, 68, .15);
+        color: #FCA5A5;
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Paginación */
+    .dsg-page-link {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-border);
+        color: #fff;
+    }
+
+    .dsg-page-link:hover {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-orange);
+        color: var(--dsg-orange);
+    }
+
+    .dsg-page-link.active-page {
+        background: var(--dsg-orange);
+        border-color: var(--dsg-orange);
+        color: #fff;
+    }
+
+    .page-item.disabled .dsg-page-link {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-border);
+        color: var(--dsg-muted);
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- Cabecera -->
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+        <h1><i class="bi bi-shield-lock me-2" style="color:var(--dsg-orange)"></i>Historial de movimientos de stands</h1>
+        <p>Registro de todas las acciones realizadas sobre los stands</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('router_admin.exportar_historial_pdf') }}" onclick="showLoader('Exportando historial en PDF...')" class="btn-dsg btn">
+            <i class="bi bi-filetype-pdf me-1"></i>PDF
+        </a>
+        <a href="{{ url_for('router_admin.exportar_historial_excel') }}" onclick="showLoader('Exportando historial en Excel...')" class="btn-dsg btn">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i>Excel
+        </a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="dsg-card mb-3">
+    <form method="GET" id="form-filtros" class="d-flex flex-wrap gap-2 align-items-end">
+
+        <div>
+            <label class="form-label" style="font-size:.78rem; color:var(--dsg-muted); margin-bottom:4px;">Observación</label>
+            <input type="text" name="search" id="filtro-search" class="form-control form-control-sm" placeholder="Buscar..."
+                value="{{ request.args.get('search','') }}"
+                style="background:var(--dsg-surface2); border-color:var(--dsg-border); color:#fff; min-width:180px;">
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size:.78rem; color:var(--dsg-muted); margin-bottom:4px;">Stand</label>
+            <input type="number" name="stand_id" id="filtro-stand" class="form-control form-control-sm" placeholder="ID"
+                value="{{ request.args.get('stand_id','') }}"
+                style="background:var(--dsg-surface2); border-color:var(--dsg-border); color:#fff; width:90px;">
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size:.78rem; color:var(--dsg-muted); margin-bottom:4px;">Usuario</label>
+            <input type="number" name="usuario_id" id="filtro-usuario" class="form-control form-control-sm" placeholder="ID"
+                value="{{ request.args.get('usuario_id','') }}"
+                style="background:var(--dsg-surface2); border-color:var(--dsg-border); color:#fff; width:90px;">
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size:.78rem; color:var(--dsg-muted); margin-bottom:4px;">Acción</label>
+            <select name="accion" id="filtro-accion" class="form-select form-select-sm"
+                style="background:var(--dsg-surface2); border-color:var(--dsg-border); color:#fff; min-width:180px;">
+                <option value="">Todas</option>
+                <option value="cambio_estado" {% if request.args.get('accion')=='cambio_estado' %}selected{% endif %}>Cambio de estado</option>
+                <option value="pre_reserva" {% if request.args.get('accion')=='pre_reserva' %}selected{% endif %}>Pre-reserva</option>
+                <option value="desasignacion" {% if request.args.get('accion')=='desasignacion' %}selected{% endif %}>Desasignación</option>
+                <option value="cambio_estado_solicitud" {% if request.args.get('accion')=='cambio_estado_solicitud' %}selected{% endif %}>Gestión solicitud admin</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size:.78rem; color:var(--dsg-muted); margin-bottom:4px;">Desde</label>
+            <input type="date" name="desde" id="filtro-desde" class="form-control form-control-sm"
+                value="{{ request.args.get('desde','') }}"
+                style="background:var(--dsg-surface2); border-color:var(--dsg-border); color:#fff;">
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size:.78rem; color:var(--dsg-muted); margin-bottom:4px;">Hasta</label>
+            <input type="date" name="hasta" id="filtro-hasta" class="form-control form-control-sm"
+                value="{{ request.args.get('hasta','') }}"
+                style="background:var(--dsg-surface2); border-color:var(--dsg-border); color:#fff;">
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn-dsg btn btn-sm">
+                <i class="bi bi-funnel me-1"></i>Filtrar
+            </button>
+            <a href="{{ request.path }}" onclick="showLoader('Limpiando filtros...')" class="btn-dsg-outline btn btn-sm">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<!-- Tabla -->
+<div class="dsg-card">
+    {% if historial %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0" id="tabla-historial">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Stand</th>
+                    <th>Acción</th>
+                    <th>Estado</th>
+                    <th>Usuarios implicados</th>
+                    <th>Observación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in historial %}
+                <tr
+                    data-stand="{{ h.stand | lower }}"
+                    data-accion="{{ h.accion | lower }}"
+                    data-observacion="{{ h.observacion | lower }}"
+                    data-usuarios="{{ ((h.usuario_origen or '') ~ ' ' ~ (h.usuario_destino or '')) | lower }}"
+                    data-fecha="{{ h.fecha | lower }}"
+                >
+
+                    <!-- FECHA -->
+                    <td style="white-space:nowrap; color:var(--dsg-muted); font-size:.82rem;">
+                        {% if h.fecha %}
+                        <i class="bi bi-clock me-1"></i>{{ h.fecha[:16] }}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+
+                    <!-- STAND -->
+                    <td>
+                        <strong style="color:#fff;">{{ h.stand }}</strong>
+                    </td>
+
+                    <!-- ACCIÓN -->
+                    <td>
+                        <span class="badge-action badge-admin">{{ h.accion }}</span>
+                    </td>
+
+                    <!-- ESTADOS -->
+                    <td style="font-size:.83rem;">
+                        {% if h.estado_anterior and h.estado_nuevo %}
+                        <span style="color:var(--dsg-muted);">{{ h.estado_anterior }}</span>
+                        <i class="bi bi-arrow-right mx-1" style="color:var(--dsg-muted);"></i>
+                        <strong style="color:#fff;">{{ h.estado_nuevo }}</strong>
+                        {% else %}
+                        <span style="color:var(--dsg-muted);">—</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- USUARIOS -->
+                    <td style="font-size:.83rem;">
+                        {% if h.usuario_origen or h.usuario_destino %}
+                        <div style="color:#fff;">
+                            <span style="color:var(--dsg-muted);">Origen:</span>
+                            {{ h.usuario_origen if h.usuario_origen else 'Administrador' }}
+                        </div>
+                        <div style="color:#fff; margin-top:2px;">
+                            <span style="color:var(--dsg-muted);">Destino:</span>
+                            {{ h.usuario_destino if h.usuario_destino else 'Administrador' }}
+                        </div>
+                        {% else %}
+                        <span style="color:var(--dsg-muted);">Administrador</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- OBSERVACIÓN -->
+                    <td style="font-size:.83rem; color:var(--dsg-muted); max-width:240px;">
+                        {{ h.observacion or '—' }}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sin resultados tras filtrar -->
+    <div id="sin-resultados" class="text-center py-5" style="color:var(--dsg-muted); display:none;">
+        <i class="bi bi-funnel" style="font-size:2.5rem;"></i>
+        <p class="mt-3">Ningún registro coincide con los filtros aplicados.</p>
+    </div>
+
+    {% else %}
+    <div class="text-center py-5" style="color:var(--dsg-muted);">
+        <i class="bi bi-shield-lock" style="font-size:2.5rem;"></i>
+        <p class="mt-3">No hay registros de auditoría que coincidan con los filtros.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Paginación -->
+{% if paginacion.pages > 1 %}
+<div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="paginacion-wrap">
+
+    <span style="font-size:.82rem; color:var(--dsg-muted);">
+        Mostrando {{ paginacion.first }} – {{ paginacion.last }} de {{ paginacion.total }} registros
+    </span>
+
+    <nav>
+        <ul class="pagination pagination-sm mb-0" style="gap:4px;">
+
+            <!-- Anterior -->
+            <li class="page-item {% if not paginacion.has_prev %}disabled{% endif %}">
+                <a class="page-link dsg-page-link"
+                   href="{{ request.path }}?{{ request.query_string.decode() | replace('page=' ~ paginacion.page, 'page=' ~ paginacion.prev_num) }}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+
+            <!-- Páginas -->
+            {% for p in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                    <li class="page-item">
+                        <a class="page-link dsg-page-link {% if p == paginacion.page %}active-page{% endif %}"
+                           href="{{ request.path }}?{{ request.query_string.decode() | replace('page=' ~ paginacion.page, 'page=' ~ p) if 'page=' in request.query_string.decode() else request.query_string.decode() ~ '&page=' ~ p }}">
+                            {{ p }}
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link dsg-page-link">…</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Siguiente -->
+            <li class="page-item {% if not paginacion.has_next %}disabled{% endif %}">
+                <a class="page-link dsg-page-link"
+                   href="{{ request.path }}?{{ request.query_string.decode() | replace('page=' ~ paginacion.page, 'page=' ~ paginacion.next_num) if 'page=' in request.query_string.decode() else request.query_string.decode() ~ '&page=' ~ paginacion.next_num }}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const filtros = {
+        search:  document.getElementById('filtro-search'),
+        stand:   document.getElementById('filtro-stand'),
+        usuario: document.getElementById('filtro-usuario'),
+        accion:  document.getElementById('filtro-accion'),
+        desde:   document.getElementById('filtro-desde'),
+        hasta:   document.getElementById('filtro-hasta'),
+    };
+
+    const filas        = document.querySelectorAll('#tabla-historial tbody tr');
+    const sinResultados = document.getElementById('sin-resultados');
+    const paginacion   = document.getElementById('paginacion-wrap');
+
+    function parseFecha(str) {
+        // Espera formato "dd/mm/yyyy hh:mm"
+        if (!str) return null;
+        const [fecha, hora] = str.split(' ');
+        const [d, m, y] = fecha.split('/');
+        return new Date(`${y}-${m}-${d}T${hora || '00:00'}`);
+    }
+
+    function filtrar() {
+        const search  = filtros.search?.value.toLowerCase().trim()  || '';
+        const stand   = filtros.stand?.value.toLowerCase().trim()   || '';
+        const usuario = filtros.usuario?.value.toLowerCase().trim() || '';
+        const accion  = filtros.accion?.value.toLowerCase().trim()  || '';
+        const desde   = filtros.desde?.value  ? new Date(filtros.desde.value)  : null;
+        const hasta   = filtros.hasta?.value  ? new Date(filtros.hasta.value + 'T23:59:59') : null;
+
+        let visibles = 0;
+
+        filas.forEach(function (fila) {
+            const dStand    = fila.dataset.stand    || '';
+            const dAccion   = fila.dataset.accion   || '';
+            const dObs      = fila.dataset.observacion || '';
+            const dUsuarios = fila.dataset.usuarios  || '';
+            const dFecha    = parseFecha(fila.dataset.fecha);
+
+            const okSearch  = !search  || dObs.includes(search) || dUsuarios.includes(search);
+            const okStand   = !stand   || dStand.includes(stand);
+            const okUsuario = !usuario || dUsuarios.includes(usuario);
+            const okAccion  = !accion  || dAccion === accion;
+            const okDesde   = !desde   || (dFecha && dFecha >= desde);
+            const okHasta   = !hasta   || (dFecha && dFecha <= hasta);
+
+            const visible = okSearch && okStand && okUsuario && okAccion && okDesde && okHasta;
+            fila.style.display = visible ? '' : 'none';
+            if (visible) visibles++;
+        });
+
+        if (sinResultados) sinResultados.style.display = visibles === 0 ? 'block' : 'none';
+
+        // Ocultar paginación mientras se filtra en tiempo real
+        if (paginacion) {
+            const hayFiltro = search || stand || usuario || accion || desde || hasta;
+            paginacion.style.display = hayFiltro ? 'none' : '';
+        }
+    }
+
+    Object.values(filtros).forEach(function (el) {
+        if (el) el.addEventListener('input', filtrar);
+    });
+})();
+</script>
+{% endblock %}

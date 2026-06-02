@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+
+{% block title %}Incidencias{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge-estado-pendiente {
+        background: rgba(245, 158, 11, .15);
+        color: #FCD34D;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 99px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .badge-estado-revisada {
+        background: rgba(16, 185, 129, .15);
+        color: #6EE7B7;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 99px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .dsg-page-link {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-border);
+        color: #fff;
+    }
+
+    .dsg-page-link:hover {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-orange);
+        color: var(--dsg-orange);
+    }
+
+    .dsg-page-link.active-page {
+        background: var(--dsg-orange);
+        border-color: var(--dsg-orange);
+        color: #fff;
+    }
+
+    .page-item.disabled .dsg-page-link {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-border);
+        color: var(--dsg-muted);
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+        <h1><i class="bi bi-exclamation-triangle me-2" style="color:var(--dsg-orange)"></i>Incidencias</h1>
+        <p>Gestiona las incidencias reportadas por usuarios</p>
+    </div>
+    <!-- Filtros de estado -->
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('router_admin.listar_incidencias') }}" onclick="showLoader('Limpiando filtros...')"
+            class="btn btn-sm {{ 'btn-dsg' if not filtro_estado else 'btn-dsg-outline' }}">
+            Todas
+        </a>
+        <a href="{{ url_for('router_admin.listar_incidencias', estado='pendiente') }}"
+            onclick="showLoader('Filtrando por pendientes...')"
+            class="btn btn-sm {{ 'btn-dsg' if filtro_estado == 'pendiente' else 'btn-dsg-outline' }}">
+            Pendientes
+        </a>
+        <a href="{{ url_for('router_admin.listar_incidencias', estado='revisada') }}"
+            onclick="showLoader('Filtrando por revisadas...')"
+            class="btn btn-sm {{ 'btn-dsg' if filtro_estado == 'revisada' else 'btn-dsg-outline' }}">
+            Revisadas
+        </a>
+    </div>
+</div>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="dsg-card">
+    {% if incidencias %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in incidencias %}
+                <tr>
+
+                    <td style="max-width:200px;">
+                        <div
+                            style="font-weight:500; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px;">
+                            {{ i.titulo }}
+                        </div>
+                    </td>
+
+                    <td style="max-width:280px;">
+                        <div
+                            style="font-size:.82rem; color:var(--dsg-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:270px;">
+                            {{ i.descripcion }}
+                        </div>
+                    </td>
+
+                    <td style="color:#fff; white-space:nowrap;">
+                        <div style="font-weight:500;">{{ i.usuario.nombre_usuario }}</div>
+                        <div style="font-size:.75rem; color:var(--dsg-muted);">{{ i.usuario.nombre_empresa or '-' }}
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="badge-rol badge-{{ i.usuario.rol.value }}">{{ i.usuario.rol.value }}</span>
+                    </td>
+
+                    <td style="white-space:nowrap; color:var(--dsg-muted); font-size:.82rem;">
+                        {{ i.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                    </td>
+
+                    <td>
+                        {% if i.estado == 'pendiente' %}
+                        <span class="badge-estado-pendiente">Pendiente</span>
+                        {% else %}
+                        <span class="badge-estado-revisada">Revisada</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="d-flex gap-2">
+                            <!-- Ver detalle completo -->
+                            <button class="btn btn-sm js-ver-detalle"
+                                style="background:var(--dsg-surface2); color:var(--dsg-muted); width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;"
+                                data-id="{{ i.id }}" data-titulo="{{ i.titulo }}" data-desc="{{ i.descripcion }}"
+                                data-usuario="{{ i.usuario.nombre_usuario }}"
+                                data-empresa="{{ i.usuario.nombre_empresa }}" data-rol="{{ i.usuario.rol.value }}"
+                                data-fecha="{{ i.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}"
+                                data-estado="{{ i.estado }}" title="Ver detalle">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <!-- Cambiar estado -->
+                            {% if i.estado == 'pendiente' %}
+                            <form method="POST"
+                                action="{{ url_for('router_admin.cambiar_estado_incidencia', incidencia_id=i.id) }}">
+                                <input type="hidden" name="estado" value="revisada">
+                                <button type="submit" class="btn btn-sm"
+                                    style="background:rgba(16,185,129,.1); color:#6EE7B7; width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;"
+                                    title="Marcar como revisada">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="POST"
+                                action="{{ url_for('router_admin.cambiar_estado_incidencia', incidencia_id=i.id) }}">
+                                <input type="hidden" name="estado" value="pendiente">
+                                <button type="submit" class="btn btn-sm"
+                                    style="background:rgba(245,158,11,.1); color:#FCD34D; width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;"
+                                    title="Marcar como pendiente">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Eliminar -->
+                            <button class="btn btn-sm js-eliminar"
+                                style="background:rgba(239,68,68,.1); color:#FCA5A5; width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;"
+                                data-id="{{ i.id }}" data-titulo="{{ i.titulo }}" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if paginacion.pages > 1 %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 pt-3"
+        style="border-top: 1px solid var(--dsg-border);">
+
+        <span style="font-size:.82rem; color:var(--dsg-muted);">
+            Mostrando {{ paginacion.first }}–{{ paginacion.last }} de {{ paginacion.total }} registros
+        </span>
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0" style="gap:4px;">
+
+                <li class="page-item {% if not paginacion.has_prev %}disabled{% endif %}">
+                    <a class="page-link dsg-page-link"
+                        href="{{ url_for('router_admin.listar_incidencias', page=paginacion.prev_num, estado=filtro_estado) }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                {% for p in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                <li class="page-item">
+                    <a class="page-link dsg-page-link {% if p == paginacion.page %}active-page{% endif %}"
+                        href="{{ url_for('router_admin.listar_incidencias', page=p, estado=filtro_estado) }}">
+                        {{ p }}
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link dsg-page-link">…</span>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                <li class="page-item {% if not paginacion.has_next %}disabled{% endif %}">
+                    <a class="page-link dsg-page-link"
+                        href="{{ url_for('router_admin.listar_incidencias', page=paginacion.next_num, estado=filtro_estado) }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5" style="color:var(--dsg-muted);">
+        <i class="bi bi-exclamation-triangle" style="font-size:2.5rem;"></i>
+        <p class="mt-3">No hay incidencias
+            {% if filtro_estado %} con estado <strong>{{ filtro_estado }}</strong>{% endif %}.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+
+<!-- Modal ver detalle -->
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: min(90vw, 600px);">
+        <div class="modal-content"
+            style="background:var(--dsg-surface); border:1px solid var(--dsg-border); border-radius:16px; overflow:hidden;">
+
+            <!-- Cabecera con acento naranja -->
+            <div
+                style="background:linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(249,115,22,0.05) 100%); border-bottom:1px solid var(--dsg-border); padding:1.25rem 1.5rem;">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                    <div>
+                        <div
+                            style="font-size:.7rem; font-weight:600; color:var(--dsg-orange); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.35rem;">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Incidencia <span
+                                id="modalDetalleMeta"></span>
+                        </div>
+                        <h5 class="mb-0" id="modalDetalleTitulo"
+                            style="color:var(--dsg-text); font-weight:600; line-height:1.3;"></h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white flex-shrink-0"
+                        data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding:1.5rem;">
+
+                <!-- Descripción -->
+                <div
+                    style="background:var(--dsg-surface2); border-radius:10px; padding:1rem 1.1rem; margin-bottom:1.25rem; border-left:3px solid var(--dsg-orange);">
+                    <div
+                        style="font-size:.7rem; font-weight:600; color:var(--dsg-orange); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem;">
+                        Descripción
+                    </div>
+                    <div id="modalDetalleDesc" style="color:var(--dsg-text); font-size:.9rem; line-height:1.7;"></div>
+                </div>
+
+                <!-- Metadatos en grid -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:.75rem;">
+
+                    <div style="background:var(--dsg-surface2); border-radius:8px; padding:.75rem 1rem;">
+                        <div
+                            style="font-size:.68rem; color:var(--dsg-muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">
+                            <i class="bi bi-person me-1"></i>Usuario
+                        </div>
+                        <div id="modalDetalleUsuario" style="color:var(--dsg-text); font-size:.88rem; font-weight:500;">
+                        </div>
+                    </div>
+
+                    <div style="background:var(--dsg-surface2); border-radius:8px; padding:.75rem 1rem;">
+                        <div
+                            style="font-size:.68rem; color:var(--dsg-muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">
+                            <i class="bi bi-envelope me-1"></i>Nombre empresa
+                        </div>
+                        <div id="modalDetalleEmpresa"
+                            style="color:var(--dsg-text); font-size:.88rem; font-weight:500; word-break:break-all;">
+                        </div>
+                    </div>
+
+                    <div style="background:var(--dsg-surface2); border-radius:8px; padding:.75rem 1rem;">
+                        <div
+                            style="font-size:.68rem; color:var(--dsg-muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">
+                            <i class="bi bi-shield me-1"></i>Rol
+                        </div>
+                        <div id="modalDetalleRol" style="font-size:.88rem; font-weight:600;"></div>
+                    </div>
+
+                    <div style="background:var(--dsg-surface2); border-radius:8px; padding:.75rem 1rem;">
+                        <div
+                            style="font-size:.68rem; color:var(--dsg-muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">
+                            <i class="bi bi-clock me-1"></i>Fecha
+                        </div>
+                        <div id="modalDetalleFecha" style="color:var(--dsg-text); font-size:.88rem; font-weight:500;">
+                        </div>
+                    </div>
+
+                    <div
+                        style="background:var(--dsg-surface2); border-radius:8px; padding:.75rem 1rem; grid-column:span 2;">
+                        <div
+                            style="font-size:.68rem; color:var(--dsg-muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem;">
+                            <i class="bi bi-flag me-1"></i>Estado
+                        </div>
+                        <div id="modalDetalleEstado" style="font-size:.88rem; font-weight:600;"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div
+                style="border-top:1px solid var(--dsg-border); padding:.75rem 1.5rem; display:flex; justify-content:flex-end;">
+                <button class="btn-dsg-outline btn" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+            style="background:var(--dsg-surface); border:1px solid var(--dsg-border); border-radius:12px;">
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle" style="font-size:2rem; color:#FCA5A5;"></i>
+                <h5 class="mt-3 mb-1" style="color:var(--dsg-text);">¿Eliminar incidencia?</h5>
+                <p style="color:var(--dsg-muted); font-size:.9rem;" id="modalEliminarNombre"></p>
+                <p style="color:var(--dsg-muted); font-size:.82rem;">Esta acción no se puede deshacer.</p>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button class="btn-dsg-outline btn" data-bs-dismiss="modal">Cancelar</button>
+                    <form id="formEliminar" method="POST">
+                        <button type="submit" class="btn btn-danger px-4">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.querySelectorAll('.js-ver-detalle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('modalDetalleTitulo').textContent = this.dataset.titulo;
+            document.getElementById('modalDetalleMeta').textContent = '#' + this.dataset.id;
+            document.getElementById('modalDetalleDesc').textContent = this.dataset.desc;
+            document.getElementById('modalDetalleUsuario').textContent = this.dataset.usuario;
+            document.getElementById('modalDetalleEmpresa').textContent = this.dataset.empresa == 'None' ? '-' : this.dataset.empresa;
+            document.getElementById('modalDetalleFecha').textContent = this.dataset.fecha;
+
+            // Rol con badge de color
+            var rol = this.dataset.rol;
+            document.getElementById('modalDetalleRol').innerHTML =
+                '<span class="badge-rol badge-' + rol + '">' + rol + '</span>';
+
+            // Estado con color
+            var estado = this.dataset.estado;
+            var estadoHtml = estado === 'pendiente'
+                ? '<span class="badge-estado-pendiente">Pendiente</span>'
+                : '<span class="badge-estado-revisada">Revisada</span>';
+            document.getElementById('modalDetalleEstado').innerHTML = estadoHtml;
+
+            new bootstrap.Modal(document.getElementById('modalDetalle')).show();
+        });
+    });
+
+    document.querySelectorAll('.js-eliminar').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('modalEliminarNombre').textContent = this.dataset.titulo;
+            document.getElementById('formEliminar').action = '/admin/incidencias/' + this.dataset.id + '/eliminar';
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        });
+    });
+</script>
+
+{% endblock %}

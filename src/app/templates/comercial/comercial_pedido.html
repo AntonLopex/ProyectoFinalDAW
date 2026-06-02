@@ -1,0 +1,1351 @@
+{% extends "base.html" %}
+
+{% block title %}Pedidos{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ════════════════════════════════════════════════════════════
+     MODAL EDICIÓN
+     ════════════════════════════════════════════════════════════ */
+  .modal-content {
+    background: var(--dsg-surface);
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 16px;
+    color: #fff;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, .6);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, .15);
+    border-radius: 0 0 16px 16px;
+  }
+
+  .modal-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+  }
+
+  .btn-close {
+    filter: invert(1) grayscale(1) opacity(.5);
+  }
+
+  .btn-close:hover {
+    opacity: 1;
+  }
+
+  /* Tabla editable */
+  #tablaLineasEdit thead th {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--dsg-muted);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    padding-bottom: .6rem;
+    font-weight: 500;
+  }
+
+  #tablaLineasEdit tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, .04);
+    transition: background .15s;
+  }
+
+  #tablaLineasEdit tbody tr:hover {
+    background: rgba(255, 255, 255, .025);
+  }
+
+  #tablaLineasEdit td {
+    padding: .65rem .5rem;
+    vertical-align: middle;
+  }
+
+  /* Input cantidad */
+  .edit-qty {
+    width: 68px;
+    background: var(--dsg-surface2);
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 7px;
+    color: #e8e8e8;
+    text-align: center;
+    padding: 5px 6px;
+    font-size: .88rem;
+    transition: border-color .18s, box-shadow .18s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .edit-qty:focus {
+    outline: none;
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, .15);
+  }
+
+  .edit-qty::-webkit-inner-spin-button,
+  .edit-qty::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Botón eliminar fila */
+  .btn-del-linea {
+    background: transparent;
+    border: 1px solid rgba(255, 80, 80, .2);
+    color: rgba(255, 100, 100, .6);
+    border-radius: 7px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: .78rem;
+    transition: all .18s;
+  }
+
+  .btn-del-linea:hover {
+    background: rgba(220, 53, 69, .15);
+    border-color: rgba(220, 53, 69, .5);
+    color: #e05c6a;
+  }
+
+  .pill-nombre {
+    font-size: .88rem;
+    color: #d8d8d8;
+    font-weight: 500;
+  }
+
+  .pill-precio-unit {
+    font-size: .78rem;
+    color: var(--dsg-muted);
+  }
+
+  .total-card {
+    background: linear-gradient(135deg, rgba(255, 140, 0, .08) 0%, rgba(255, 140, 0, .03) 100%);
+    border: 1px solid rgba(255, 140, 0, .2);
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: right;
+  }
+
+  .total-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--dsg-muted);
+    margin-bottom: 2px;
+  }
+
+  .total-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dsg-orange);
+    line-height: 1;
+  }
+
+  .obs-textarea {
+    width: 100%;
+    background: var(--dsg-surface2);
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 8px;
+    color: #d0d0d0;
+    padding: 9px 12px;
+    font-size: .85rem;
+    resize: vertical;
+    min-height: 64px;
+    transition: border-color .18s;
+  }
+
+  .obs-textarea:focus {
+    outline: none;
+    border-color: var(--dsg-orange);
+  }
+
+  /* Etiqueta de sección — usada en modal y en detalle */
+  .modal-section-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--dsg-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .modal-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, .05);
+  }
+
+  @keyframes rowIn {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .row-nueva {
+    animation: rowIn .2s ease;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     CATÁLOGO INLINE
+     ════════════════════════════════════════════════════════════ */
+  .catalogo-panel {
+    border: 1px solid rgba(255, 140, 0, .2);
+    border-radius: 12px;
+    background: rgba(255, 140, 0, .03);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+
+  .catalogo-panel-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 140, 0, .12);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .catalogo-search-wrap {
+    position: relative;
+    flex: 1;
+  }
+
+  .catalogo-search-wrap i {
+    position: absolute;
+    left: .7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dsg-muted);
+    pointer-events: none;
+    font-size: .85rem;
+  }
+
+  .catalogo-search {
+    width: 100%;
+    background: var(--dsg-surface2);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 8px;
+    color: #e0e0e0;
+    padding: 7px 10px 7px 2.1rem;
+    font-size: .85rem;
+    transition: border-color .18s;
+  }
+
+  .catalogo-search:focus {
+    outline: none;
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, .12);
+  }
+
+  .catalogo-search::placeholder {
+    color: var(--dsg-muted);
+  }
+
+  .catalogo-results {
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 6px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 140, 0, .3) transparent;
+  }
+
+  .catalogo-results::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .catalogo-results::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .catalogo-results::-webkit-scrollbar-thumb {
+    background: rgba(255, 140, 0, .3);
+    border-radius: 4px;
+  }
+
+  .catalogo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background .12s;
+    gap: 10px;
+  }
+
+  .catalogo-item:hover {
+    background: rgba(255, 255, 255, .04);
+  }
+
+  .catalogo-item-nombre {
+    font-size: .87rem;
+    color: #d8d8d8;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .catalogo-item-proveedor {
+    font-size: .73rem;
+    color: var(--dsg-muted);
+    margin-top: 1px;
+  }
+
+  .catalogo-item-precio {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--dsg-orange);
+    white-space: nowrap;
+  }
+
+  .btn-catalogo-add {
+    background: rgba(255, 140, 0, .1);
+    border: 1px solid rgba(255, 140, 0, .3);
+    color: var(--dsg-orange);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-catalogo-add:hover {
+    background: rgba(255, 140, 0, .22);
+    border-color: var(--dsg-orange);
+  }
+
+  .btn-catalogo-add.ya-añadido {
+    background: rgba(255, 140, 0, .2);
+    border-color: var(--dsg-orange);
+    opacity: .7;
+    cursor: default;
+  }
+
+  .catalogo-empty {
+    text-align: center;
+    padding: 28px 0;
+    color: var(--dsg-muted);
+    font-size: .85rem;
+  }
+
+  .catalogo-empty i {
+    font-size: 1.6rem;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .btn-toggle-catalogo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 140, 0, .08);
+    border: 1px dashed rgba(255, 140, 0, .35);
+    color: var(--dsg-orange);
+    border-radius: 9px;
+    padding: 9px 18px;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    transition: background .18s, border-color .18s;
+    margin-bottom: 1rem;
+  }
+
+  .btn-toggle-catalogo:hover {
+    background: rgba(255, 140, 0, .15);
+    border-color: rgba(255, 140, 0, .6);
+  }
+
+  .btn-toggle-catalogo.abierto {
+    border-style: solid;
+    background: rgba(255, 140, 0, .1);
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     BARRA DE FILTROS
+     ════════════════════════════════════════════════════════════ */
+  .filtros-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .filtros-inputs {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  .filtro-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 130px;
+  }
+
+  .filtro-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--dsg-muted);
+    margin: 0;
+  }
+
+  .filtro-input {
+    background: var(--dsg-surface2);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 9px;
+    color: #d8d8d8;
+    padding: 8px 11px;
+    font-size: .85rem;
+    width: 100%;
+    transition: border-color .18s;
+  }
+
+  .filtro-input:focus {
+    outline: none;
+    border-color: var(--dsg-orange);
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, .12);
+  }
+
+  .filtro-input::-webkit-calendar-picker-indicator {
+    filter: invert(.4);
+    cursor: pointer;
+  }
+
+  .filtros-actions {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .filtro-btn {
+    height: 38px;
+    padding: 0 14px;
+    font-size: .85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     MOBILE  (< 768 px)
+     ════════════════════════════════════════════════════════════ */
+  @media (max-width: 767px) {
+
+    /* Listado: ocultar tabla, mostrar tarjetas */
+    .pedidos-tabla-desktop {
+      display: none !important;
+    }
+
+    .pedidos-lista-mobile {
+      display: flex !important;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Detalle: ocultar filas desktop, mostrar grid y lista mobile */
+    .detalle-row-desktop {
+      display: none !important;
+    }
+
+    .detalle-info-grid {
+      display: grid !important;
+    }
+
+    .lineas-tabla-desktop {
+      display: none !important;
+    }
+
+    .lineas-lista-mobile {
+      display: flex !important;
+    }
+
+    /* Tarjetas del listado */
+    .pedido-mobile-card {
+      background: var(--dsg-surface);
+      border: 0.5px solid rgba(255, 255, 255, .07);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .pmc-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .pmc-cliente {
+      font-size: 14px;
+      font-weight: 500;
+      color: #e0e0e0;
+      line-height: 1.2;
+    }
+
+    .pmc-email {
+      font-size: 11.5px;
+      color: var(--dsg-muted);
+      margin-top: 2px;
+    }
+
+    .pmc-meta {
+      display: flex;
+      justify-content: space-between;
+      border-top: 0.5px solid rgba(255, 255, 255, .06);
+      padding-top: 10px;
+    }
+
+    .pmc-empresa {
+      font-size: 12px;
+      color: var(--dsg-muted);
+      max-width: 55%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .pmc-fecha {
+      font-size: 12px;
+      color: var(--dsg-muted);
+    }
+
+    .pmc-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pmc-id {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--dsg-orange);
+    }
+
+    .pmc-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pmc-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--dsg-surface2);
+      border: 0.5px solid rgba(255, 255, 255, .08);
+      color: var(--dsg-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      text-decoration: none;
+    }
+
+    /* Cabecera detalle */
+    .detalle-cab {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+    }
+
+    .detalle-cab .d-flex.gap-2 {
+      width: 100%;
+    }
+
+    .detalle-cab .btn {
+      flex: 1;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    /* Grid info detalle */
+    .detalle-info-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .dic {
+      background: var(--dsg-surface2);
+      border: 0.5px solid rgba(255, 255, 255, .06);
+      border-radius: 11px;
+      padding: 11px 13px;
+    }
+
+    .dic.full {
+      grid-column: 1 / -1;
+    }
+
+    .dic-label {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--dsg-muted);
+      margin-bottom: 4px;
+    }
+
+    .dic-value {
+      font-size: 14px;
+      color: #d8d8d8;
+      font-weight: 500;
+    }
+
+    .dic-sub {
+      font-size: 11.5px;
+      color: var(--dsg-muted);
+      margin-top: 1px;
+    }
+
+    .dic-total {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dsg-orange);
+      line-height: 1;
+    }
+
+    /* Lista de líneas */
+    .lineas-lista-mobile {
+      flex-direction: column;
+      background: var(--dsg-surface2);
+      border: 0.5px solid rgba(255, 255, 255, .06);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .lmr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 0.5px solid rgba(255, 255, 255, .05);
+      gap: 10px;
+    }
+
+    .lmr:last-child {
+      border-bottom: none;
+    }
+
+    .lmr-nombre {
+      font-size: 13px;
+      color: #d0d0d0;
+      font-weight: 500;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lmr-cant {
+      font-size: 11px;
+      color: var(--dsg-muted);
+      margin-top: 2px;
+    }
+
+    .lmr-subtotal {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    /* Filtros */
+    .filtros-bar {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filtros-inputs {
+      width: 100%;
+    }
+
+    .filtro-field {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .filtros-actions {
+      width: 100%;
+    }
+
+    .filtro-btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  /* Ocultar vistas mobile en desktop */
+  .pedidos-lista-mobile,
+  .lineas-lista-mobile,
+  .detalle-info-grid {
+    display: none;
+  }
+</style>
+
+{# ── Macro: badge de estado (evita repetirlo 4 veces) ──────── #}
+{% macro badge_estado(estado) %}
+{% if estado == 'pendiente' %}
+<span class="badge-rol badge-comercial">Pendiente</span>
+{% elif estado == 'confirmado' %}
+<span class="badge-rol badge-cliente">Confirmado</span>
+{% else %}
+<span class="badge-rol badge-control">Cancelado</span>
+{% endif %}
+{% endmacro %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- ── Cabecera ─────────────────────────────────────────────── -->
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1><i class="bi bi-bag me-2" style="color:var(--dsg-orange)"></i>Pedidos</h1>
+    <p>Seguimiento de pedidos de tus clientes</p>
+  </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger mb-3">
+  <i class="bi bi-x-circle me-2"></i>{{ error }}
+</div>
+{% endif %}
+
+
+<!-- ══════════════════════════════════════════════════════════
+     DETALLE DEL PEDIDO
+     ══════════════════════════════════════════════════════════ -->
+{% if pedido %}
+<div class="dsg-card mb-4">
+
+  <div class="d-flex align-items-center justify-content-between mb-3 detalle-cab">
+    <h6 class="fw-600 mb-0">
+      <i class="bi bi-bag-check me-2" style="color:var(--dsg-orange)"></i>Detalle del pedido #{{ pedido.id }}
+    </h6>
+    <div class="d-flex gap-2">
+      {% if pedido.estado in ['pendiente', 'confirmado'] %}
+      <button class="btn-dsg btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPedido">
+        <i class="bi bi-pencil me-1"></i> Editar pedido
+      </button>
+      {% endif %}
+      <a href="{{ url_for('router_comercial.mis_pedidos') }}" onclick="showLoader('Cargando lista de pedidos...')"
+        class="btn-dsg-outline btn btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+      </a>
+    </div>
+  </div>
+
+  <!-- Metadata desktop -->
+  <div class="row g-3 mb-3 detalle-row-desktop">
+    <div class="col-md-4">
+      <div style="color:var(--dsg-muted); font-size:.8rem;">Cliente</div>
+      <div style="font-weight:500;">{{ pedido.cliente.nombre.capitalize() }} {{ pedido.cliente.apellido1.capitalize() }}
+        {{ pedido.cliente.apellido2.capitalize() }}</div>
+      <div style="font-size:.78rem; color:var(--dsg-muted)">{{ pedido.cliente.email }}</div>
+    </div>
+    <div class="col-md-4">
+      <div style="color:var(--dsg-muted); font-size:.8rem;">Empresa</div>
+      <div style="color:#ccc;">{{ pedido.cliente.nombre_empresa or '—' }}</div>
+    </div>
+    <div class="col-md-4">
+      <div style="color:var(--dsg-muted); font-size:.8rem;">Fecha del pedido</div>
+      <div style="color:#ccc;">{{ pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M') }}</div>
+    </div>
+    <div class="col-md-4">
+      <div style="color:var(--dsg-muted); font-size:.8rem;">Estado</div>
+      {{ badge_estado(pedido.estado) }}
+    </div>
+    <div class="col-md-4">
+      <div style="color:var(--dsg-muted); font-size:.8rem;">Total</div>
+      <div style="font-weight:700; font-size:1.15rem; color:var(--dsg-orange)">{{ "%.2f"|format(pedido.total) }} €</div>
+    </div>
+    {% if pedido.observaciones %}
+    <div class="col-12">
+      <div style="color:var(--dsg-muted); font-size:.8rem;">Observaciones</div>
+      <div style="color:#ccc;">{{ pedido.observaciones }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Metadata móvil -->
+  <div class="detalle-info-grid">
+    <div class="dic full">
+      <div class="dic-label">Cliente</div>
+      <div class="dic-value">{{ pedido.cliente.nombre.capitalize() }} {{ pedido.cliente.apellido1.capitalize() }} {{
+        pedido.cliente.apellido2.capitalize() }}</div>
+      <div class="dic-sub">{{ pedido.cliente.email }}</div>
+    </div>
+    <div class="dic">
+      <div class="dic-label">Empresa</div>
+      <div class="dic-value">{{ pedido.cliente.nombre_empresa or '—' }}</div>
+    </div>
+    <div class="dic">
+      <div class="dic-label">Fecha</div>
+      <div class="dic-value">{{ pedido.fecha_pedido.strftime('%d/%m/%Y') }}</div>
+      <div class="dic-sub">{{ pedido.fecha_pedido.strftime('%H:%M') }}</div>
+    </div>
+    <div class="dic">
+      <div class="dic-label">Estado</div>
+      <div style="margin-top:4px;">{{ badge_estado(pedido.estado) }}</div>
+    </div>
+    <div class="dic">
+      <div class="dic-label">Total</div>
+      <div class="dic-total">{{ "%.2f"|format(pedido.total) }} €</div>
+    </div>
+    {% if pedido.observaciones %}
+    <div class="dic full">
+      <div class="dic-label">Observaciones</div>
+      <div class="dic-value" style="font-weight:400; color:#ccc;">{{ pedido.observaciones }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Líneas: sección -->
+  <div class="modal-section-label">Líneas del pedido</div>
+
+  <!-- Tabla desktop -->
+  <div class="table-responsive lineas-tabla-desktop">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th style="color:var(--dsg-muted); font-size:.75rem; font-weight:500;">Código de referencia</th>
+          <th style="color:var(--dsg-muted); font-size:.75rem; font-weight:500;">Producto</th>
+          <th style="color:var(--dsg-muted); font-size:.75rem; font-weight:500;">Cantidad</th>
+          <th style="color:var(--dsg-muted); font-size:.75rem; font-weight:500;">Precio unit.</th>
+          <th style="color:var(--dsg-muted); font-size:.75rem; font-weight:500;">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linea in pedido.detalles %}
+        <tr>
+          <td style="color:#d8d8d8;">{{ linea.producto.id }}</td>
+          <td style="color:#d8d8d8;">{{ linea.producto.nombre }}</td>
+          <td style="color:#ccc;">{{ linea.cantidad }}</td>
+          <td style="color:var(--dsg-muted);">{{ "%.2f"|format(linea.precio_unitario) }} €</td>
+          <td style="font-weight:600; color:#fff;">{{ "%.2f"|format(linea.subtotal) }} €</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="text-center py-3" style="color:var(--dsg-muted)">Sin líneas</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Lista móvil de líneas -->
+  <div class="lineas-lista-mobile">
+    {% for linea in pedido.detalles %}
+    <div class="lmr">
+      <div>
+        <div class="lmr-nombre">{{ linea.producto.nombre }}</div>
+        <div class="lmr-cant">Ref: {{ linea.producto.id }}</div>
+        <div class="lmr-cant">× {{ linea.cantidad }} &nbsp;·&nbsp; {{ "%.2f"|format(linea.precio_unitario) }} €/u</div>
+      </div>
+      <div class="lmr-subtotal">{{ "%.2f"|format(linea.subtotal) }} €</div>
+    </div>
+    {% else %}
+    <div class="lmr" style="justify-content:center; color:var(--dsg-muted);">
+      <i class="bi bi-inbox me-2"></i>Sin líneas
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL EDITAR PEDIDO
+     ══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalEditarPedido" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil-square me-2" style="color:var(--dsg-orange);"></i>
+          Editar pedido <span style="color:var(--dsg-muted); font-weight:400;">#{{ pedido.id }}</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body" style="padding:1.25rem 1.5rem;">
+
+        <div class="modal-section-label">
+          <i class="bi bi-list-ul" style="color:var(--dsg-orange);"></i> Líneas del pedido
+        </div>
+
+        <div class="table-responsive mb-3">
+          <table class="table mb-0" id="tablaLineasEdit">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th style="width:100px;">Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+                <th style="width:36px;"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyLineas">
+              {% for linea in pedido.detalles %}
+              <tr data-linea-id="{{ linea.id }}" data-precio="{{ linea.precio_unitario }}"
+                data-producto-id="{{ linea.producto_id }}">
+                <td><span class="pill-nombre">{{ linea.producto.nombre }}</span></td>
+                <td>
+                  <input type="number" class="edit-qty" min="1" max="9999" value="{{ linea.cantidad }}"
+                    onchange="recalcularFila(this)">
+                </td>
+                <td class="pill-precio-unit" style="color:#fff;">{{ "%.2f"|format(linea.precio_unitario) }} €</td>
+                <td class="td-subtotal" style="color:#fff; font-weight:600;">{{ "%.2f"|format(linea.subtotal) }} €</td>
+                <td>
+                  <button type="button" class="btn-del-linea" onclick="eliminarFila(this)">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Buscador catálogo -->
+        <button type="button" class="btn-toggle-catalogo" id="btnToggleCatalogo" onclick="toggleCatalogo()">
+          <i class="bi bi-grid-3x3-gap"></i>
+          <span id="lblToggle">Añadir productos desde el catálogo</span>
+          <i class="bi bi-chevron-down" id="icoToggle" style="margin-left:auto; font-size:.8rem;"></i>
+        </button>
+
+        <div class="catalogo-panel" id="catalogoPanel" style="display:none;">
+          <div class="catalogo-panel-header">
+            <div class="catalogo-search-wrap">
+              <i class="bi bi-search"></i>
+              <input type="text" class="catalogo-search" id="catalogoSearch" placeholder="Buscar por nombre o código..."
+                autocomplete="off">
+            </div>
+            <span id="catalogoContador" style="color:var(--dsg-muted); font-size:.75rem; white-space:nowrap;"></span>
+          </div>
+          <div class="catalogo-results" id="catalogoResults"></div>
+        </div>
+
+        <!-- Total -->
+        <div class="d-flex justify-content-end mb-4">
+          <div class="total-card">
+            <div class="total-label">Total del pedido</div>
+            <div class="total-valor" id="totalModal">{{ "%.2f"|format(pedido.total) }} €</div>
+          </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="modal-section-label">
+          <i class="bi bi-chat-left-text" style="color:var(--dsg-orange);"></i> Observaciones
+        </div>
+        <textarea class="obs-textarea" id="editObservaciones"
+          placeholder="Notas internas sobre este pedido…">{{ pedido.observaciones or '' }}</textarea>
+
+      </div>
+
+      <div class="modal-footer">
+        <span style="color:var(--dsg-muted); font-size:.78rem;">
+          <i class="bi bi-shield-check me-1" style="color:var(--dsg-orange);"></i>
+          Los cambios se aplican al guardar
+        </span>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn-dsg-outline btn btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn-dsg btn btn-sm" id="btnGuardar" onclick="guardarCambios()">
+            <i class="bi bi-check2 me-1"></i> Guardar cambios
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Formulario oculto -->
+<form id="formEditarPedido" method="POST" action="{{ url_for('router_comercial.editar_pedido', pedido_id=pedido.id) }}"
+  style="display:none;">
+  <input type="hidden" name="observaciones" id="fObservaciones">
+  <input type="hidden" name="lineas_json" id="fLineasJson">
+</form>
+
+{% endif %}
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FILTROS + LISTADO
+     ══════════════════════════════════════════════════════════ -->
+{% if not pedido %}
+<div class="dsg-card">
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="fw-600 mb-0">
+      <i class="bi bi-list-ul me-2" style="color:var(--dsg-orange)"></i>Listado
+    </h6>
+    <span style="font-size:.75rem; color:var(--dsg-muted);">
+      {% if request.args.get('fecha_inicio') or request.args.get('fecha_fin') %}
+      <i class="bi bi-funnel-fill me-1" style="color:var(--dsg-orange);"></i>Filtro activo
+      {% endif %}
+    </span>
+  </div>
+
+  <!-- Filtros -->
+  <form method="GET" action="{{ url_for('router_comercial.mis_pedidos') }}" class="filtros-bar mb-3">
+    <div class="filtros-inputs">
+      <div class="filtro-field">
+        <label class="filtro-label">Desde</label>
+        <input type="date" name="fecha_inicio" class="filtro-input" value="{{ request.args.get('fecha_inicio', '') }}">
+      </div>
+      <div class="filtro-field">
+        <label class="filtro-label">Hasta</label>
+        <input type="date" name="fecha_fin" class="filtro-input" value="{{ request.args.get('fecha_fin', '') }}">
+      </div>
+    </div>
+    <div class="filtros-actions">
+      <button type="submit" class="btn-dsg btn filtro-btn">
+        <i class="bi bi-funnel"></i><span>Filtrar</span>
+      </button>
+      <a href="{{ url_for('router_comercial.mis_pedidos') }}" onclick="showLoader('Limpiando filtros...')"
+        class="btn-dsg-outline btn filtro-btn">
+        <i class="bi bi-x"></i>
+        <span>Limpiar</span>
+      </a>
+    </div>
+  </form>
+
+  <!-- Tabla desktop -->
+  <div class="table-responsive pedidos-tabla-desktop">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Empresa</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr>
+          <td>
+            <div style="font-weight:500; color:#d8d8d8;">{{ p.cliente.nombre }} {{ p.cliente.apellido1 }} {{
+              p.cliente.apellido2 }}</div>
+            <div style="font-size:.78rem; color:var(--dsg-muted)">{{ p.cliente.email }}</div>
+          </td>
+          <td style="color:var(--dsg-muted)">{{ p.cliente.nombre_empresa or '—' }}</td>
+          <td style="color:var(--dsg-muted)">{{ p.fecha_pedido.strftime('%d/%m/%Y') }}</td>
+          <td>{{ badge_estado(p.estado) }}</td>
+          <td>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <a href="{{ url_for('router_comercial.detalle_pedido', pedido_id=p.id) }}"
+                onclick="showLoader('Cargando detalle del pedido...')" class="btn btn-sm" title="Ver pedido" style="background:var(--dsg-surface2); color:var(--dsg-muted);
+                width:32px; height:32px; padding:0;
+                display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% if p.estado in ['pendiente', 'confirmado'] %}
+              <a href="{{ url_for('router_comercial.detalle_pedido', pedido_id=p.id) }}?modal=editar"
+                onclick="showLoader('Cargando detalle del pedido...')" class="btn btn-sm" title="Editar pedido" style="background:var(--dsg-surface2); color:var(--dsg-muted);
+                width:32px; height:32px; padding:0;
+                display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="text-center py-4" style="color:var(--dsg-muted)">
+            <i class="bi bi-inbox me-2"></i>Sin pedidos
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tarjetas móvil -->
+  <div class="pedidos-lista-mobile">
+    {% for p in pedidos %}
+    <div class="pedido-mobile-card">
+      <div class="pmc-top">
+        <div>
+          <div class="pmc-cliente">{{ p.cliente.nombre.capitalize() }} {{ p.cliente.apellido1.capitalize() }} {{
+            p.cliente.apellido2.capitalize() }}</div>
+          <div class="pmc-email">{{ p.cliente.nombre_empresa or '—' }}</div>
+        </div>
+        {{ badge_estado(p.estado) }}
+      </div>
+      <div class="pmc-meta">
+        <div class="pmc-empresa">Número de pedido: {{ p.id }}</div>
+        <div class="pmc-fecha">{{ p.fecha_pedido.strftime('%d/%m/%Y') }}</div>
+      </div>
+      <div class="pmc-bottom">
+        <div class="pmc-id">{{ p.total }}&euro;</div>
+        <div class="pmc-actions">
+          <a href="{{ url_for('router_comercial.detalle_pedido', pedido_id=p.id) }}"
+            onclick="showLoader('Cargando detalle del pedido...')" class="pmc-btn" title="Ver pedido">
+            <i class="bi bi-eye"></i>
+          </a>
+          {% if p.estado in ['pendiente', 'confirmado'] %}
+          <a href="{{ url_for('router_comercial.detalle_pedido', pedido_id=p.id) }}?modal=editar"
+            onclick="showLoader('Cargando detalle del pedido...')" class="pmc-btn" title="Editar pedido">
+            <i class="bi bi-pencil"></i>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:2rem 0; color:var(--dsg-muted)">
+      <i class="bi bi-inbox me-2"></i>Sin pedidos
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endif %}
+
+<script type="application/json" id="productos-data">{{ productos | tojson }}</script>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  const PRODUCTOS = JSON.parse(document.getElementById('productos-data').textContent);
+
+  /* ── Escape HTML ─────────────────────────────────────────── */
+  const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = s => String(s).replace(/[&<>"']/g, c => ESC_MAP[c]);
+
+  /* ── Recalcular subtotal de fila ─────────────────────────── */
+  function recalcularFila(input) {
+    const tr = input.closest('tr');
+    const precio = parseFloat(tr.dataset.precio) || 0;
+    const qty = Math.max(1, parseInt(input.value) || 1);
+    input.value = qty;
+    tr.querySelector('.td-subtotal').textContent = (precio * qty).toFixed(2) + ' €';
+    recalcularTotal();
+  }
+
+  /* ── Recalcular total ────────────────────────────────────── */
+  function recalcularTotal() {
+    let total = 0;
+    document.querySelectorAll('#tbodyLineas .td-subtotal').forEach(td => {
+      total += parseFloat(td.textContent) || 0;
+    });
+    document.getElementById('totalModal').textContent = total.toFixed(2) + ' €';
+  }
+
+  /* ── Eliminar fila ───────────────────────────────────────── */
+  function eliminarFila(btn) {
+    const tr = btn.closest('tr');
+    tr.style.transition = 'opacity .18s, transform .18s';
+    tr.style.opacity = '0';
+    tr.style.transform = 'translateX(8px)';
+    setTimeout(() => { tr.remove(); recalcularTotal(); }, 180);
+  }
+
+  /* ── Añadir producto a la tabla ──────────────────────────── */
+  function añadirProducto(id, nombre, precio) {
+    id = String(id);
+    const existe = document.querySelector(`#tbodyLineas tr[data-producto-id="${id}"]`);
+    if (existe) {
+      const input = existe.querySelector('.edit-qty');
+      input.value = parseInt(input.value || 1) + 1;
+      recalcularFila(input);
+      existe.style.background = 'rgba(255,140,0,.1)';
+      setTimeout(() => existe.style.background = '', 500);
+      return;
+    }
+
+    const tr = document.createElement('tr');
+    tr.classList.add('row-nueva');
+    tr.dataset.lineaId = 'new';
+    tr.dataset.precio = precio;
+    tr.dataset.productoId = id;
+    tr.innerHTML = `
+      <td><span class="pill-nombre">${esc(nombre)}</span></td>
+      <td><input type="number" class="edit-qty" min="1" max="9999" value="1" onchange="recalcularFila(this)"></td>
+      <td class="pill-precio-unit" style="color:#fff;">${parseFloat(precio).toFixed(2)} €</td>
+      <td class="td-subtotal" style="color:#fff; font-weight:600;">${parseFloat(precio).toFixed(2)} €</td>
+      <td><button type="button" class="btn-del-linea" onclick="eliminarFila(this)"><i class="bi bi-x"></i></button></td>
+    `;
+    document.getElementById('tbodyLineas').appendChild(tr);
+    recalcularTotal();
+  }
+
+  /* ── IDs ya en el pedido ─────────────────────────────────── */
+  function idsEnPedido() {
+    const ids = new Set();
+    document.querySelectorAll('#tbodyLineas tr[data-producto-id]').forEach(tr => ids.add(String(tr.dataset.productoId)));
+    return ids;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     CATÁLOGO INLINE
+     ══════════════════════════════════════════════════════════ */
+  let catalogoAbierto = false;
+
+  function toggleCatalogo() {
+    const panel = document.getElementById('catalogoPanel');
+    catalogoAbierto = !catalogoAbierto;
+    panel.style.display = catalogoAbierto ? 'block' : 'none';
+    document.getElementById('btnToggleCatalogo').classList.toggle('abierto', catalogoAbierto);
+    document.getElementById('icoToggle').className = catalogoAbierto ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+    document.getElementById('lblToggle').textContent = catalogoAbierto ? 'Ocultar catálogo' : 'Añadir productos desde el catálogo';
+    if (catalogoAbierto) {
+      document.getElementById('catalogoSearch').focus();
+      renderCatalogo('');
+    }
+  }
+
+  function renderCatalogo(busqueda) {
+    const results = document.getElementById('catalogoResults');
+    const contador = document.getElementById('catalogoContador');
+    const enPedido = idsEnPedido();
+    const q = busqueda.toLowerCase().trim();
+
+    const filtrados = q
+      ? PRODUCTOS.filter(p =>
+        p.nombre.toLowerCase().includes(q) ||
+        String(p.id).includes(q) ||
+        (p.proveedor || '').toLowerCase().includes(q))
+      : PRODUCTOS;
+
+    contador.textContent = filtrados.length
+      ? `${filtrados.length} producto${filtrados.length !== 1 ? 's' : ''}`
+      : '';
+
+    if (!filtrados.length) {
+      results.innerHTML = `<div class="catalogo-empty"><i class="bi bi-search"></i>Sin resultados para "${esc(q)}"</div>`;
+      return;
+    }
+
+    results.innerHTML = filtrados.map(p => {
+      const yaEsta = enPedido.has(String(p.id));
+      const btn = yaEsta
+        ? `<button class="btn-catalogo-add ya-añadido" data-id="${p.id}" disabled><i class="bi bi-check2"></i> En pedido</button>`
+        : `<button class="btn-catalogo-add" data-id="${p.id}" data-nombre="${esc(p.nombre)}" data-precio="${p.precio}"><i class="bi bi-plus"></i> Añadir</button>`;
+      return `
+        <div class="catalogo-item">
+          <div style="flex:1; min-width:0;">
+            <div class="catalogo-item-nombre">${esc(p.nombre)}</div>
+            ${p.proveedor ? `<div class="catalogo-item-proveedor"><i class="bi bi-building me-1"></i>${esc(p.proveedor)}</div>` : ''}
+          </div>
+          <div class="catalogo-item-precio">${parseFloat(p.precio).toFixed(2)} €</div>
+          ${btn}
+        </div>`;
+    }).join('');
+  }
+
+  /* Click en botones del catálogo */
+  document.getElementById('catalogoResults')?.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-catalogo-add');
+    if (!btn || btn.disabled) return;
+    const { id, nombre, precio } = btn.dataset;
+    añadirProducto(id, nombre, precio);
+    // Refrescar toda la lista para que el estado "En pedido" sea correcto incluso si ya existía
+    renderCatalogo(document.getElementById('catalogoSearch').value);
+  });
+
+  /* Búsqueda con debounce */
+  let searchTimer;
+  document.getElementById('catalogoSearch')?.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => renderCatalogo(this.value), 200);
+  });
+
+  /* ══════════════════════════════════════════════════════════
+     GUARDAR
+     ══════════════════════════════════════════════════════════ */
+  function guardarCambios() {
+    const lineas = [];
+    let valido = true;
+
+    document.querySelectorAll('#tbodyLineas tr').forEach(tr => {
+      const input = tr.querySelector('.edit-qty');
+      const qty = parseInt(input?.value) || 0;
+      if (qty < 1) { valido = false; if (input) input.style.borderColor = '#e05c6a'; return; }
+      lineas.push({
+        linea_id: tr.dataset.lineaId === 'new' ? null : parseInt(tr.dataset.lineaId),
+        producto_id: parseInt(tr.dataset.productoId),
+        cantidad: qty,
+        precio_unitario: parseFloat(tr.dataset.precio),
+      });
+    });
+
+    if (!valido) { toast('Corrige las cantidades marcadas.', 'danger'); return; }
+    if (!lineas.length) { toast('El pedido debe tener al menos una línea.', 'danger'); return; }
+
+    document.getElementById('fLineasJson').value = JSON.stringify(lineas);
+    document.getElementById('fObservaciones').value = document.getElementById('editObservaciones').value;
+
+    const btn = document.getElementById('btnGuardar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Guardando…';
+    document.getElementById('formEditarPedido').submit();
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     TOAST
+     ══════════════════════════════════════════════════════════ */
+  function toast(msg, tipo = 'success') {
+    const id = 'toast_' + Date.now();
+    document.body.insertAdjacentHTML('beforeend', `
+      <div id="${id}" class="toast align-items-center text-bg-${tipo} border-0 show"
+           style="position:fixed;bottom:24px;right:24px;z-index:9999;min-width:280px;">
+        <div class="d-flex">
+          <div class="toast-body">${esc(msg)}</div>
+          <button class="btn-close btn-close-white me-2 m-auto"
+                  onclick="document.getElementById('${id}').remove()"></button>
+        </div>
+      </div>`);
+    setTimeout(() => document.getElementById(id)?.remove(), 4000);
+  }
+
+  /* Abrir modal si viene por URL */
+  if (new URLSearchParams(location.search).get('modal') === 'editar') {
+    new bootstrap.Modal(document.getElementById('modalEditarPedido')).show();
+    history.replaceState({}, '', location.pathname);
+  }
+</script>
+{% endblock %}

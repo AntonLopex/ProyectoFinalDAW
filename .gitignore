@@ -1,0 +1,94 @@
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+.Python
+.python-version
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# =========================
+# Distribución / empaquetado
+# =========================
+dist/
+build/
+*.egg-info/
+
+# =========================
+# Testing / cachés
+# =========================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# =========================
+# Variables de entorno
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Flask
+# =========================
+instance/
+.webassets-cache/
+
+# Bases de datos locales
+*.db
+*.sqlite3
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+*.pid
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+docker-compose.yml
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Sistemas operativos
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDEs / Editores
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+

@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Editar' if accion == 'editar' else 'Nueva' }} presentación{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-content {
+        padding: 0 !important;
+    }
+
+    .pres-wrapper {
+        min-height: calc(100vh - 56px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.5rem;
+    }
+
+    .pres-box {
+        width: 100%;
+        max-width: 540px;
+    }
+
+    .form-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .form-header .back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: var(--dsg-surface2);
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-muted);
+        text-decoration: none;
+        transition: background 0.15s, color 0.15s;
+        flex-shrink: 0;
+    }
+
+    .form-header .back-btn:hover {
+        background: var(--dsg-surface);
+        color: var(--dsg-text);
+    }
+
+    .form-header-text h1 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--dsg-text);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .form-header-text p {
+        color: var(--dsg-muted);
+        font-size: 0.82rem;
+        margin: 0;
+    }
+
+    .pres-card {
+        background: var(--dsg-surface);
+        border: 1px solid var(--dsg-border);
+        border-radius: 12px;
+        padding: 2rem;
+    }
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--dsg-orange);
+        margin: 1.25rem 0 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+    }
+
+    .section-label:first-of-type {
+        margin-top: 0;
+    }
+
+    .form-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--dsg-muted);
+        margin-bottom: 0.3rem;
+    }
+
+    .form-control,
+    .form-select {
+        height: 40px;
+        font-size: 0.9rem;
+        background: var(--dsg-surface2);
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-text);
+        border-radius: 6px;
+    }
+
+    textarea.form-control {
+        height: auto;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background: var(--dsg-surface2);
+        border-color: var(--dsg-orange);
+        color: var(--dsg-text);
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    }
+
+    .form-control::placeholder {
+        color: var(--dsg-muted);
+    }
+
+    .form-select option {
+        background: var(--dsg-surface2);
+        color: var(--dsg-text);
+    }
+
+    .input-icon-wrap {
+        position: relative;
+    }
+
+    .input-icon-wrap i {
+        position: absolute;
+        left: 0.7rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dsg-muted);
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+
+    .input-icon-wrap .form-control,
+    .input-icon-wrap .form-select {
+        padding-left: 2.1rem;
+    }
+
+    .char-count {
+        font-size: 0.7rem;
+        color: var(--dsg-muted);
+        text-align: right;
+        margin-top: 3px;
+        opacity: 0.6;
+    }
+
+    .org-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: var(--dsg-surface2);
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        margin-top: 0.5rem;
+        font-size: 0.82rem;
+    }
+
+    .org-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--dsg-orange);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .pill-inscritos {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(59, 130, 246, 0.15);
+        color: #93C5FD;
+        border-radius: 99px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 3px 12px;
+    }
+
+    .id-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+    }
+
+    .id-label {
+        font-size: 0.82rem;
+        color: var(--dsg-muted);
+        font-weight: 600;
+    }
+
+    .ocupacion-wrap {
+        background: var(--dsg-surface2);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-top: 1.25rem;
+    }
+
+    .ocupacion-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .ocupacion-bar {
+        height: 7px;
+        border-radius: 99px;
+        background: var(--dsg-border);
+        overflow: hidden;
+    }
+
+    .ocupacion-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: var(--dsg-orange);
+    }
+
+    .ocupacion-pct {
+        font-size: 0.7rem;
+        color: var(--dsg-muted);
+        text-align: right;
+        margin-top: 0.3rem;
+    }
+
+    .btn-pres {
+        height: 44px;
+        background: var(--dsg-orange);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 6px;
+        letter-spacing: 0.02em;
+        transition: background 0.15s, transform 0.1s;
+        padding: 0 1.5rem;
+    }
+
+    .btn-pres:hover {
+        background: var(--dsg-orange-dark);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .btn-pres:active {
+        transform: translateY(0);
+    }
+
+    .btn-pres-outline {
+        height: 44px;
+        background: transparent;
+        border: 1px solid var(--dsg-border);
+        color: var(--dsg-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0 1.25rem;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-pres-outline:hover {
+        background: var(--dsg-surface2);
+        color: var(--dsg-text);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="pres-wrapper">
+    <div class="pres-box">
+
+        <div class="form-header">
+            <a href="{{ url_for('router_admin.adminDashboard') }}" onclick="showLoader('Abriendo dashboard...')"
+                class="back-btn">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div class="form-header-text">
+                <h1>Crear presentación</h1>
+                <p>{{ 'Modifica los datos de la presentación' if accion == 'editar' else 'Rellena los datos para crear
+                    una nueva presentación' }}</p>
+            </div>
+        </div>
+
+        <div class="pres-card">
+
+            {% if accion == 'editar' %}
+            {% set inscritos_count = presentacion.presentacion_usuarios.count() %}
+            <div class="id-row">
+                <span class="id-label">ID #{{ presentacion.id }}</span>
+                <span class="pill-inscritos">
+                    <i class="bi bi-people-fill"></i>
+                    {{ inscritos_count }} inscrito{{ 's' if inscritos_count != 1 }}
+                </span>
+            </div>
+            {% endif %}
+
+            <form method="POST"
+                action="{{ url_for('router_admin.editar_presentacion', presentacion_id=presentacion.id) if accion == 'editar' else url_for('router_admin.crear_presentacion') }}">
+
+                <!-- ── Información principal ───────────────────────── -->
+                <div class="section-label">Información principal</div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tema <span style="color:#F87171;">*</span></label>
+                    <div class="input-icon-wrap">
+                        <i class="bi bi-easel2"></i>
+                        <input type="text" name="tema" id="inputTema" class="form-control"
+                            placeholder="Ej. Tendencias en marketing digital 2025" maxlength="255" required
+                            value="{{ presentacion.tema if accion == 'editar' else (form.tema or '') }}">
+                    </div>
+                    <div class="char-count"><span id="temaCount">0</span> / 255</div>
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label">Descripción</label>
+                    <textarea name="descripcion" id="inputDesc" class="form-control" rows="4" maxlength="2000"
+                        placeholder="Describe brevemente el contenido y objetivos…">{{ presentacion.descripcion if accion == 'editar' else (form.descripcion or '') }}</textarea>
+                    <div class="char-count"><span id="descCount">0</span> / 2000</div>
+                </div>
+
+                <!-- ── Fecha y capacidad ───────────────────────────── -->
+                <div class="section-label">Fecha y capacidad</div>
+
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <label class="form-label">Fecha y hora <span style="color:#F87171;">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-calendar-event"></i>
+                            <input type="datetime-local" name="fecha_hora" class="form-control" required
+                                value="{{ presentacion.fecha_hora.strftime('%Y-%m-%dT%H:%M') if accion == 'editar' else (form.fecha_hora or '') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Aforo máximo <span style="color:#F87171;">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-people"></i>
+                            <input type="text" name="aforo" class="form-control" min="1" max="9999" required
+                                placeholder="Ej. 50"
+                                value="{{ presentacion.aforo if accion == 'editar' else (form.aforo or '') }}">
+                        </div>
+                        {% if accion == 'editar' %}
+                        <div style="font-size:.7rem; color:var(--dsg-muted); margin-top:4px; opacity:.7;">
+                            Mínimo {{ inscritos_count }} (inscritos actuales)
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- ── Organizador ────────────────────────────────── -->
+                <div class="section-label">Organizador</div>
+
+                <div class="mb-0">
+                    <label class="form-label">Asignar organizador <span style="color:#F87171;">*</span></label>
+                    <div class="input-icon-wrap">
+                        <i class="bi bi-person-badge"></i>
+                        <input type="text" name="org" class="form-control" required placeholder="Ej. DSG"
+                            value="{{ presentacion.organizadores if accion == 'editar' else (form.organizadores or '') }}">
+                    </div>
+
+                    <div class="org-preview" id="orgPreview" style="display:none;">
+                        <div class="org-avatar" id="orgAvatar"></div>
+                        <div>
+                            <div style="font-weight:600; color:var(--dsg-text);" id="orgNombre"></div>
+                            <div style="color:var(--dsg-muted); font-size:.78rem;" id="orgRol"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Barra de ocupación (solo editar) ───────────── -->
+                {% if accion == 'editar' and inscritos_count > 0 %}
+                <div class="ocupacion-wrap">
+                    <div class="ocupacion-header">
+                        <span>{{ inscritos_count }} inscritos</span>
+                        <span style="color:var(--dsg-muted);">{{ presentacion.aforo }} plazas</span>
+                    </div>
+                    <div class="ocupacion-bar">
+                        <div class="ocupacion-fill" data-inscritos="{{ inscritos_count }}"
+                            data-aforo="{{ presentacion.aforo }}">
+                        </div>
+                    </div>
+                    <div class="ocupacion-pct" id="pctLabel"></div>
+                </div>
+                {% endif %}
+
+                <!-- ── Botones ─────────────────────────────────────── -->
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" onclick="showLoader();" class="btn btn-pres w-100">
+                        <i class="bi bi-{{ 'floppy' if accion == 'editar' else 'plus-lg' }} me-2"></i>
+                        {{ 'Guardar cambios' if accion == 'editar' else 'Crear presentación' }}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+
+        // ── Barra de ocupación ──
+        document.querySelectorAll('.ocupacion-fill').forEach(function (el) {
+            var inscritos = parseInt(el.dataset.inscritos, 10) || 0;
+            var aforo = parseInt(el.dataset.aforo, 10) || 1;
+            var pct = Math.min(Math.round((inscritos / aforo) * 100), 100);
+            el.style.width = pct + '%';
+            var label = document.getElementById('pctLabel');
+            if (label) label.textContent = pct + '% ocupado';
+        });
+
+        // ── Contadores de caracteres ──
+        function bindCounter(inputId, countId) {
+            var el = document.getElementById(inputId);
+            var cnt = document.getElementById(countId);
+            if (!el || !cnt) return;
+            cnt.textContent = el.value.length;
+            el.addEventListener('input', function () { cnt.textContent = this.value.length; });
+        }
+        bindCounter('inputTema', 'temaCount');
+        bindCounter('inputDesc', 'descCount');
+
+        // ── Preview organizador ──
+        var sel = document.getElementById('selectOrg');
+        var preview = document.getElementById('orgPreview');
+        var avatar = document.getElementById('orgAvatar');
+        var nombre = document.getElementById('orgNombre');
+        var rol = document.getElementById('orgRol');
+
+        function updateOrg() {
+            var opt = sel.options[sel.selectedIndex];
+            if (!opt || !opt.value) { preview.style.display = 'none'; return; }
+            var n = opt.dataset.nombre || opt.text.split('—')[0].trim();
+            avatar.textContent = n.split(' ').slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
+            nombre.textContent = n;
+            rol.textContent = opt.dataset.rol || '';
+            preview.style.display = 'flex';
+        }
+
+        sel.addEventListener('change', updateOrg);
+        updateOrg();
+
+    })();
+</script>
+{% endblock %}
