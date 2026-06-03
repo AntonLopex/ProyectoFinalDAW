@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'recetas',
     'interacciones',
     'moderacion',
-    'anymail',
+    'resend',
 ]
 
 # Para la autenticación.
