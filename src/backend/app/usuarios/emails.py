@@ -1,23 +1,9 @@
-from django.core.mail import EmailMultiAlternatives
+import resend
 from django.conf import settings
 
 
 def send_welcome_email(user):
-
-    subject = "Bienvenido a OLEA 🍽️"
-
-    from_email = settings.EMAIL_HOST_USER
-
-    to_email = [user.email]
-
-    text_content = f"""
-Bienvenido a OLEA
-
-Tu nombre de usuario es:
-{user.nombre_usuario}
-
-Ya puedes compartir recetas y descubrir platos increíbles.
-    """
+    resend.api_key = settings.RESEND_API_KEY
 
     html_content = f"""
     <div style="
@@ -66,23 +52,16 @@ Ya puedes compartir recetas y descubrir platos increíbles.
                     Bienvenido a la comunidad 🍽️
                 </h2>
 
-                <p style="
-                    font-size: 16px;
-                    line-height: 1.7;
-                ">
+                <p style="font-size: 16px; line-height: 1.7;">
                     Hola <strong>{user.nombre}</strong>,
                 </p>
 
-                <p style="
-                    font-size: 16px;
-                    line-height: 1.7;
-                ">
+                <p style="font-size: 16px; line-height: 1.7;">
                     Tu cuenta ha sido creada correctamente y ya puedes comenzar
                     a compartir recetas, descubrir nuevos platos y conectar
                     con amantes de la cocina.
                 </p>
 
-                <!-- USERNAME BOX -->
                 <div style="
                     background-color: #f8f9fa;
                     border-left: 5px solid #dda15e;
@@ -90,45 +69,20 @@ Ya puedes compartir recetas y descubrir platos increíbles.
                     border-radius: 12px;
                     margin: 30px 0;
                 ">
-
-                    <p style="
-                        margin: 0;
-                        font-size: 14px;
-                        color: #666;
-                    ">
+                    <p style="margin: 0; font-size: 14px; color: #666;">
                         Tu nombre de usuario
                     </p>
-
-                    <h3 style="
-                        margin: 8px 0 0 0;
-                        color: #606c38;
-                        font-size: 28px;
-                    ">
+                    <h3 style="margin: 8px 0 0 0; color: #606c38; font-size: 28px;">
                         {user.nombre_usuario}
                     </h3>
-
                 </div>
 
-                <!-- FEATURES -->
-                <div style="
-                    margin-top: 30px;
-                ">
-
-                    <p style="margin-bottom: 10px;">
-                        ✅ Compartir recetas
-                    </p>
-
-                    <p style="margin-bottom: 10px;">
-                        ✅ Guardar favoritos
-                    </p>
-
-                    <p style="margin-bottom: 10px;">
-                        ✅ Comentar y valorar platos
-                    </p>
-
+                <div style="margin-top: 30px;">
+                    <p style="margin-bottom: 10px;">✅ Compartir recetas</p>
+                    <p style="margin-bottom: 10px;">✅ Guardar favoritos</p>
+                    <p style="margin-bottom: 10px;">✅ Comentar y valorar platos</p>
                 </div>
 
-                <!-- FOOTER -->
                 <div style="
                     margin-top: 40px;
                     padding-top: 20px;
@@ -137,25 +91,17 @@ Ya puedes compartir recetas y descubrir platos increíbles.
                     font-size: 14px;
                     text-align: center;
                 ">
-
                     Gracias por formar parte de OLEA 🌿
-
                 </div>
 
             </div>
-
         </div>
-
     </div>
     """
 
-    email = EmailMultiAlternatives(
-        subject,
-        text_content,
-        from_email,
-        to_email
-    )
-
-    email.attach_alternative(html_content, "text/html")
-
-    email.send()
+    resend.Emails.send({
+        "from": "OLEA <onboarding@resend.dev>",
+        "to": [user.email],
+        "subject": "Bienvenido a OLEA 🍽️",
+        "html": html_content,
+    })

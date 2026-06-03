@@ -19,3 +19,7 @@ django-cors-headers>=3.14
 
 # Django REST Framework para APIs
 djangorestframework>=3.14.0
+
+# Para envio de correos.
+
+django-anymail
