@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-a=63onkgzfm)_@=z!5gm4galf(c9_y5r6e$+0gr4m7l0)c531y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1","proyectofinaldaw-production-3df7.up.railway.app"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1","backolea.up.railway.app"]
 
 
 # Application definition
@@ -76,6 +76,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "frontolea.up.railway.app",
+    "backolea.up.railway.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -83,6 +85,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "frontolea.up.railway.app",
+    "backolea.up.railway.app"
 ]
 
 
