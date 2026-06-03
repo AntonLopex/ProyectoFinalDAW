@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from recetas.permissions import IsAdminOrRegistrado
-from rest_framework import status
+from rest_framework import status 
+from rest_framework.permissions import AllowAny
 
 from recetas.models import Receta
 from recetas.views import get_logged_user
