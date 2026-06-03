@@ -26,7 +26,10 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            send_welcome_email(user)
+            try:
+                send_welcome_email(user)
+            except Exception as e:
+                print(f"Error enviando email: {e}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
