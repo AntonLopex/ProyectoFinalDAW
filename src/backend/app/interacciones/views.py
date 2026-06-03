@@ -9,7 +9,7 @@ from .models import Favorito
 
 
 class FavoritoToggleView(APIView):
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def post(self, request, receta_id):
         receta = Receta.objects.get(pk=receta_id)

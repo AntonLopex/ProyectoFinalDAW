@@ -96,7 +96,7 @@ class MyProfileView(APIView):
     Devuelve y actualiza el perfil del usuario logueado.
     URL: /usuarios/mi-perfil/
     """
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
@@ -120,7 +120,7 @@ class MyProfileView(APIView):
 
 
 class UpdatePasswordView(APIView):
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         user = get_logged_user(request)
@@ -151,7 +151,7 @@ class UpdatePasswordView(APIView):
 
 
 class MiPerfilView(APIView):
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         usuario = get_logged_user(request)

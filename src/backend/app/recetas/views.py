@@ -39,7 +39,7 @@ class RecetaAPIView(generics.ListCreateAPIView):
         .prefetch_related("categorias", "likes", "favoritos", "comentarios")
     )
     serializer_class = RecetaListSerializer
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -171,7 +171,7 @@ class CategoriaListView(generics.ListCreateAPIView):
     """
     queryset = Categoria.objects.all().order_by("nombre")
     serializer_class = CategoriaSerializer
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -209,7 +209,7 @@ class TopRecetasAPIView(generics.ListAPIView):
     Devuelve las 6 recetas con más likes.
     """
     serializer_class = RecetaListSerializer
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return (
@@ -226,7 +226,7 @@ class UserProfileView(generics.ListAPIView):
     URL: /recetas/perfil/<username>/
     """
     serializer_class = RecetaListSerializer
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         username = self.kwargs["username"]
@@ -265,7 +265,7 @@ class SearchUserView(APIView):
     Busca usuarios por nombre_usuario o nombre.
     URL: /recetas/buscar-usuario/?q=<query>
     """
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         query = self.request.query_params.get("q", "")
@@ -300,7 +300,7 @@ class CategoriaCreateView(generics.CreateAPIView):
     """
     queryset = Categoria.objects.all()
     serializer_class = CategoriaCreateSerializer
-    permission_classes = [IsAdminOrRegistrado]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
