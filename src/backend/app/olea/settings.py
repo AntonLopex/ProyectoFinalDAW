@@ -53,12 +53,16 @@ REST_FRAMEWORK = {
          "rest_framework.authentication.SessionAuthentication",
         ],
 }
-CSRF_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SAMESITE = "Lax"
+
+
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
 
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
