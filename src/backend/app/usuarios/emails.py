@@ -100,7 +100,7 @@ def send_welcome_email(user):
     """
 
     resend.Emails.send({
-        "from": "OLEA <onboarding@resend.dev>",
+        "from": "onboarding@resend.dev",
         "to": [user.email],
         "subject": "Bienvenido a OLEA 🍽️",
         "html": html_content,
