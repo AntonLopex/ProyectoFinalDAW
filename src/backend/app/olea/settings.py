@@ -164,10 +164,10 @@ USE_TZ = True
 #CONFIGURACION PARA ENVIO DE MAIL.
 
 EMAIL_BACKEND = 'resend.backends.EmailBackend'
-RESEND = {
-    "API_KEY": os.environ.get('RESEND_API_KEY'),
-}
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
 DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
+
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
