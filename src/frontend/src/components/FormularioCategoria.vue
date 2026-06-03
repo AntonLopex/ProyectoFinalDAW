@@ -146,7 +146,7 @@ const volverAlInicio = () => {
   border-radius: 8px;
   font-size: 1rem;
   color: var(--color-texto);
-  background: var(--fondo-crema);
+  background: #fff;
   width: 100%;
   box-sizing: border-box;
 }

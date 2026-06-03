@@ -40,7 +40,7 @@ class RecetaListSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     comentarios_count = serializers.SerializerMethodField()
 
-    # Comentarios asociados (solo los últimos 5)
+    # Comentarios asociados
     comentarios = serializers.SerializerMethodField()
 
     # Flags para el usuario actual (like y favorito)
@@ -190,7 +190,7 @@ class RecetaCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        # Extraer categoría (es un solo objeto, no lista)
+        # Extraer categoría 
         categoria_obj = validated_data.pop('categoria', None)
         
         # Parsear JSON string a Python list
@@ -222,7 +222,7 @@ class CategoriaCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         nombre = validated_data.get('nombre').strip()
         
-        # Verificar si ya existe
+        # Verifica si ya existe
         if Categoria.objects.filter(nombre__iexact=nombre).exists():
             raise serializers.ValidationError({
                 'nombre': 'Ya existe una categoría con este nombre'

@@ -39,7 +39,7 @@ class RecetaAPIView(generics.ListCreateAPIView):
         .prefetch_related("categorias", "likes", "favoritos", "comentarios")
     )
     serializer_class = RecetaListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -64,7 +64,7 @@ class RecetaDetailView(generics.RetrieveAPIView):
 
 # 3) Endpoint de like
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminOrRegistrado])
 def receta_like_view(request, receta_id):
     user = get_logged_user(request)
     if not user:
@@ -94,7 +94,7 @@ def receta_like_view(request, receta_id):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminOrRegistrado])
 def comentarios_receta_view(request, receta_id):
     """
     Todos los comentarios visibles de una receta.
@@ -113,7 +113,7 @@ def comentarios_receta_view(request, receta_id):
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminOrRegistrado])
 def crear_comentario_view(request):
     """
     Crear un comentario para una receta.
@@ -153,7 +153,7 @@ def crear_comentario_view(request):
 
 class ComentariosPorRecetaView(generics.ListCreateAPIView):
     serializer_class = ComentarioSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_queryset(self):
         receta_id = self.kwargs["receta_id"]
@@ -171,7 +171,7 @@ class CategoriaListView(generics.ListCreateAPIView):
     """
     queryset = Categoria.objects.all().order_by("nombre")
     serializer_class = CategoriaSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -184,7 +184,7 @@ class CategoriaListView(generics.ListCreateAPIView):
 
 class RecetasPorCategoriaAPIView(ListAPIView):
     serializer_class = RecetaListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_queryset(self):
         categoria_id = self.kwargs["categoria_id"]
@@ -209,7 +209,7 @@ class TopRecetasAPIView(generics.ListAPIView):
     Devuelve las 6 recetas con más likes.
     """
     serializer_class = RecetaListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_queryset(self):
         return (
@@ -226,7 +226,7 @@ class UserProfileView(generics.ListAPIView):
     URL: /recetas/perfil/<username>/
     """
     serializer_class = RecetaListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_queryset(self):
         username = self.kwargs["username"]
@@ -265,7 +265,7 @@ class SearchUserView(APIView):
     Busca usuarios por nombre_usuario o nombre.
     URL: /recetas/buscar-usuario/?q=<query>
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get(self, request):
         query = self.request.query_params.get("q", "")
@@ -300,7 +300,7 @@ class CategoriaCreateView(generics.CreateAPIView):
     """
     queryset = Categoria.objects.all()
     serializer_class = CategoriaCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -320,7 +320,7 @@ class RecetaCreateView(generics.CreateAPIView):
     """
     queryset = Receta.objects.all()
     serializer_class = RecetaCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrRegistrado]
 
     def get_serializer_context(self):
         return {

@@ -1,5 +1,4 @@
-from django.db.models import F  # <- Agregar esto
-from django.shortcuts import get_object_or_404
+from django.db.models import F
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -88,7 +87,7 @@ class UsuarioDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'pk'  # <- Agregar esto explícitamente
+    lookup_field = 'pk' 
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -128,7 +127,7 @@ class RecetaAdminListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Receta.objects.all().select_related("usuario").prefetch_related("categorias")
         
-        # Filtros opcionales
+        
         visible = self.request.query_params.get('visible')
         if visible is not None:
             queryset = queryset.filter(visible=visible.lower() == 'true')
@@ -150,7 +149,7 @@ class RecetaAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Receta.objects.all()
     serializer_class = RecetaAdminDetailSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'pk'  # <- Agregar esto explícitamente
+    lookup_field = 'pk' 
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -192,7 +191,7 @@ class ReporteAdminListView(generics.ListAPIView):
             "informador", "receta", "comentario"
         )
         
-        # Filtros opcionales
+       
         estado = self.request.query_params.get('estado')
         if estado:
             queryset = queryset.filter(estado=estado)
@@ -214,7 +213,7 @@ class ReporteDetailView(generics.RetrieveUpdateAPIView):
     queryset = Reporte.objects.all()
     serializer_class = ReporteAdminSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'pk'  # <- Agregar esto explícitamente
+    lookup_field = 'pk'
 
     def get(self, request, *args, **kwargs):
         if not check_admin_permission(request):

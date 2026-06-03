@@ -10,8 +10,10 @@
   <div v-else-if="recetas.length > 0" class="top-recetas-container">
     <div class="top-recetas-header">
       <i class="bi bi-trophy-fill top-recetas__icon"></i>
-      <h1 class="top-recetas__titulo">Top 6 Recetas más Liked</h1>
-      <p class="top-recetas__subtitle">Las recetas Favoritas de la comunidad</p>
+      <h1 class="top-recetas__titulo">Top 6 Recetas en tendencia!</h1>
+      <p class="top-recetas__subtitle">
+        Las recetas más populares de la comunidad
+      </p>
     </div>
 
     <div class="top-recetas__grid">
@@ -22,12 +24,12 @@
         :class="getRankClass(index)"
       >
         <div class="rank-badge" :class="getBadgeClass(index)">
-          <span class="rank-number">{{ index + 1 }}</span>
           <i
             v-if="index < 3"
             :class="getBadgeIcon(index)"
             class="rank-icon"
           ></i>
+          <span class="rank-number">{{ index + 1 }}</span>
         </div>
         <RecetaCard
           :receta="receta"
@@ -49,6 +51,7 @@
     <i class="bi bi-inbox fs-1"></i>
     <p class="mt-3">No hay recetas disponibles.</p>
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -59,6 +62,7 @@ import api from "../api/axios";
 
 import ComentariosModal from "../components/ComentariosModal.vue";
 import Navbar from "../components/NavBar.vue";
+import Footer from "../components/Footer.vue";
 import RecetaCard from "../components/RecetaCard.vue";
 
 const auth = useAuthStore();
@@ -166,6 +170,7 @@ onMounted(() => {
 
 <style scoped>
 .top-recetas-container {
+  margin-top: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
@@ -283,6 +288,7 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .top-recetas-container {
+    margin-top: 2rem;
     padding: 1rem;
   }
 

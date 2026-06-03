@@ -1,7 +1,6 @@
 from usuarios.models import Usuario
 
 def generate_username(nombre, apellidos):
-    # 1. Crear base tipo ALL
     parts = (nombre + " " + apellidos).split()
 
     base = "".join([p[0].upper() for p in parts if p])

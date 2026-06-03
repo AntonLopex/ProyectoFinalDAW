@@ -1,4 +1,3 @@
-# permissions.py
 from rest_framework import permissions
 from utils.utils import get_logged_user
 

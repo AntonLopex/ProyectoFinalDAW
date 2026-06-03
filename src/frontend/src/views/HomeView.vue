@@ -10,6 +10,7 @@ import RecetaCard from "../components/RecetaCard.vue";
 import CategoriasCarousel from "../components/CategoriasCarousel.vue";
 import UsuarioBuscador from "../components/UsuarioBuscador.vue";
 import ReporteModal from "../components/ReporteModal.vue";
+import Footer from "../components/Footer.vue";
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -154,6 +155,7 @@ const handleLike = async (recetaId) => {
       No hay recetas disponibles todavía.
     </div>
   </div>
+  <Footer />
 </template>
 
 <style>

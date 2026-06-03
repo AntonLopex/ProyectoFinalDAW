@@ -146,6 +146,7 @@
       @resolver="resolverReporte"
     />
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -158,6 +159,7 @@ import ListaReportes from "../components/admin/ListaReportes.vue";
 import ModalUsuario from "../components/admin/ModalUsuario.vue";
 import ModalResolverReporte from "../components/admin/ModalResolverReporte.vue";
 import NavBar from "../components/NavBar.vue";
+import Footer from "../components/Footer.vue";
 
 const router = useRouter();
 const mobileMenuOpen = ref(false);

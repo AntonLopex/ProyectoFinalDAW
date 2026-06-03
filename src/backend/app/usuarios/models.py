@@ -19,7 +19,6 @@ class Usuario(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
-    # Propiedades que DRF necesita para funcionar con modelos personalizados
     @property
     def is_authenticated(self):
         return True

@@ -142,7 +142,7 @@ class UpdatePasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Actualizar contraseña usando make_password (no set_password)
+        # Actualizar contraseña usando make_password
         user.password_hash = make_password(password_nueva)
         user.save()
 

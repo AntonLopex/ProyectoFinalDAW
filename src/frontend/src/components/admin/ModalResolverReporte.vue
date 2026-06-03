@@ -1,4 +1,3 @@
-<!-- components/admin/ModalResolverReporte.vue -->
 <template>
   <transition name="modal-fade">
     <div v-if="visible" class="modal-overlay" @click="cerrar">

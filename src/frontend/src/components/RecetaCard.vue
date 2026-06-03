@@ -298,8 +298,8 @@ const abrirReporte = () => {
 .receta-card__categoria-tag {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--color-olea);
-  background-color: var(--fondo-crema);
+  color: var(--fondo-crema);
+  background-color: var(--color-olea);
   border-radius: 9999px;
   padding: 0.25rem 0.75rem;
   border: 1px solid rgba(96, 108, 56, 0.2);

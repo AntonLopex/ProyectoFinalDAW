@@ -41,6 +41,7 @@
       </transition>
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -49,7 +50,7 @@ import { useRouter } from "vue-router";
 import Navbar from "../components/NavBar.vue";
 import FormularioReceta from "../components/FormularioReceta.vue";
 import FormularioCategoria from "../components/FormularioCategoria.vue";
-import api from "../api/axios";
+import Footer from "../components/Footer.vue";
 
 const router = useRouter();
 const modoSeleccionado = ref("receta");

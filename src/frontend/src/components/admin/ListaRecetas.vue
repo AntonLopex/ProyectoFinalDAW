@@ -1,7 +1,7 @@
 <template>
   <div class="tab-content">
     <div class="content-header">
-      <h2>🍳 Recetas</h2>
+      <h2>Recetas</h2>
       <select
         v-model="filtroLocal"
         class="form-control"

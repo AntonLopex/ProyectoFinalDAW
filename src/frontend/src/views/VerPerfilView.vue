@@ -1,4 +1,3 @@
-<!-- views/PerfilView.vue -->
 <template>
   <div class="perfil-page">
     <Navbar />
@@ -134,12 +133,14 @@
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "../api/axios";
 import Navbar from "../components/NavBar.vue";
+import Footer from "../components/Footer.vue";
 import RecetaCard from "../components/RecetaCard.vue";
 
 const loading = ref(true);

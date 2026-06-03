@@ -1,4 +1,3 @@
-<!-- components/admin/ModalUsuario.vue -->
 <template>
   <div v-if="visible" class="modal-overlay" @click="cerrar">
     <div class="modal-olea modal-lg" @click.stop>

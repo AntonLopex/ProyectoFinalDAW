@@ -9,7 +9,7 @@
       "nombre_usuario": "admin_chef",
       "email": "admin@recetasapp.com",
       "password_hash": "pbkdf2_sha256$720000$abc123$hashed_password_here",
-      "foto_perfil": null,
+      "foto_perfil": "perfiles/perfil.jpg",
       "biografia_y_enlaces": "Administrador de la plataforma. Amante de la cocina mediterránea.",
       "rol": "admin",
       "strikes_count": 0
@@ -25,7 +25,7 @@
       "nombre_usuario": "maricocinera",
       "email": "maria.fernandez@gmail.com",
       "password_hash": "pbkdf2_sha256$720000$def456$hashed_password_here",
-      "foto_perfil": null,
+      "foto_perfil": "perfiles/maria.jpg",
       "biografia_y_enlaces": "Apasionada de la repostería y la cocina italiana. Sigo a @pastrychef_es.",
       "rol": "registrado",
       "strikes_count": 0
@@ -41,7 +41,7 @@
       "nombre_usuario": "carloscocina",
       "email": "carlos.martinez@hotmail.com",
       "password_hash": "pbkdf2_sha256$720000$ghi789$hashed_password_here",
-      "foto_perfil": null,
+      "foto_perfil": "perfiles/carlos.jpg",
       "biografia_y_enlaces": "Chef aficionado. Especialista en arroces y paellas. Valencia ❤️",
       "rol": "registrado",
       "strikes_count": 1
@@ -57,7 +57,7 @@
       "nombre_usuario": "lucia_veggie",
       "email": "lucia.gomez@outlook.com",
       "password_hash": "pbkdf2_sha256$720000$jkl012$hashed_password_here",
-      "foto_perfil": null,
+      "foto_perfil": "perfiles/lucia.jpg",
       "biografia_y_enlaces": "Cocina vegana y vegetariana. Creo que comer sano puede ser delicioso.",
       "rol": "registrado",
       "strikes_count": 0
@@ -73,7 +73,7 @@
       "nombre_usuario": "javi_grill",
       "email": "javier.torres@yahoo.es",
       "password_hash": "pbkdf2_sha256$720000$mno345$hashed_password_here",
-      "foto_perfil": null,
+      "foto_perfil": "perfiles/javier.jpg",
       "biografia_y_enlaces": "Fanático de las brasas y la carne a la parrilla. #BBQLife",
       "rol": "registrado",
       "strikes_count": 0

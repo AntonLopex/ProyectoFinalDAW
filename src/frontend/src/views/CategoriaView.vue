@@ -30,6 +30,7 @@
       />
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -39,7 +40,7 @@ import { useRoute, useRouter } from "vue-router";
 import Navbar from "../components/NavBar.vue";
 import RecetaCard from "../components/RecetaCard.vue";
 import ComentariosModal from "../components/ComentariosModal.vue";
-
+import Footer from "../components/Footer.vue";
 import api from "../api/axios";
 
 const route = useRoute();

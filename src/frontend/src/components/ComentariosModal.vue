@@ -1,4 +1,3 @@
-<!-- components/ComentariosModal.vue -->
 <template>
   <Transition name="fade-up">
     <div v-if="open" class="comentarios-modal-backdrop" @click.self="close">
@@ -38,7 +37,7 @@
 
         <!-- Sección derecha: comentarios + formulario -->
         <div class="comentarios-modal__right">
-          <!-- Versión móvil: imagen + título + likes aquí -->
+          <!-- Versión móvil: imagen + título + likes -->
           <div class="comentarios-modal__mobile-header">
             <div class="comentarios-modal__img-container-mobile">
               <img

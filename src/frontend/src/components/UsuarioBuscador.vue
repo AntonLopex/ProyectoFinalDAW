@@ -103,7 +103,7 @@ const selectUser = (user) => {
   border-radius: 50px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  border: 2px solid transparent;
+  border: 1px solid var(--color-olea);
   transition:
     border-color 0.3s,
     box-shadow 0.3s;
@@ -116,9 +116,9 @@ const selectUser = (user) => {
 
 .input-icon {
   padding: 0.75rem 1rem;
-  color: #6c757d;
+  color: var(--fondo-crema);
   font-size: 1.2rem;
-  background: #f8f9fa;
+  background: var(--color-olea);
 }
 
 .form-control-pill {

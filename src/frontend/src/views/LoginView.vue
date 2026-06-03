@@ -136,126 +136,122 @@ async function handleRegister() {
           {{ error }}
         </div>
         <div class="auth-form-wrapper">
-          <Transition
-    name="fade-slide"
-    mode="out-in"
-  >
-          <!-- LOGIN -->
-          <div v-if="mode === 'login'" key="login">
-            <h2 class="auth-title">Bienvenido de nuevo</h2>
+          <Transition name="fade-slide" mode="out-in">
+            <!-- LOGIN -->
+            <div v-if="mode === 'login'" key="login">
+              <h2 class="auth-title">Bienvenido de nuevo</h2>
 
-            <div class="mb-3">
-              <label class="form-label"> Nombre de usuario </label>
+              <div class="mb-3">
+                <label class="form-label"> Nombre de usuario </label>
 
-              <input
-                v-model="loginForm.nombre_usuario"
-                type="text"
-                class="form-control"
-              />
-            </div>
-
-            <div class="mb-4">
-              <label class="form-label"> Contraseña </label>
-
-              <input
-                v-model="loginForm.password"
-                type="password"
-                class="form-control"
-              />
-            </div>
-
-            <button
-              class="btn btn-auth w-100"
-              :disabled="loading"
-              @click="handleLogin"
-            >
-              <span
-                v-if="loading"
-                class="spinner-border spinner-border-sm me-2"
-              ></span>
-
-              Iniciar sesión
-            </button>
-          </div>
-
-          <!-- REGISTER -->
-          <div v-else key="register">
-
-            <div class="mb-2">
-              <label class="form-label"> Nombre </label>
-
-              <input
-                v-model="registerForm.nombre"
-                type="text"
-                class="form-control"
-              />
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label"> Apellidos </label>
-
-              <input
-                v-model="registerForm.apellidos"
-                type="text"
-                class="form-control"
-              />
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label"> Email </label>
-
-              <input
-                v-model="registerForm.email"
-                type="email"
-                class="form-control"
-              />
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label"> Contraseña </label>
-
-              <input
-                v-model="registerForm.password"
-                type="password"
-                class="form-control"
-              />
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label"> Confirmar contraseña </label>
-
-              <input
-                v-model="registerForm.confirmPassword"
-                type="password"
-                class="form-control"
-                :class="{
-                  'is-valid': passwordsMatch,
-                  'is-invalid': passwordsDontMatch,
-                }"
-              />
-
-              <div v-if="passwordsDontMatch" class="invalid-feedback">
-                Las contraseñas no coinciden.
+                <input
+                  v-model="loginForm.nombre_usuario"
+                  type="text"
+                  class="form-control"
+                />
               </div>
 
-              <div v-if="passwordsMatch" class="valid-feedback">
-                Las contraseñas coinciden.
+              <div class="mb-4">
+                <label class="form-label"> Contraseña </label>
+
+                <input
+                  v-model="loginForm.password"
+                  type="password"
+                  class="form-control"
+                />
               </div>
+
+              <button
+                class="btn btn-auth w-100"
+                :disabled="loading"
+                @click="handleLogin"
+              >
+                <span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+
+                Iniciar sesión
+              </button>
             </div>
 
-            <button
-              class="btn btn-auth w-100"
-              :disabled="loading || passwordsDontMatch"
-              @click="handleRegister"
-            >
-              <span
-                v-if="loading"
-                class="spinner-border spinner-border-sm me-2"
-              ></span>
+            <!-- REGISTER -->
+            <div v-else key="register">
+              <div class="mb-2">
+                <label class="form-label"> Nombre </label>
 
-              Registrarse
-            </button>
-          </div>
+                <input
+                  v-model="registerForm.nombre"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label"> Apellidos </label>
+
+                <input
+                  v-model="registerForm.apellidos"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label"> Email </label>
+
+                <input
+                  v-model="registerForm.email"
+                  type="email"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label"> Contraseña </label>
+
+                <input
+                  v-model="registerForm.password"
+                  type="password"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label"> Confirmar contraseña </label>
+
+                <input
+                  v-model="registerForm.confirmPassword"
+                  type="password"
+                  class="form-control"
+                  :class="{
+                    'is-valid': passwordsMatch,
+                    'is-invalid': passwordsDontMatch,
+                  }"
+                />
+
+                <div v-if="passwordsDontMatch" class="invalid-feedback">
+                  Las contraseñas no coinciden.
+                </div>
+
+                <div v-if="passwordsMatch" class="valid-feedback">
+                  Las contraseñas coinciden.
+                </div>
+              </div>
+
+              <button
+                class="btn btn-auth w-100"
+                :disabled="loading || passwordsDontMatch"
+                @click="handleRegister"
+              >
+                <span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+
+                Registrarse
+              </button>
+            </div>
           </Transition>
         </div>
       </div>
@@ -284,14 +280,12 @@ async function handleRegister() {
 
   display: flex;
 
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
 }
 /* TRANSICION */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition:
-    all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 .fade-slide-enter-from {

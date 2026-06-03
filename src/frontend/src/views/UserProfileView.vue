@@ -17,7 +17,7 @@
         <div class="perfil-avatar">
           <img
             v-if="usuario.foto_perfil"
-            :src="usuario.foto_perfil"
+            :src="getFullImageUrl(usuario.foto_perfil)"
             :alt="usuario.nombre_usuario"
           />
           <span v-else>{{ usuario.nombre_usuario[0].toUpperCase() }}</span>
@@ -81,6 +81,7 @@
       :receta="comentariosModalReceta"
     />
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -91,6 +92,7 @@ import api from "../api/axios";
 
 import ComentariosModal from "../components/ComentariosModal.vue";
 import Navbar from "../components/NavBar.vue";
+import Footer from "../components/Footer.vue";
 import RecetaCard from "../components/RecetaCard.vue";
 import UsuarioBuscador from "../components/UsuarioBuscador.vue";
 
@@ -108,6 +110,13 @@ const comentariosModalReceta = ref(null);
 
 const totalRecetas = ref(0);
 const totalLikes = ref(0);
+
+const getFullImageUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  const baseUrl = "http://localhost:8000";
+  return baseUrl + path;
+};
 
 const fetchUserProfile = async (username) => {
   loading.value = true;

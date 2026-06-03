@@ -20,7 +20,7 @@ class BaseAdmin(admin.ModelAdmin):
             readonly.append("updated_at")
 
         return tuple(set(readonly))
-# 🧩 ADMIN MIXINS OPCIONALES
+# ADMIN MIXINS OPCIONALES
 
 class TimestampAdminMixin:
     """
@@ -37,7 +37,7 @@ class ActiveFilterAdminMixin:
     list_editable = ("activo",)
 
 
-# 🎨 ADMIN SITE PERSONALIZADO (OPCIONAL)
+#  ADMIN SITE PERSONALIZADO (OPCIONAL)
 class CustomAdminSite(admin.AdminSite):
     site_header = "Panel de Administración"
     site_title = "Sistema"

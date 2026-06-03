@@ -207,6 +207,7 @@
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -214,6 +215,7 @@ import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "../stores/auth";
 import api from "../api/axios";
 import Navbar from "../components/NavBar.vue";
+import Footer from "../components/Footer.vue";
 
 const auth = useAuthStore();
 

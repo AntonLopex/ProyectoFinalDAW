@@ -163,6 +163,7 @@
 
     <div v-else class="text-center text-muted py-5">Receta no encontrada.</div>
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -171,6 +172,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import api from "../api/axios";
 import Navbar from "../components/NavBar.vue";
+import Footer from "../components/Footer.vue";
 
 const route = useRoute();
 const router = useRouter();
