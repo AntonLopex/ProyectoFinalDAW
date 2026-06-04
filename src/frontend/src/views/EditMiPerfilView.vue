@@ -38,7 +38,7 @@ const getFullImageUrl = (path) => {
   // Detectar si estamos en producción o desarrollo
   const isProduction = window.location.hostname !== "localhost";
   const backendHost = isProduction
-    ? "https://tu-backend.railway.app" // Tu backend en producción
+    ? "https://backolea.up.railway.app" // Tu backend en producción
     : "http://localhost:8000";
 
   return backendHost + path;
