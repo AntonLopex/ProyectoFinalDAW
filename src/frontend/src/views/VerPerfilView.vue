@@ -211,10 +211,6 @@ const handleFavorite = async (receta) => {
   }
 };
 
-const openComments = (receta) => {
-  console.log("Abrir comentarios:", receta);
-};
-
 const getStrikeItemClass = (strikes) => {
   const strikesNum = parseInt(strikes) || 0;
 

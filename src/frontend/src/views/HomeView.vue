@@ -51,10 +51,9 @@ const recetas = ref([]);
 const loading = ref(true);
 
 async function fetchRecetas() {
-  console.log("Cargando recetas...");
   try {
     const { data } = await api.get("/recetas/recetas/");
-    console.log("Recetas cargadas:", data);
+
     recetas.value = data;
   } catch (error) {
     console.error("Error al cargar recetas:", error);

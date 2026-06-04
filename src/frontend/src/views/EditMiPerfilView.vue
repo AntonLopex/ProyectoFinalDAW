@@ -18,8 +18,8 @@
               <div class="card-body text-center">
                 <div class="mi-perfil-avatar-wrapper">
                   <img
-                    v-if="fotoActual"
-                    :src="fotoActual"
+                    v-if="usuario.foto_perfil || fotoPreview"
+                    :src="usuario.foto_perfil"
                     alt="Foto de perfil"
                     class="mi-perfil-avatar"
                   />
@@ -303,7 +303,6 @@ const guardarPerfil = async () => {
     dataEnviar.append("apellido1", formData.value.apellido1);
     dataEnviar.append("apellido2", formData.value.apellido2);
     dataEnviar.append("nombre_usuario", formData.value.nombre_usuario);
-    console.log("nombre_usuario a enviar:", formData.value.nombre_usuario);
     dataEnviar.append("email", formData.value.email);
     dataEnviar.append(
       "biografia_y_enlaces",

@@ -56,14 +56,12 @@ const router = useRouter();
 const modoSeleccionado = ref("receta");
 
 const manejarRecetaCreada = (receta) => {
-  console.log("Receta creada:", receta);
-  // Opcional: redirigir a la receta creada
+  // redirigir a la receta creada
   router.push(`/recetas/${receta.id}/`);
 };
-
 const manejarCategoriaCreada = (categoria) => {
-  console.log("Categoría creada:", categoria);
-  // Opcional: mostrar mensaje de éxito
+  // redirigir a la página de la categoría creada
+  router.push(`/`);
 };
 </script>
 

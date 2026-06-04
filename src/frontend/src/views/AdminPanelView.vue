@@ -235,30 +235,24 @@ const cargarReportes = async () => {
 };
 
 const abrirModalUsuario = (usuario = null) => {
-  console.log("Abriendo modal usuario:", usuario);
   usuarioEdicion.value = usuario;
   mostrarModalUsuario.value = true;
-  console.log("mostrarModalUsuario:", mostrarModalUsuario.value);
 };
 
 const guardarUsuario = async (formData) => {
-  console.log("Guardando usuario:", formData);
   try {
     if (usuarioEdicion.value) {
-      console.log("PATCH usuario:", usuarioEdicion.value.id);
       await api.patch(
         `/recetas/admin/usuarios/${usuarioEdicion.value.id}/`,
         formData,
       );
     } else {
-      console.log("POST usuario nuevo");
       await api.post("/recetas/admin/usuarios/", formData);
     }
     mostrarModalUsuario.value = false;
     usuarioEdicion.value = null;
     cargarUsuarios();
     cargarStats();
-    console.log("Usuario guardado exitosamente");
   } catch (error) {
     console.error("Error guardar:", error);
     alert("Error: " + JSON.stringify(error.response?.data));
@@ -300,14 +294,11 @@ const eliminarReceta = async (receta) => {
 };
 
 const abrirModalResolver = (reporte) => {
-  console.log("Abriendo modal resolver reporte:", reporte);
   reporteSeleccionado.value = reporte;
   mostrarModalResolver.value = true;
-  console.log("mostrarModalResolver:", mostrarModalResolver.value);
 };
 
 const resolverReporte = async ({ decision, motivo_strike }) => {
-  console.log("Resolviendo reporte:", decision, motivo_strike);
   try {
     await api.patch(
       `/recetas/admin/reportes/${reporteSeleccionado.value.id}/`,
@@ -331,16 +322,10 @@ const resolverReporte = async ({ decision, motivo_strike }) => {
 const cerrarSesion = () => router.push("/");
 
 onMounted(async () => {
-  console.log("AdminPanel mounted");
   await cargarStats();
   await cargarUsuarios();
   await cargarRecetas();
   await cargarReportes();
-  console.log("Datos cargados:", {
-    usuarios: usuarios.value.length,
-    recetas: recetas.value.length,
-    reportes: reportes.value.length,
-  });
 });
 </script>
 
