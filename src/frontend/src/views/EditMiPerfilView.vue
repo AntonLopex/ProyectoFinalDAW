@@ -171,10 +171,12 @@ onMounted(() => {
     <div class="container py-5">
       <h1 class="mi-perfil-titulo">Editar mi perfil</h1>
 
-      <div v-if="loading" class="text-center py-5">
-        <div class="spinner-border text-olea" role="status">
-          <span class="visually-hidden">Cargando perfil...</span>
+      <!-- Loader -->
+      <div v-if="loading" class="loader-wrapper">
+        <div class="olea-loader">
+          <img src="../../public/logo.png" alt="OLEA" class="loader-icon" />
         </div>
+        <p class="loader-text">Cargando perfil...</p>
       </div>
 
       <div v-else class="mi-perfil-container">
@@ -217,7 +219,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Resto del template igual... -->
           <div class="col-lg-8">
             <div class="card mi-perfil-card">
               <div class="card-header">
@@ -458,5 +459,44 @@ onMounted(() => {
 .btn-outline-olea:hover {
   background-color: var(--color-olea);
   color: white;
+}
+
+/* Loader */
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.olea-loader {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  animation: spin 1.5s linear infinite;
+}
+
+.loader-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-text {
+  font-size: 1.1rem;
+  color: var(--color-texto);
+  font-weight: 500;
+  margin: 0;
 }
 </style>

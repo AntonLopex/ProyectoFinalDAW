@@ -2,10 +2,12 @@
   <div class="perfil-page">
     <Navbar />
 
-    <div v-if="loading" class="text-center py-5 mt-5">
-      <div class="spinner-border text-olea" role="status">
-        <span class="visually-hidden">Cargando perfil...</span>
+    <!-- Loader -->
+    <div v-if="loading" class="loader-wrapper">
+      <div class="olea-loader">
+        <img src="../../public/logo.png" alt="OLEA" class="loader-icon" />
       </div>
+      <p class="loader-text">Cargando perfil...</p>
     </div>
 
     <div v-else-if="usuario" class="perfil-container">
@@ -114,8 +116,14 @@ const totalLikes = ref(0);
 const getFullImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  const baseUrl = "http://localhost:8000";
-  return baseUrl + path;
+
+  // Detectar si estamos en producción o desarrollo
+  const isProduction = window.location.hostname !== "localhost";
+  const backendHost = isProduction
+    ? "https://backolea.up.railway.app"
+    : "http://localhost:8000";
+
+  return backendHost + path;
 };
 
 const fetchUserProfile = async (username) => {
@@ -187,6 +195,45 @@ onMounted(() => {
   background-color: var(--fondo-crema);
   min-height: 100vh;
   padding-top: 80px;
+}
+
+/* Loader */
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.olea-loader {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  animation: spin 1.5s linear infinite;
+}
+
+.loader-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-text {
+  font-size: 1.1rem;
+  color: var(--color-texto);
+  font-weight: 500;
+  margin: 0;
 }
 
 .perfil-container {

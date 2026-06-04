@@ -1,4 +1,3 @@
-<!-- views/CrearView.vue -->
 <template>
   <div class="crear-page">
     <Navbar />
@@ -6,8 +5,16 @@
     <div class="crear-container">
       <h1 class="crear-titulo">Crear nuevo</h1>
 
+      <!-- Loader -->
+      <div v-if="loading" class="loader-wrapper">
+        <div class="olea-loader">
+          <img src="../../public/logo.png" alt="OLEA" class="loader-icon" />
+        </div>
+        <p class="loader-text">Cargando...</p>
+      </div>
+
       <!-- Botones de selección -->
-      <div class="crear-botones">
+      <div v-else class="crear-botones">
         <button
           class="crear-btn"
           :class="{ 'crear-btn-active': modoSeleccionado === 'receta' }"
@@ -29,13 +36,13 @@
       <!-- Formulario de Receta -->
       <transition name="fade" mode="out-in">
         <div
-          v-if="modoSeleccionado === 'receta'"
+          v-if="modoSeleccionado === 'receta' && !loading"
           key="receta"
           class="crear-formulario"
         >
           <FormularioReceta @receta-creada="manejarRecetaCreada" />
         </div>
-        <div v-else key="categoria" class="crear-formulario">
+        <div v-else-if="!loading" key="categoria" class="crear-formulario">
           <FormularioCategoria @categoria-creada="manejarCategoriaCreada" />
         </div>
       </transition>
@@ -45,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Navbar from "../components/NavBar.vue";
 import FormularioReceta from "../components/FormularioReceta.vue";
@@ -54,6 +61,7 @@ import Footer from "../components/Footer.vue";
 
 const router = useRouter();
 const modoSeleccionado = ref("receta");
+const loading = ref(true);
 
 const manejarRecetaCreada = (receta) => {
   // redirigir a la receta creada
@@ -63,6 +71,13 @@ const manejarCategoriaCreada = (categoria) => {
   // redirigir a la página de la categoría creada
   router.push(`/`);
 };
+
+onMounted(() => {
+  // Simular carga inicial (puedes eliminar esto si no necesitas carga asíncrona)
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+});
 </script>
 
 <style scoped>
@@ -129,6 +144,45 @@ const manejarCategoriaCreada = (categoria) => {
   border-radius: 14px;
   padding: 2rem;
   box-shadow: var(--shadow-soft);
+}
+
+/* Loader */
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.olea-loader {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  animation: spin 1.5s linear infinite;
+}
+
+.loader-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-text {
+  font-size: 1.1rem;
+  color: var(--color-texto);
+  font-weight: 500;
+  margin: 0;
 }
 
 /* Transición fade */

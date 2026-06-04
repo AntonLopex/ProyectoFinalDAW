@@ -13,122 +13,135 @@
         <p class="admin-subtitulo">Gestiona usuarios, recetas y reportes</p>
       </div>
 
-      <!-- Stats -->
-      <div class="admin-stats">
-        <div class="stat-card">
-          <div class="stat-icon bg-primary">
-            <i class="bi bi-people-fill"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ stats.total_usuarios }}</h3>
-            <p>Usuarios</p>
-          </div>
+      <!-- Loader -->
+      <div v-if="loading" class="loader-wrapper">
+        <div class="olea-loader">
+          <img src="../../public/logo.png" alt="OLEA" class="loader-icon" />
         </div>
-        <div class="stat-card">
-          <div class="stat-icon bg-success">
-            <i class="bi bi-journal-text"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ stats.total_recetas }}</h3>
-            <p>Recetas</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon bg-info"><i class="bi bi-eye-fill"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.recetas_visibles }}</h3>
-            <p>Visibles</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon bg-warning">
-            <i class="bi bi-eye-slash-fill"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ stats.recetas_ocultas }}</h3>
-            <p>Ocultas</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon bg-danger"><i class="bi bi-flag-fill"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.reportes_pendientes }}</h3>
-            <p>Reportes</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon bg-secondary">
-            <i class="bi bi-x-circle-fill"></i>
-          </div>
-          <div class="stat-info">
-            <h3>{{ stats.total_strikes }}</h3>
-            <p>Strikes</p>
-          </div>
-        </div>
+        <p class="loader-text">Cargando datos...</p>
       </div>
 
-      <!-- Tabs -->
-      <div class="admin-tabs">
-        <button
-          :class="['tab-btn', { active: tabActual === 'usuarios' }]"
-          @click="tabActual = 'usuarios'"
-        >
-          <i class="bi bi-people"></i> Usuarios
-        </button>
-        <button
-          :class="['tab-btn', { active: tabActual === 'recetas' }]"
-          @click="tabActual = 'recetas'"
-        >
-          <i class="bi bi-journal-text"></i> Recetas
-        </button>
-        <button
-          :class="['tab-btn', { active: tabActual === 'reportes' }]"
-          @click="tabActual = 'reportes'"
-        >
-          <i class="bi bi-flag"></i> Reportes<span
-            v-if="stats.reportes_pendientes > 0"
-            class="tab-badge"
-            >{{ stats.reportes_pendientes }}</span
+      <!-- Stats + Tabs + Contenido (cuando no está cargando) -->
+      <template v-else>
+        <!-- Stats -->
+        <div class="admin-stats">
+          <div class="stat-card">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.total_usuarios }}</h3>
+              <p>Usuarios</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-journal-text"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.total_recetas }}</h3>
+              <p>Recetas</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-info"><i class="bi bi-eye-fill"></i></div>
+            <div class="stat-info">
+              <h3>{{ stats.recetas_visibles }}</h3>
+              <p>Visibles</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-warning">
+              <i class="bi bi-eye-slash-fill"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.recetas_ocultas }}</h3>
+              <p>Ocultas</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-danger">
+              <i class="bi bi-flag-fill"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.reportes_pendientes }}</h3>
+              <p>Reportes</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-secondary">
+              <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.total_strikes }}</h3>
+              <p>Strikes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+          <button
+            :class="['tab-btn', { active: tabActual === 'usuarios' }]"
+            @click="tabActual = 'usuarios'"
           >
-        </button>
-      </div>
+            <i class="bi bi-people"></i> Usuarios
+          </button>
+          <button
+            :class="['tab-btn', { active: tabActual === 'recetas' }]"
+            @click="tabActual = 'recetas'"
+          >
+            <i class="bi bi-journal-text"></i> Recetas
+          </button>
+          <button
+            :class="['tab-btn', { active: tabActual === 'reportes' }]"
+            @click="tabActual = 'reportes'"
+          >
+            <i class="bi bi-flag"></i> Reportes<span
+              v-if="stats.reportes_pendientes > 0"
+              class="tab-badge"
+              >{{ stats.reportes_pendientes }}</span
+            >
+          </button>
+        </div>
 
-      <!-- Contenido -->
-      <div class="admin-content card">
-        <ListaUsuarios
-          v-if="tabActual === 'usuarios'"
-          :usuarios="usuarios"
-          :loading="loading"
-          @abrir-modal-usuario="abrirModalUsuario(null)"
-          @editar-usuario="abrirModalUsuario"
-          @eliminar-usuario="eliminarUsuario"
-        />
+        <!-- Contenido -->
+        <div class="admin-content card">
+          <ListaUsuarios
+            v-if="tabActual === 'usuarios'"
+            :usuarios="usuarios"
+            :loading="loading"
+            @abrir-modal-usuario="abrirModalUsuario(null)"
+            @editar-usuario="abrirModalUsuario"
+            @eliminar-usuario="eliminarUsuario"
+          />
 
-        <ListaRecetas
-          v-if="tabActual === 'recetas'"
-          :recetas="recetas"
-          :loading="loading"
-          :filtro-visible="filtroVisible"
-          @cambiar-filtro="
-            filtroVisible = $event;
-            cargarRecetas();
-          "
-          @toggle-visibilidad="toggleVisibilidad"
-          @eliminar-receta="eliminarReceta"
-        />
+          <ListaRecetas
+            v-if="tabActual === 'recetas'"
+            :recetas="recetas"
+            :loading="loading"
+            :filtro-visible="filtroVisible"
+            @cambiar-filtro="
+              filtroVisible = $event;
+              cargarRecetas();
+            "
+            @toggle-visibilidad="toggleVisibilidad"
+            @eliminar-receta="eliminarReceta"
+          />
 
-        <ListaReportes
-          v-if="tabActual === 'reportes'"
-          :reportes="reportes"
-          :loading="loading"
-          :filtro-estado="filtroEstado"
-          @cambiar-filtro="
-            filtroEstado = $event;
-            cargarReportes();
-          "
-          @resolver-reporte="abrirModalResolver"
-        />
-      </div>
+          <ListaReportes
+            v-if="tabActual === 'reportes'"
+            :reportes="reportes"
+            :loading="loading"
+            :filtro-estado="filtroEstado"
+            @cambiar-filtro="
+              filtroEstado = $event;
+              cargarReportes();
+            "
+            @resolver-reporte="abrirModalResolver"
+          />
+        </div>
+      </template>
     </div>
 
     <!-- Modales -->
@@ -368,6 +381,46 @@ onMounted(async () => {
   font-size: 1rem;
   margin: 0;
 }
+
+/* Loader */
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.olea-loader {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  animation: spin 1.5s linear infinite;
+}
+
+.loader-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-text {
+  font-size: 1.1rem;
+  color: var(--color-texto);
+  font-weight: 500;
+  margin: 0;
+}
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
