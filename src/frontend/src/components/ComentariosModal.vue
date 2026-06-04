@@ -529,9 +529,34 @@ const close = () => {
     flex-direction: column;
   }
 
-  /* Mostrar botón cerrar en móvil */
   .comentarios-modal__close-btn {
-    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 2px solid rgba(96, 108, 56, 0.3);
+    border-radius: 50%;
+    color: var(--color-olea);
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.25s ease;
+    margin: 0;
+    padding: 0;
+  }
+
+  .comentarios-modal__close-btn:hover {
+    background: rgba(96, 108, 56, 0.1);
+    border-color: var(--color-olea);
+  }
+
+  .comentarios-modal__close-btn i.bi {
+    font-size: 1.1rem;
   }
 
   .comentarios-modal__left {
@@ -551,7 +576,7 @@ const close = () => {
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
-    padding-top: 3rem;
+    padding-top: 1rem;
     flex-shrink: 0;
     border-bottom: 1px solid rgba(96, 108, 56, 0.1);
   }
