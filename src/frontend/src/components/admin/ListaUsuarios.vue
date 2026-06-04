@@ -3,9 +3,6 @@
   <div class="tab-content">
     <div class="content-header">
       <h2>👥 Usuarios</h2>
-      <button class="btn btn-olea" @click="$emit('abrir-modal-usuario')">
-        <i class="bi bi-plus-lg"></i> Nuevo
-      </button>
     </div>
 
     <div v-if="loading" class="loading-state">
