@@ -186,6 +186,7 @@ onMounted(() => {
   justify-content: center;
   padding: 4rem 1rem;
   text-align: center;
+  margin-top: 4rem;
 }
 
 .olea-loader {
