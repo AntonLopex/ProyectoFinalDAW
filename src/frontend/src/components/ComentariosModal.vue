@@ -261,11 +261,10 @@ const close = () => {
   position: absolute;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);
   display: none;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
   margin-top: 0.75rem;
   background: var(--fondo-olea);
   border: 1px solid var(--color-olea);
