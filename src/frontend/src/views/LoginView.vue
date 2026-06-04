@@ -423,6 +423,7 @@ function closeModal() {
 .modal-header h3 {
   font-family: var(--fuente-titulos);
   font-size: 1.4rem;
+  color: white;
   margin: 0;
   font-weight: 700;
 }
