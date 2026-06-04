@@ -2,6 +2,16 @@
   <Transition name="fade-up">
     <div v-if="open" class="comentarios-modal-backdrop" @click.self="close">
       <div class="comentarios-modal comentarios-modal--large">
+        <!-- Botón cerrar (solo móvil) -->
+        <button
+          v-if="isMobile"
+          class="comentarios-modal__close-btn"
+          @click="close"
+          aria-label="Cerrar"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+
         <!-- Sección izquierda: imagen + título + likes (solo escritorio) -->
         <div class="comentarios-modal__left">
           <div class="comentarios-modal__img-container">
@@ -140,7 +150,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useAuthStore } from "../stores/auth";
 import api from "../api/axios";
 
@@ -150,6 +160,11 @@ const open = defineModel("open", { type: Boolean, default: false });
 const props = defineProps({
   recetaId: { type: Number, required: false },
   receta: { type: Object, required: true },
+});
+
+// Detectar si es móvil
+const isMobile = computed(() => {
+  return window.innerWidth <= 768;
 });
 
 const comentarios = ref([]);
@@ -238,6 +253,37 @@ const close = () => {
   max-height: 90vh;
   display: flex;
   overflow: hidden;
+  position: relative;
+}
+
+/* Botón cerrar (solo móvil) */
+.comentarios-modal__close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-olea);
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.comentarios-modal__close-btn:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.comentarios-modal__close-btn i.bi {
+  font-size: 1.3rem;
 }
 
 /* ============================= */
@@ -421,6 +467,7 @@ const close = () => {
   cursor: not-allowed;
 }
 
+/* Animación para escritorio (no cambia) */
 .fade-up-enter-active,
 .fade-up-leave-active {
   transition:
@@ -451,6 +498,11 @@ const close = () => {
     flex-direction: column;
   }
 
+  /* Mostrar botón cerrar en móvil */
+  .comentarios-modal__close-btn {
+    display: flex;
+  }
+
   .comentarios-modal__left {
     display: none;
   }
@@ -468,6 +520,7 @@ const close = () => {
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
+    padding-top: 3.5rem; /* Espacio para el botón cerrar */
     flex-shrink: 0;
     border-bottom: 1px solid rgba(96, 108, 56, 0.1);
   }
@@ -525,14 +578,18 @@ const close = () => {
     padding: 0.75rem;
   }
 
+  /* Animación específica para móvil: de abajo a arriba (entrar) y arriba a abajo (salir) */
   .fade-up-enter-active,
   .fade-up-leave-active {
     transition: transform 0.3s ease;
   }
 
-  .fade-up-enter-from,
-  .fade-up-leave-to {
+  .fade-up-enter-from {
     transform: translateY(100%);
+  }
+
+  .fade-up-leave-to {
+    transform: translateY(-100%);
   }
 }
 
