@@ -264,7 +264,7 @@ const close = () => {
   display: none;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   margin-top: 0.75rem;
   background: var(--fondo-olea);
   border: 1px solid var(--color-olea);
@@ -283,10 +283,6 @@ const close = () => {
 
 .comentarios-modal__close-btn i.bi {
   font-size: 1rem;
-}
-
-.comentarios-modal__close-btn:hover i.bi {
-  transform: rotate(180deg);
 }
 
 /* ============================= */
