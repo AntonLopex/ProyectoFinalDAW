@@ -1,5 +1,5 @@
 <template>
-  <Transition name="fade-up">
+  <Transition name="slide-up">
     <div v-if="open" class="comentarios-modal-backdrop" @click.self="close">
       <div class="comentarios-modal comentarios-modal--large">
         <!-- Botón cerrar (solo móvil) -->
@@ -9,7 +9,8 @@
           @click="close"
           aria-label="Cerrar"
         >
-          <i class="bi bi-x-lg"></i>
+          <span>Cerrar</span>
+          <i class="bi bi-chevron-down"></i>
         </button>
 
         <!-- Sección izquierda: imagen + título + likes (solo escritorio) -->
@@ -259,31 +260,38 @@ const close = () => {
 /* Botón cerrar (solo móvil) */
 .comentarios-modal__close-btn {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--color-olea);
-  border-radius: 50%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: none;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 9999px;
+  color: var(--color-olea);
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   z-index: 10;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .comentarios-modal__close-btn:hover {
   background: white;
-  transform: scale(1.1);
+  transform: translateX(-50%) translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .comentarios-modal__close-btn i.bi {
-  font-size: 1.3rem;
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.comentarios-modal__close-btn:hover i.bi {
+  transform: rotate(180deg);
 }
 
 /* ============================= */
@@ -468,15 +476,15 @@ const close = () => {
 }
 
 /* Animación para escritorio (no cambia) */
-.fade-up-enter-active,
-.fade-up-leave-active {
+.slide-up-enter-active,
+.slide-up-leave-active {
   transition:
     opacity 0.3s ease,
     transform 0.3s ease;
 }
 
-.fade-up-enter-from,
-.fade-up-leave-to {
+.slide-up-enter-from,
+.slide-up-leave-to {
   opacity: 0;
   transform: translateY(100%);
 }
@@ -520,7 +528,7 @@ const close = () => {
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
-    padding-top: 3.5rem; /* Espacio para el botón cerrar */
+    padding-top: 4.5rem; /* Espacio para el botón cerrar centrado */
     flex-shrink: 0;
     border-bottom: 1px solid rgba(96, 108, 56, 0.1);
   }
@@ -578,18 +586,22 @@ const close = () => {
     padding: 0.75rem;
   }
 
-  /* Animación específica para móvil: de abajo a arriba (entrar) y arriba a abajo (salir) */
-  .fade-up-enter-active,
-  .fade-up-leave-active {
-    transition: transform 0.3s ease;
+  /* Animación específica para móvil: slide con opacity */
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    transition:
+      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.3s ease;
   }
 
-  .fade-up-enter-from {
+  .slide-up-enter-from {
     transform: translateY(100%);
+    opacity: 0;
   }
 
-  .fade-up-leave-to {
-    transform: translateY(-100%);
+  .slide-up-leave-to {
+    transform: translateY(100%);
+    opacity: 0;
   }
 }
 
