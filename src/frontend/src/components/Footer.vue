@@ -4,8 +4,7 @@
       <div class="footer-top">
         <div class="footer-brand">
           <div class="footer-logo">
-            <span class="logo-icon">🍃</span>
-            <span class="logo-text">Olea</span>
+            <img src="/logo.png" alt="logo" width="200px" height="auto" />
           </div>
           <p class="footer-description">
             Tu plataforma de recetas saludables. Cocina con sabor, cocina con

@@ -178,7 +178,7 @@ onMounted(() => {
 
 .top-recetas-header {
   text-align: center;
-  margin: 3rem;
+  margin: 4rem;
 }
 
 .top-recetas__icon {

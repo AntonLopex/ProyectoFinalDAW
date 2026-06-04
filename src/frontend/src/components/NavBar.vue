@@ -3,8 +3,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link to="/" class="navbar-brand">
-        <span class="logo-icon">🍃</span>
-        Olea
+        <img src="/logo.png" alt="Olea" class="logo-icon" />
       </router-link>
 
       <!-- Botón hamburguesa -->
@@ -19,6 +18,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <!-- Menú -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mx-auto">
@@ -45,6 +45,7 @@
             </router-link>
           </li>
         </ul>
+
         <!-- Usuario -->
         <div
           v-if="auth.isLoggedIn && auth.usuario.nombre_usuario"
@@ -208,7 +209,7 @@ onMounted(() => {
     var(--color-olea) 0%,
     #5a6b35 100%
   ) !important;
-  padding: 0.75rem 0;
+  padding: 0.625rem 0 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
@@ -221,10 +222,23 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0;
+  margin: 0;
 }
 
 .logo-icon {
-  font-size: 1.75rem;
+  height: 70px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .nav-link {
@@ -253,14 +267,6 @@ onMounted(() => {
   color: white !important;
   background: rgba(255, 255, 255, 0.2);
   font-weight: 600;
-}
-
-.navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 /* Usuario */

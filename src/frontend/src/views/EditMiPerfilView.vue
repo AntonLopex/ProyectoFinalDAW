@@ -303,6 +303,7 @@ const guardarPerfil = async () => {
     dataEnviar.append("apellido1", formData.value.apellido1);
     dataEnviar.append("apellido2", formData.value.apellido2);
     dataEnviar.append("nombre_usuario", formData.value.nombre_usuario);
+    console.log("nombre_usuario a enviar:", formData.value.nombre_usuario);
     dataEnviar.append("email", formData.value.email);
     dataEnviar.append(
       "biografia_y_enlaces",

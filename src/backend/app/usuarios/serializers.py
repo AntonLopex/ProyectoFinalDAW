@@ -81,7 +81,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "rol",
             "full_name",
         ]
-        read_only_fields = ["id", "nombre_usuario", "rol"]
+        read_only_fields = ["id", "rol"]
     
     def get_full_name(self, obj):
         return f"{obj.nombre} {obj.apellido1} {obj.apellido2}".strip() or obj.nombre_usuario
