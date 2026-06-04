@@ -33,9 +33,7 @@
                 <div class="mt-3">
                   <label for="foto-perfil" class="btn btn-outline-olea btn-sm">
                     <i class="bi bi-camera"></i>
-                    {{
-                      fotoActual || fotoPreview ? "Cambiar foto" : "Subir foto"
-                    }}
+                    {{ fotoPreview ? "Cambiar foto" : "Subir foto" }}
                   </label>
                   <input
                     id="foto-perfil"
@@ -242,15 +240,6 @@ const contrasena = ref({
   password_confirmar: "",
 });
 
-const fotoActual = computed(() => {
-  if (fotoPreview.value) return fotoPreview.value;
-  if (formData.value.foto_perfil) {
-    const backendHost = "http://localhost:8000";
-    return backendHost + formData.value.foto_perfil;
-  }
-  return null;
-});
-
 const cargarDatos = async () => {
   loading.value = true;
   try {
@@ -261,7 +250,7 @@ const cargarDatos = async () => {
       apellido2: data.apellido2 || "",
       nombre_usuario: data.nombre_usuario || "",
       email: data.email || "",
-      foto_perfil: data.foto_perfil || null,
+      foto_perfil: data.foto_perfil || "",
       biografia_y_enlaces: data.biografia_y_enlaces || "",
     };
   } catch (error) {
