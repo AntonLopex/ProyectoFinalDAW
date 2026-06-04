@@ -266,8 +266,9 @@ const close = () => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
+  margin-top: 0.75rem;
+  background: var(--fondo-olea);
+  border: 1px solid var(--color-olea);
   border-radius: 9999px;
   color: var(--color-olea);
   font-weight: 600;
@@ -278,8 +279,6 @@ const close = () => {
 }
 
 .comentarios-modal__close-btn:hover {
-  background: white;
-  transform: translateX(-50%) translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
