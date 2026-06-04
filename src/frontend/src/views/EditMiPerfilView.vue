@@ -18,8 +18,8 @@
               <div class="card-body text-center">
                 <div class="mi-perfil-avatar-wrapper">
                   <img
-                    v-if="usuario.foto_perfil || fotoPreview"
-                    :src="usuario.foto_perfil"
+                    v-if="formData.foto_perfil || fotoPreview"
+                    :src="formData.foto_perfil"
                     alt="Foto de perfil"
                     class="mi-perfil-avatar"
                   />
@@ -232,7 +232,7 @@ const formData = ref({
   apellido2: "",
   nombre_usuario: "",
   email: "",
-  foto_perfil: null,
+  foto_perfil: "",
   biografia_y_enlaces: "",
 });
 
