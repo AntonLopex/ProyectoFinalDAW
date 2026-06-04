@@ -41,15 +41,6 @@ const passwordsDontMatch = computed(() => {
   );
 });
 
-function generateUsername(nombre, apellidos) {
-  const initNombre = nombre.charAt(0).toUpperCase();
-  const initApellidos = apellidos
-    .split(" ")
-    .map((a) => a.charAt(0).toUpperCase())
-    .join("");
-  return `${initNombre}${initApellidos}`;
-}
-
 async function handleLogin() {
   error.value = "";
   loading.value = true;
@@ -76,18 +67,16 @@ async function handleRegister() {
   loading.value = true;
 
   try {
-    await auth.register({
+    const response = await auth.register({
       nombre: registerForm.value.nombre,
       apellidos: registerForm.value.apellidos,
       email: registerForm.value.email,
       password: registerForm.value.password,
     });
 
-    // Generar nombre de usuario
-    generatedUsername.value = generateUsername(
-      registerForm.value.nombre,
-      registerForm.value.apellidos,
-    );
+    // Obtener el nombre de usuario de la respuesta del backend
+    generatedUsername.value =
+      response.data?.nombre_usuario || response.nombre_usuario;
 
     // Mostrar modal y cambiar a login
     showSuccessModal.value = true;
