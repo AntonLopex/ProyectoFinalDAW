@@ -220,32 +220,7 @@ const enviarComentario = async () => {
   }
 };
 
-const handleLike = async () => {
-  if (!props.recetaId) return;
-
-  const eraLike = !!receta.value.usuario_like;
-
-  // Optimista: actualiza UI antes de la llamada
-  receta.value.usuario_like = !eraLike;
-  receta.value.likes_count = eraLike
-    ? Math.max((receta.value.likes_count || 0) - 1, 0)
-    : (receta.value.likes_count || 0) + 1;
-
-  try {
-    if (eraLike) {
-      await api.delete(`/recetas/likes/${props.recetaId}/`);
-    } else {
-      await api.post(`/recetas/likes/${props.recetaId}/`);
-    }
-  } catch (error) {
-    // Revertir si falla
-    receta.value.usuario_like = eraLike;
-    receta.value.likes_count = eraLike
-      ? (receta.value.likes_count || 0) + 1
-      : Math.max((receta.value.likes_count || 0) - 1, 0);
-    console.error("[ComentariosModal] Error al actualizar like:", error);
-  }
-};
+const handleLike = () => {};
 
 const close = () => {
   open.value = false;
@@ -284,33 +259,32 @@ const close = () => {
 /* Botón cerrar (solo móvil) */
 .comentarios-modal__close-btn {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 36px;
-  height: 36px;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: none;
   align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 2px solid rgba(96, 108, 56, 0.3);
-  border-radius: 50%;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 9999px;
   color: var(--color-olea);
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   z-index: 10;
-  transition: all 0.25s ease;
-  margin: 0;
-  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .comentarios-modal__close-btn:hover {
-  background: rgba(96, 108, 56, 0.1);
-  border-color: var(--color-olea);
-  transform: scale(1.05);
+  background: white;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .comentarios-modal__close-btn i.bi {
-  font-size: 1.1rem;
-  transition: transform 0.3s ease;
+  font-size: 1rem;
 }
 
 .comentarios-modal__close-btn:hover i.bi {
@@ -551,7 +525,7 @@ const close = () => {
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
-    padding-top: 3rem;
+    padding-top: 4.5rem; /* Espacio para el botón cerrar centrado */
     flex-shrink: 0;
     border-bottom: 1px solid rgba(96, 108, 56, 0.1);
   }
