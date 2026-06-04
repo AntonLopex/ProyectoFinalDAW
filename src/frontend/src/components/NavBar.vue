@@ -168,8 +168,14 @@ async function logout() {
 const getFullImageUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  const baseUrl = "http://localhost:8000";
-  return baseUrl + path;
+
+  // Detectar si estamos en producción o desarrollo
+  const isProduction = window.location.hostname !== "localhost";
+  const backendHost = isProduction
+    ? "https://backolea.up.railway.app"
+    : "http://localhost:8000";
+
+  return backendHost + path;
 };
 
 function closeMobileMenu() {
