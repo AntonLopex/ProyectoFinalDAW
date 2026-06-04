@@ -78,6 +78,8 @@ async function handleRegister() {
     generatedUsername.value =
       response.data?.nombre_usuario || response.nombre_usuario;
 
+    console.log("Nombre de usuario generado:", generatedUsername.value);
+
     // Mostrar modal y cambiar a login
     showSuccessModal.value = true;
     mode.value = "login";
