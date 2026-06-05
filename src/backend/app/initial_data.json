@@ -180,7 +180,7 @@
       "raciones": "4",
       "tiempo_de_elaboracion": "00:35:00",
       "dificultad": "media",
-      "imagen": "recetas/tortilla.jpg",
+      "imagen": "recetas/tortilla.png",
       "visible": true
     }
   },
@@ -241,7 +241,7 @@
       "raciones": "6",
       "tiempo_de_elaboracion": "01:00:00",
       "dificultad": "dificil",
-      "imagen": "recetas/paella-valenciana-tradicional.jpg",
+      "imagen": "recetas/paella.png",
       "visible": true
     }
   },
@@ -292,7 +292,7 @@
       "raciones": "4",
       "tiempo_de_elaboracion": "00:15:00",
       "dificultad": "facil",
-      "imagen": "recetas/hummus.jpg",
+      "imagen": "recetas/hummus.png",
       "visible": true
     }
   },
@@ -337,7 +337,7 @@
       "raciones": "4",
       "tiempo_de_elaboracion": "03:00:00",
       "dificultad": "media",
-      "imagen": "recetas/costillas.jpg",
+      "imagen": "recetas/costillas.png",
       "visible": true
     }
   },
@@ -391,7 +391,7 @@
       "raciones": "8",
       "tiempo_de_elaboracion": "01:30:00",
       "dificultad": "media",
-      "imagen": "recetas/tartaQueso.jpg",
+      "imagen": "recetas/tartaQueso.png",
       "visible": true
     }
   },
@@ -442,7 +442,7 @@
       "raciones": "4",
       "tiempo_de_elaboracion": "00:40:00",
       "dificultad": "facil",
-      "imagen": "recetas/crema.jpg",
+      "imagen": "recetas/crema.png",
       "visible": true
     }
   },

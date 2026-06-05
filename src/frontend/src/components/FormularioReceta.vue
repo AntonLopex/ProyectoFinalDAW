@@ -1,6 +1,6 @@
 <!-- components/FormularioReceta.vue -->
 <template>
-  <form @submit.prevent="enviarFormulario" class="formulario-receta">
+  <form @submit.prevent="confirmarEnvio" class="formulario-receta">
     <h2 class="formulario-titulo">Nueva Receta</h2>
 
     <!-- Título -->
@@ -209,6 +209,25 @@
         Enviando...
       </span>
     </button>
+
+    <!-- Modal de Cesión de Derechos -->
+    <div v-if="mostrarModal" class="modal-overlay">
+      <div class="modal-contenedor">
+        <h3 class="modal-titulo">Términos y condiciones</h3>
+        <p class="modal-mensaje">
+          Al guardar la receta, cede los derechos de imágenes a <strong>OLEA</strong>, y será almacenada en nuestros servidores.
+        </p>
+        <div class="modal-acciones">
+          <button type="button" class="btn-modal btn-cancelar" @click="mostrarModal = false">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal btn-aceptar" @click="aceptarYEnviar" :disabled="enviando">
+            <span v-if="!enviando">Aceptar</span>
+            <span v-else>Guardando...</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </form>
 </template>
 
@@ -221,6 +240,7 @@ const router = useRouter();
 const emit = defineEmits(["receta-creada"]);
 
 const enviando = ref(false);
+const mostrarModal = ref(false); // Controla el estado de visibilidad del modal
 const categorias = ref([]);
 const mostrarOpciones = ref(false);
 const busquedaCategoria = ref("");
@@ -357,13 +377,19 @@ const eliminarPaso = (index) => {
   }
 };
 
-const enviarFormulario = async () => {
+// Primer paso: Intercepta el submit del formulario y abre el modal si es válido
+const confirmarEnvio = () => {
   if (!EsValidoFormulario.value) {
     alert("Por favor completa todos los campos requeridos");
     return;
   }
+  mostrarModal.value = true;
+};
 
+// Segundo paso: Si acepta las condiciones en el modal, se envían los datos a la API
+const aceptarYEnviar = async () => {
   enviando.value = true;
+  mostrarModal.value = false; // Cierra el modal al proceder
 
   try {
     const datosFormulario = new FormData();
@@ -664,6 +690,91 @@ onMounted(() => {
   border-width: 0.15em;
 }
 
+/* --- ESTILOS DEL MODAL --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-contenedor {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  max-width: 450px;
+  width: 90%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-titulo {
+  margin-top: 0;
+  color: var(--color-olea, #333);
+  font-family: var(--fuente-titulos);
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.modal-mensaje {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-texto, #555);
+  margin-bottom: 1.5rem;
+}
+
+.modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-modal {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+  transition: opacity 0.2s;
+}
+
+.btn-modal:hover {
+  opacity: 0.9;
+}
+
+.btn-modal:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-cancelar {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-aceptar {
+  background-color: var(--color-olea, #606c38);
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive móvil */
 @media (max-width: 768px) {
   .formulario-titulo {
@@ -729,6 +840,10 @@ onMounted(() => {
   .btn-submit {
     font-size: 1rem;
     padding: 0.85rem;
+  }
+
+  .modal-contenedor {
+    padding: 1.5rem;
   }
 }
 </style>
