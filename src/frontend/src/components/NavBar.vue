@@ -41,7 +41,7 @@
           <li class="nav-item">
             <router-link to="/crear" class="nav-link" active-class="active">
               <i class="bi bi-plus-circle"></i>
-              Añadir receta
+              Añadir contenido
             </router-link>
           </li>
         </ul>

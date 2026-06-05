@@ -63,14 +63,8 @@ const router = useRouter();
 const modoSeleccionado = ref("receta");
 const loading = ref(true);
 
-const manejarRecetaCreada = (receta) => {
-  // redirigir a la receta creada
-  router.push(`/recetas/${receta.id}/`);
-};
-const manejarCategoriaCreada = (categoria) => {
-  // redirigir a la página de la categoría creada
-  router.push(`/`);
-};
+
+
 
 onMounted(() => {
   // Simular carga inicial (puedes eliminar esto si no necesitas carga asíncrona)
